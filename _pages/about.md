@@ -1,11 +1,9 @@
 ---
 layout: page
-title: About Me
+title: About Us
 permalink: /about/
 ---
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
+안녕하세요.
 
-
-
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
+소개글을 적는 곳입니다.
