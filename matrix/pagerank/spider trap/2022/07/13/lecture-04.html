@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 4 - Graph as Matrix | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 4 - Graph as Matrix" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224w - lecture 04" />
+<meta property="og:description" content="CS224w - lecture 04" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-04.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-04.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-13T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 4 - Graph as Matrix" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-13T00:00:00-05:00","datePublished":"2022-07-13T00:00:00-05:00","description":"CS224w - lecture 04","headline":"Lecture 4 - Graph as Matrix","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-04.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-04.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Us</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 4 - Graph as Matrix</h1><p class="page-description">CS224w - lecture 04</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-13T00:00:00-05:00" itemprop="datePublished">
+        Jul 13, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      7 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#spider trap">spider trap</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#lecture4-graph-as-matrix">Lecture4. Graph as Matrix</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#lecture-41---pagerank">**Lecture 4.1 - PageRank**</a></li>
+<li class="toc-entry toc-h2"><a href="#lecture-42---pagerank-how-to-solve">**Lecture 4.2 - PageRank: How to Solve?**</a></li>
+<li class="toc-entry toc-h2"><a href="#lecture-43---random-walk-with-restarts">**Lecture 4.3 - Random Walk with Restarts**</a></li>
+<li class="toc-entry toc-h2"><a href="#lecture-44---matrix-factorization-and-node-embeddings">**Lecture 4.4 - Matrix Factorization and Node Embeddings**</a></li>
+</ul>
+</li>
+</ul><h1 id="lecture4-graph-as-matrix">
+<a class="anchor" href="#lecture4-graph-as-matrix" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lecture4. Graph as Matrix</h1>
+
+<p>4강에서는 Graph를 <strong>매트릭스(선형대수) 관점</strong>으로 바라보는 것에 대해 이야기 합니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled.png" alt="Untitled"></p>
+
+<p>다음 3가지 키워드, 
+<strong>Random walk(Node Importance), Matrix Factorization, Node embedding</strong>를 중심으로 공부합니다.</p>
+
+<hr>
+
+<h2 id="lecture-41---pagerank">
+<a class="anchor" href="#lecture-41---pagerank" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 4.1 - PageRank</strong>**</h2>
+
+<p><strong>The Web as a Directed Graph</strong></p>
+
+<p>웹을 거시적인 관점으로 보게되면, 
+<strong>하나의 웹 페이지 → Node</strong>로 
+<strong>하이퍼링크 → Edge</strong>로 생각하여 하나의 거대한 <strong>Graph</strong>로 볼 수 있습니다.</p>
+
+<blockquote>
+  <p><strong><em>Side issue</em></strong></p>
+  <ul>
+    <li>다이나믹하게 새로 페이지들이 생길 수 있습니다.</li>
+    <li>다크웹과 같은 접근할 수 없는 페이지들도 있을 수 있습니다.</li>
+  </ul>
+
+</blockquote>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%201.png" alt="Untitled"></p>
+
+<p>잠시 Side issue는 내려놓고, 새로 페이지들이 생기지도 않고 기존의 페이지들이 사라지지도 않는 <strong>Static pages</strong> 상황을 가정해봅시다. 아래의 그림에서처럼 페이지들은 하이퍼링크들로 서로 연결되어 있고, 유저는 페이지들에 달려있는 <strong>하이퍼 링크들</strong>로 이루어진 연결망을 기반으로 항해하듯이 <strong>Navigational</strong> 하게 page to page 이동을 하게 됩니다. 
+(오늘날에는 post, comment, like 등의 기반의 transactional한 웹에서의 상호작용이 일어나지만 이는 우선 논외로 하겠습니다.)</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%202.png" alt="Untitled"></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%203.png" alt="Untitled"></p>
+
+<p>위의 그림처럼 웹 그래프는 방향성이 있는 <strong>유향 그래프(Directed graph)</strong>임을 알 수 있습니다. 위키피디아와 같은 웹 사전 페이지들 간의 관계성이나 논문의 인용 관계 그래프 등에서 예시를 쉽게 찾아볼 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%204.png" alt="Untitled"></p>
+
+<p><strong>Ranking Nodes on the Graph</strong></p>
+
+<p>웹을 하나의 거대한 유향 그래프로 생각할 때 한가지 <strong>중요한 insight</strong>가 있습니다.</p>
+
+<aside>
+💡 **모든** 웹 페이지들이 **똑같이 중요하지는 않다**
+
+</aside>
+
+<p>바로 각 페이지의 중요성이 똑같지 않다는 이야기는 그래프에서 <strong>각 노드의 중요성(importance)가 다르다</strong>는 말로 바꿔 생각할 수 있습니다. 아래 사진을 보면 직관적으로 파란색 노드가 빨간색 노드보다 더 중요할 것 같다라고 생각할 수 있습니다. <em>왜 그렇게 보일까요?</em> 아직 노드의 중요성에 대해 정의하지 않았지만 그래프에서 각 노드를 중심으로 뻗어있는 edge(link)의 수가 한눈에 비교되기 때문에 직관적으로 파악할 수 있는 것입니다. 이처럼 웹 그래프의 <strong>link structure</strong>를 가지고 우리는 각 페이지들(node)의 <strong>ranking</strong>을 매길 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%205.png" alt="Untitled"></p>
+
+<p><strong>Link Analysis Algorithms</strong></p>
+
+<p><strong>각 페이지들의 중요성(importance)</strong>를 파악하기 위해 <strong>Link Analysis</strong>가 필요합니다.</p>
+
+<p>본 수업에서 다룰 Link Analysis 알고리즘들은 아래 총 3개에 대해서 다룰 예정입니다.</p>
+
+<ul>
+  <li>PageRank</li>
+  <li>Personalized PageRank (PPR)</li>
+  <li>Random Walk with Restarts</li>
+</ul>
+
+<p><strong>Links as Votes</strong></p>
+
+<p><strong>링크가 투표용지</strong>라고 생각해봅시다. 여기서 유향 그래프인 웹 그래프에서 링크는 2가지 종류가 있다는 것을 다시한번 생각해봐야 합니다.</p>
+
+<ul>
+  <li>
+<code class="language-plaintext highlighter-rouge">in-comming links(in-links)</code>: 기준 페이지로 들어오는 방향의 링크</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">out-going links(out-links)</code>: 기준 페이지에서 나가는 방향의 링크</li>
+</ul>
+
+<p>이렇게 방향까지 고려하여 링크를 투표라고 생각할 때, 엄밀히 말하자면 in-link를 투표라고 생각해야 할 것 입니다. 한 가지 더 생각해볼 문제는 <strong><em>모든 in-link들을 동등하게 생각할 수 있는가?</em></strong>라는 문제입니다. <strong>어떤 링크들</strong>은 다른 링크들에 비해 <strong>좀 더 중요한 페이지로부터(from) 기준페이지로(to)</strong> 온 링크일 수도 있기 때문에 count에 차등을 둬야 하지 않을까라고 생각할 수도 있습니다. 이런 고민들은 결국 페이지들이 서로 연결되어 있어서 recursive한 문제로 볼 수 있습니다.</p>
+
+<aside>
+➕ `recursive한 문제` 물리고 물리는 문제로 생각할 수 있습니다. A→B 링크에서 A가 중요한 페이지라는 사실을 기반으로 B가 중요해지고, 이어지는 B→C 링크에서 이 영향을 이어받아 C까지 중요한 페이지라고 판단하게 되기 때문입니다.
+
+</aside>
+
+<p><strong>PageRank</strong></p>
+
+<p><strong>The “Flow” Model</strong></p>
+
+<p>위에서 설명한 recursive한 특성을 기반으로 중요성이 흘러가는(flow) 모델을 생각해볼 수 있습니다. 중요성을 $r$이라는 변수로 두고 기준 노드 <strong>j</strong>의 importance가 어떻게 flow되는지 살펴보겠습니다.</p>
+
+<ol>
+  <li>
+<strong>j</strong>로 in-link되어있는 <strong>i, k</strong> 의 importance <strong>$r_i$, $r_k$</strong>를 각 노드의 out-link의 수만큼 나누어서 <strong>j</strong>로 전달됩니다. i 노드의 out-link는 총 3개 이므로 <strong>$\frac{r_i}{3}$</strong>, k노드의 out-link는 총 4개 이므로 <strong>$\frac{r_k}{4}$</strong>로 계산되어 두 값의 합이 <strong>$r_j$</strong>가 됩니다.</li>
+  <li>$<strong>r_j</strong>$는 <strong>j</strong>노드의 out-link를 통해 flow하게 되는데 <strong>**out-link의 수, 즉 3으로 나누어져 **$\frac{r_j}{3}$</strong> 값이 각각의 <strong>다음 노드들</strong>로 <strong>$r_j$</strong>값이 전달되게 됩니다.</li>
+</ol>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%206.png" alt="Untitled"></p>
+
+<p>이처럼 importance가 높은 페이지로부터 in-link된 페이지는 영향을 받아 importance가 높아짐을 알 수 있습니다. <strong>노드 $j$의 rank</strong>, $r_j$를 정의하면 다음과 같이 수식으로 나타낼 수 있습니다. (이때 $d_i$는 노드 i의 out-degree를 말합니다.)</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>→</mo><mi>j</mi></mrow></munder><mfrac><msub><mi>r</mi><mi>i</mi></msub><msub><mi>d</mi><mi>i</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">r_{j}=\sum_{i \rightarrow j} \frac{r_{i}}{d_{i}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5213em;vertical-align:-1.4138em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">→</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+<p>다음과 같은 예시에서 각 <code class="language-plaintext highlighter-rouge">기준 노드</code>를 가지고 <code class="language-plaintext highlighter-rouge">in-link</code>들을 고려하여 “Flow equation”을 계산해보면 다음과 같다.</p>
+
+<ul>
+  <li>노드 y : y에서 오는 링크 + a에서 오는 링크</li>
+</ul>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>y</mi></msub><mo>=</mo><mfrac><msub><mi>r</mi><mi>y</mi></msub><mn>2</mn></mfrac><mo>+</mo><mfrac><msub><mi>r</mi><mi>a</mi></msub><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">r_y = \frac{r_y}{2} + \frac{r_a}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+<ul>
+  <li>노드 a : y에서 오는 링크 + m에서 오는 링크</li>
+</ul>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>a</mi></msub><mo>=</mo><mfrac><msub><mi>r</mi><mi>y</mi></msub><mn>2</mn></mfrac><mo>+</mo><msub><mi>r</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">r_a = \frac{r_y}{2} + r_m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>
+
+<ul>
+  <li>노드 m : a에서 오는 링크</li>
+</ul>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>m</mi></msub><mo>=</mo><mfrac><msub><mi>r</mi><mi>a</mi></msub><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">r_m = \frac{r_a}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%207.png" alt="Untitled"></p>
+
+<aside>
+➕ 3 Unknowns, 3 Equations 이기 때문에 4번째 constraint로 $r_y + r_a + r_m =1$로 scale관련 constraint를 추가하여 Gaussian elimination을 사용하여 선형방정식으로 풀려고 하는 생각은 좋지 않다. 왜냐하면 importance는 이런식으로 scalable하지 않기 때문이다. (It’s not scalable) 좀 더 정교한 설계가 필요하다.
+
+</aside>
+
+<p><strong>Matrix Formulation</strong></p>
+
+<p><strong>Stochastic Adjacency Matrix</strong> $\mathbf{M}$</p>
+
+<ul>
+  <li>$\mathbf{M}$은 $(node의 수)\times (node의 수)$차원의 매트릭스 입니다.</li>
+  <li>
+    <p>$i$→$j$ 링크에서 매트릭스 요소 $M_{ji}$는 $\frac{1}{d_i}$가 됩니다. ($d_i$를 노드 $i$의 out-degree라고 정의합니다.)</p>
+
+    <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>M</mi><mrow><mi>j</mi><mi>i</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>d</mi><mi>i</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">M_{ji} = \frac{1}{d_i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ji</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1574em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+    <p>오른쪽 예시에서처럼 노드 $i$를 기준으로 총 3개의 out-link들이 있다면 각각의 값은 $1/3$이 됩니다.</p>
+  </li>
+  <li>
+<strong>column 기준 stochastic</strong> : 열 방향의 모든 값들을 더하면 1이 되는 확률값이 됩니다.</li>
+</ul>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/1.png" alt="1.png"></p>
+
+<p><strong>Rank Vector</strong> $r$</p>
+
+<ul>
+  <li>$\mathbf{r}$은 각 페이지의 entry 값을 가지는 $(node의 수)\times 1$ 차원의 벡터입니다.</li>
+  <li>각 페이지의 importance score를 $r_i$로 정의합니다.</li>
+  <li>모든 노드의 importance score의 합은 1입니다. 따라서 이 또한 확률값으로 생각할 수 있습니다.</li>
+</ul>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>r</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\sum_ir_i = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3277em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></span>
+
+<p><strong>Flow Equations</strong></p>
+
+<p>이전에 정의했던 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">노드의 rank 수식</a> 을 새롭게 정의한 매트릭스 $M$과 벡터 $r$로 다시 써보면 Flow Equation을 완성할 수 있습니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="bold">r</mi><mo>=</mo><mi mathvariant="bold">M</mi><mo>⋅</mo><mi mathvariant="bold">r</mi></mrow><annotation encoding="application/x-tex">\mathbf{r}=\mathbf{M} \cdot \mathbf{r}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">r</span></span></span></span></span>
+
+<p>앞서 살펴본 간단한 그래프 예시를 가져와서 flow equation을 매트릭스 연산으로 표현해보면 아래와 같습니다. (flow equation은 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">앞내용을 참고</a>)</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%208.png" alt="Untitled"></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%209.png" alt="Untitled"></p>
+
+<p><strong>Connection to Random Walk</strong></p>
+
+<p>다음과 같은 조건을 만족하며 랜덤하게 웹페이지들을 돌아다니고 있는 유저를 생각해보겠습니다.</p>
+
+<ol>
+  <li>시점 $t$에 페이지 $i$에 있습니다.</li>
+  <li>다음 시점 $t+1$에 페이지 $i$로부터 나가는 방향의 out-link들 중에 uniform하게 선택하여 서핑을 합니다.</li>
+  <li>앞서 선택된 out-link를 통해 $i$와 연결된 $j$ 페이지에 도달합니다.</li>
+  <li>이 과정(1~3)을 무한으로 반복합니다.</li>
+</ol>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2010.png" alt="Untitled"></p>
+
+<p>여기에서 우리는 <code class="language-plaintext highlighter-rouge">시점</code> 의 개념을 고려하여 새로운 개념 정의를 하나 할 수 있습니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{p(t)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mclose">)</span></span></span></span></span></span>
+
+<p>$\mathbf{p(t)}$는 확률 벡터(probability distribution)로, 
+이 벡터의 $i$번째 요소는 앞서 가정한 유저가 <strong>시점 $t$에 페이지 $i$에 있을 확률</strong>을 나타냅니다.</p>
+
+<p><strong>The Stationary Distribution</strong></p>
+
+<p>앞서 정의한 $\mathbf{p(t)}$를 가지고 이 유저가 시점 $<strong>t+1$에 있을 확률분포는</strong> 다음과 같이 계산합니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo>+</mo><mn mathvariant="bold">1</mn><mo stretchy="false">)</mo></mrow><mo>=</mo><mi mathvariant="bold">M</mi><mo>⋅</mo><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{p(t+1)}=\mathbf{M} \cdot \mathbf{p(t)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">1</span><span class="mclose">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mclose">)</span></span></span></span></span></span>
+
+<aside>
+💡 만약에 유저가 웹 서핑을 계속하다가  $\mathbf{p(t+1)} = \mathbf{p(t)}$ 같은 상황이 되면 어떨까요?
+
+</aside>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo>+</mo><mn mathvariant="bold">1</mn><mo stretchy="false">)</mo></mrow><mo>=</mo><mi mathvariant="bold">M</mi><mo>⋅</mo><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{p(t+1)}=\mathbf{M} \cdot \mathbf{p(t)} = \mathbf{p(t)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">1</span><span class="mclose">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mclose">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mclose">)</span></span></span></span></span></span>
+
+<p>이러한 상황에서는 더 이상 유저가 특정 페이지에 있을 확률이 변하지 않고 유지되는 경우가 되며, 이를 <strong>stationary distribution of a random walk</strong> 라고 합니다.</p>
+
+<p>이러한 형태는 낮설지가 않은데, 앞서 rank vector $\mathbf{r}$가 매트릭스 $\mathbf{M}$과 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">flow equation</a>을 구성할 때 이러한 꼴이었으며, 따라서 $\mathbf{r}$은 <strong>stationary distribution of a random walk</strong> 입니다.</p>
+
+<p><strong>Eigenvector Formulation</strong></p>
+
+<p>이전 Lecture 2에서 잠시 배웠던 <strong>eigenvector와 eignvalue</strong>를 생각해보면 다음 수식을 떠올려볼 수 있습니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>λ</mi><mi mathvariant="bold">c</mi><mo>=</mo><mi mathvariant="bold">A</mi><mi mathvariant="bold">c</mi></mrow><annotation encoding="application/x-tex">\lambda \mathbf{c} = \mathbf{A} \mathbf{c}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mord mathbf">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">Ac</span></span></span></span></span>
+
+<p>여기에서 flow equation을 다시 위와 같은 꼴로 작성해보면, 
+아래와 같이 eigenvalue가 1이고 eigenvector가 $\mathbf{r}$인 수식으로 해석될 수 있습니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>1</mn><mo>⋅</mo><mi mathvariant="bold">r</mi><mo>=</mo><mi mathvariant="bold">M</mi><mo>⋅</mo><mi mathvariant="bold">r</mi></mrow><annotation encoding="application/x-tex">1 \cdot \mathbf{r}=\mathbf{M} \cdot \mathbf{r}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">r</span></span></span></span></span>
+
+<p>따라서 $\mathbf{r}$은 매트릭스 $\mathbf{M}$의 <strong>principle eigenvector</strong>(eigenvalue 1)이며, 
+임의의 벡터 $\mathbf{u}$에서 시작해서 계속 매트릭스 $\mathbf{M}$을 곱하여 극한 $\mathbf{M}(\mathbf{M}(…(\mathbf{M}(\mathbf{M}\mathbf{u}))))$으로 도달하게되는 <strong>long-term distribution</strong>이 됩니다. 이러한 방식으로 $\mathbf{r}$을 구하는 방법을 <strong>Power iteration</strong> 이라고 합니다.</p>
+
+<p><strong>PageRank 정리</strong></p>
+
+<ul>
+  <li>웹 구조에서 볼 수 있는 link들을 기반으로 node들의 importance를 측정할 수 있다.</li>
+  <li>랜덤하게 웹 서핑하는 유저 모델은 stochastic advacency matrix $\mathbf{M}$으로 나타낼 수 있다.</li>
+  <li>PageRank 수식은 $\mathbf{r} = \mathbf{M}\mathbf{r}$ 이며, 
+$\mathbf{r}$은 (1) 매트릭스 $\mathbf{M}$의 principle eigenvector, 
+(2) stationary distribution of a random walk 2가지로 해석될 수 있다.</li>
+</ul>
+
+<hr>
+
+<h2 id="lecture-42---pagerank-how-to-solve">
+<a class="anchor" href="#lecture-42---pagerank-how-to-solve" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 4.2 - PageRank: How to Solve?</strong>**</h2>
+
+<p>이전의 강의에서 Powe iteration 방법으로 반복적인 매트릭스 곱 연산으로 $\mathbf{r}$을 구할 수 있음을 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">확인</a>했습니다. 이 방법에 대해 조금 더 구체적으로 살펴보겠습니다.</p>
+
+<p><strong>Power Iteration Method</strong></p>
+
+<p>power iteration은 2가지 표현식이 있는데 하나는 벡터의 요소 관점에서의 업데이트 식(왼쪽)과 다른 하나는 매트릭스 관점의 업데이트 식(오른쪽)으로 나타낼 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2011.png" alt="Untitled"></p>
+
+<p><strong>과정</strong>을 살펴보면 다음과 같습니다.</p>
+
+<ol>
+  <li>처음 초기화로 모든 노드의 importance score를 똑같은 값으로 만들어 줍니다.(반복적인 연산으로 수렴을 보장하므로 사실 어떤 값으로 초기화하든 상관없습니다.) 
+$\boldsymbol{r}^{(0)}=[1 / N, \ldots ., 1 / N]^{T}$</li>
+  <li>반복적인 연산을 하면서 $\mathbf{r}$ 값을 업데이트합니다.
+$\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>수렴조건 $\left</td>
+          <td>\boldsymbol{r}^{(\boldsymbol{t}+\mathbf{1})}-\boldsymbol{r}^{(t)}\right</td>
+          <td>_{1}&lt;\varepsilon$을 만족할 때까지 2번 과정의 연산을 진행합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ol>
+
+<p>예시 그래프에서의 power iteration 과정은 다음과 같습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2012.png" alt="Untitled"></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2013.png" alt="Untitled"></p>
+
+<p><strong>Three Questions</strong></p>
+
+<ol>
+  <li>
+<strong>Does this converge?</strong> 반복적인 연산과정을 통해 값이 수렴하는가?</li>
+  <li>
+<strong>Does it converge to what we want?</strong> 수렴한 값이 우리가 원하는 값인가?</li>
+  <li>
+<strong>Are results reasonable?</strong> 연산 결과가 합당한가?(말이 되는가?)</li>
+</ol>
+
+<p><em>(어색한 한국어 번역보다 영어로된 질문에서 얻어가는 insight가 좋을 것 같습니다.)</em></p>
+
+<p><strong>Problems</strong></p>
+
+<p>PageRank에는 2가지의 문제가 있습니다.</p>
+
+<ol>
+  <li><strong>Dead Ends</strong></li>
+</ol>
+
+<p>out-link를 가지지 않는 일부 페이지(노드)들에서 생기는 문제로 이런 페이지들에서 importance가 <code class="language-plaintext highlighter-rouge">leak out</code> 됩니다. leak out의 <code class="language-plaintext highlighter-rouge">세어나가다</code> 라는 뜻 그대로 importance flow의 흐름에서 값이 세어나가는 문제를 말합니다.</p>
+
+<p>아래의 예시에서 페이지 b에서 나가는 out-link가 없다보니 importance update를 한 결과가 $r_a = 0, r_b=0$이 됨을 확인할 수 있습니다. 이는 앞서 page rank $\mathbf{r}$ vector의 정의에서 약속한 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">모든 노드의 importance의 합이 1이 된다</a>는 <code class="language-plaintext highlighter-rouge">column stochastic</code> 수학적 전제에서 벗어난 결과 입니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2014.png" alt="Untitled"></p>
+
+<ol>
+  <li><strong>Spider traps</strong></li>
+</ol>
+
+<p>그래프의 모든 out-link들이 빠져나갈 곳이 없는 순환구조를 이룰 때 발생합니다. 결국 spider trap 페이지가 모든 importance 값을 독차지하게 됩니다.</p>
+
+<p>아래의 예시에서 a에서 walk를 시작하더라고 b로 이동한 후 b에서 빠져나올 수 없습니다. 이런 경우 importance update 결과 모든 importance를 페이지 b가 가지게 되어 $r_a = 0, r_b=1$이 됩니다. 이런 경우 페이지 a에 아무리 큰 웹 그래프가 연결되어 있다고 하더라도 이동할 수 없습니다. 사실 spider trap은 <code class="language-plaintext highlighter-rouge">column stochastic</code>을 만족하기 때문에 수학적으로 문제되진 않습니다. 하지만 <code class="language-plaintext highlighter-rouge">우리가 원하지 않는 값에 수렴하는 문제</code>로 볼 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2015.png" alt="Untitled"></p>
+
+<p><strong>Solutions</strong></p>
+
+<p>위의 2가지 문제들 모두 <strong>Teleports</strong>로 해결할 수 있습니다.</p>
+
+<ol>
+  <li>
+    <p><strong>Dead Ends</strong>를 Teleports로 해결하기</p>
+
+    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/2.png" alt="2.png"></p>
+  </li>
+  <li>
+    <p><strong>Spider Traps</strong>를 Teleports로 해결하기</p>
+
+    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2016.png" alt="Untitled"></p>
+  </li>
+</ol>
+
+<p><strong>The Google Matrix</strong></p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>→</mo><mi>j</mi></mrow></munder><mi>β</mi><mfrac><msub><mi>r</mi><mi>i</mi></msub><msub><mi>d</mi><mi>i</mi></msub></mfrac><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>β</mi><mo stretchy="false">)</mo><mfrac><mn>1</mn><mi>N</mi></mfrac></mrow><annotation encoding="application/x-tex">r_{j}=\sum_{i \rightarrow j} \beta \frac{r_{i}}{d_{i}}+(1-\beta) \frac{1}{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5213em;vertical-align:-1.4138em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">→</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mclose">)</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>G</mi><mo>=</mo><mi>β</mi><mi>M</mi><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>β</mi><mo stretchy="false">)</mo><msub><mrow><mo fence="true">[</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><mo fence="true">]</mo></mrow><mrow><mi>N</mi><mo>×</mo><mi>N</mi></mrow></msub></mrow><annotation encoding="application/x-tex">G=\beta M+(1-\beta)\left[\frac{1}{N}\right]_{N \times N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">G</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">βM</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.5081em;vertical-align:-1.0581em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:-0.5214em;"><span style="top:-1.7003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span><span class="mbin mtight">×</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.0581em;"><span></span></span></span></span></span></span></span></span></span></span>
+
+<p><strong>Random Teleports ($\beta$=0.8)</strong></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2017.png" alt="Untitled"></p>
+
+<p><strong>Solving PageRank 정리</strong></p>
+
+<ul>
+  <li>PageRank $\mathbf{r} = \mathbf{G} \mathbf{r}$을 power iteration method로 풀 수 있다.</li>
+  <li>PageRank에서 생길 수 있는 문제들인 <strong>Dead Ends와 Spider Traps</strong>를 <strong>Random Uniform Teleportation</strong>으로 해결할 수 있다.</li>
+</ul>
+
+<hr>
+
+<h2 id="lecture-43---random-walk-with-restarts">
+<a class="anchor" href="#lecture-43---random-walk-with-restarts" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 4.3 - Random Walk with Restarts</strong>**</h2>
+
+<p><strong>Recommendation</strong></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2018.png" alt="Untitled"></p>
+
+<p>Bipartite User-Item Graph</p>
+
+<p>Node proximity Measurements</p>
+
+<p>Node proximity Measurements</p>
+
+<p>Proximity on Graphs</p>
+
+<hr>
+
+<h2 id="lecture-44---matrix-factorization-and-node-embeddings">
+<a class="anchor" href="#lecture-44---matrix-factorization-and-node-embeddings" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 4.4 - Matrix Factorization and Node Embeddings</strong>**</h2>
+
+<p>Embeddings &amp; Matrix Factorization</p>
+
+<p>Connection to Matrix Factorization</p>
+
+<p>Matrix Factorization</p>
+
+<p>RandomWalk-based Similarity</p>
+
+<p>Limitations</p>
+
+<p>Algorithms 정리</p>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-04.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" target="_blank" title="fastai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" target="_blank" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
