@@ -132,7 +132,7 @@ window.onload = wrap_img;
 
 <p>power iteration은 2가지 표현식이 있는데 하나는 벡터의 요소 관점에서의 업데이트 식(왼쪽)과 다른 하나는 매트릭스 관점의 업데이트 식(오른쪽)으로 나타낼 수 있습니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/EvHE2Zq.png?1" alt="Imgur"></p>
 
 <p><strong>과정</strong>을 살펴보면 다음과 같습니다.</p>
 
@@ -156,9 +156,9 @@ $\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
 
 <p>예시 그래프에서의 power iteration 과정은 다음과 같습니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/cLqhzSc.png?1" alt="Imgur"></p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/ucqymgk.png?1" alt="Imgur"></p>
 
 <h1 id="three-questions">
 <a class="anchor" href="#three-questions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Three Questions</h1>
@@ -187,7 +187,7 @@ $\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
 
 <p>아래의 예시에서 페이지 b에서 나가는 out-link가 없다보니 importance update를 한 결과가 $r_a = 0, r_b=0$이 됨을 확인할 수 있습니다. 이는 앞서 page rank $\mathbf{r}$ vector의 정의에서 약속한 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">모든 노드의 importance의 합이 1이 된다</a>는 <code class="language-plaintext highlighter-rouge">column stochastic</code> 수학적 전제에서 벗어난 결과 입니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2014.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/XGRYKJe.png?1" alt="Imgur"></p>
 
 <ol>
   <li><strong>Spider traps</strong></li>
@@ -197,7 +197,7 @@ $\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
 
 <p>아래의 예시에서 a에서 walk를 시작하더라고 b로 이동한 후 b에서 빠져나올 수 없습니다. 이런 경우 importance update 결과 모든 importance를 페이지 b가 가지게 되어 $r_a = 0, r_b=1$이 됩니다. 이런 경우 페이지 a에 아무리 큰 웹 그래프가 연결되어 있다고 하더라도 이동할 수 없습니다. 사실 spider trap은 <code class="language-plaintext highlighter-rouge">column stochastic</code>을 만족하기 때문에 수학적으로 문제되진 않습니다. 하지만 <code class="language-plaintext highlighter-rouge">우리가 원하지 않는 값에 수렴하는 문제</code>로 볼 수 있습니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2015.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/cKsXAsY.png?1" alt="Imgur"></p>
 
 <h1 id="solutions">
 <a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
@@ -206,16 +206,17 @@ $\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
 
 <ol>
   <li>
-    <p><strong>Dead Ends</strong>를 Teleports로 해결하기</p>
-
-    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/2.png" alt="2.png"></p>
-  </li>
-  <li>
-    <p><strong>Spider Traps</strong>를 Teleports로 해결하기</p>
-
-    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2016.png" alt="Untitled"></p>
-  </li>
+<strong>Dead Ends</strong>를 Teleports로 해결하기</li>
 </ol>
+
+<p><img src="https://i.imgur.com/bwVrukA.png?1" alt="Imgur"></p>
+
+<ol>
+  <li>
+<strong>Spider Traps</strong>를 Teleports로 해결하기</li>
+</ol>
+
+<p><img src="https://i.imgur.com/wZUsNOu.png?1" alt="Imgur"></p>
 
 <h1 id="the-google-matrix">
 <a class="anchor" href="#the-google-matrix" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Google Matrix</h1>
@@ -227,7 +228,7 @@ $\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
 <h1 id="random-teleports-beta08">
 <a class="anchor" href="#random-teleports-beta08" aria-hidden="true"><span class="octicon octicon-link"></span></a>Random Teleports ($\beta$=0.8)</h1>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2017.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/NwNOgV6.png?1" alt="Imgur"></p>
 
 <h1 id="solving-pagerank-정리">
 <a class="anchor" href="#solving-pagerank-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solving PageRank 정리</h1>

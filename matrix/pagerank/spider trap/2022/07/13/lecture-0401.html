@@ -134,14 +134,16 @@ window.onload = wrap_img;
 
   <p>4강에서는 Graph를 <strong>매트릭스(선형대수) 관점</strong>으로 바라보는 것에 대해 이야기 합니다.</p>
 
-  <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled.png" alt="Untitled"></p>
+  <p><img src="https://i.imgur.com/aU2bZOQ.png?1" alt="Imgur"></p>
 
   <p>다음 3가지 키워드, <strong>Random walk(Node Importance), Matrix Factorization, Node embedding</strong>를 중심으로 공부합니다. 강의는 총 4파트로 나누어져 진행됩니다.</p>
 
-  <p><a href="">Lecture 4.1 - PageRank</a>
-<a href="">Lecture 4.2 - PageRank, How to Solve?</a>
-<a href="">Lecture 4.3 - Random Walk with Restarts</a>
-<a href="">Lecture 4.4 - Matrix Factorization and Node Embeddings</a></p>
+  <ul>
+    <li><a href="">Lecture 4.1 - PageRank</a></li>
+    <li><a href="">Lecture 4.2 - PageRank, How to Solve?</a></li>
+    <li><a href="">Lecture 4.3 - Random Walk with Restarts</a></li>
+    <li><a href="">Lecture 4.4 - Matrix Factorization and Node Embeddings</a></li>
+  </ul>
 
 </blockquote>
 
@@ -163,18 +165,17 @@ window.onload = wrap_img;
 
 </blockquote>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%201.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/H6RQ3C9.png?1" alt="Imgur"></p>
 
 <p>잠시 Side issue는 내려놓고, 새로 페이지들이 생기지도 않고 기존의 페이지들이 사라지지도 않는 <strong>Static pages</strong> 상황을 가정해봅시다. 아래의 그림에서처럼 페이지들은 하이퍼링크들로 서로 연결되어 있고, 유저는 페이지들에 달려있는 <strong>하이퍼 링크들</strong>로 이루어진 연결망을 기반으로 항해하듯이 <strong>Navigational</strong> 하게 page to page 이동을 하게 됩니다. 
 (오늘날에는 post, comment, like 등의 기반의 transactional한 웹에서의 상호작용이 일어나지만 이는 우선 논외로 하겠습니다.)</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%202.png" alt="Untitled"></p>
-
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%203.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/wRTsHJI.png?1" alt="Imgur">
+<img src="https://i.imgur.com/DAynWgh.png?1" alt="Imgur"></p>
 
 <p>위의 그림처럼 웹 그래프는 방향성이 있는 <strong>유향 그래프(Directed graph)</strong>임을 알 수 있습니다. 위키피디아와 같은 웹 사전 페이지들 간의 관계성이나 논문의 인용 관계 그래프 등에서 예시를 쉽게 찾아볼 수 있습니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%204.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/idCvZ6r.png?1" alt="Imgur"></p>
 
 <h1 id="ranking-nodes-on-the-graph">
 <a class="anchor" href="#ranking-nodes-on-the-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ranking Nodes on the Graph</h1>
@@ -187,7 +188,7 @@ window.onload = wrap_img;
 
 <p>바로 각 페이지의 중요성이 똑같지 않다는 이야기는 그래프에서 <strong>각 노드의 중요성(importance)가 다르다</strong>는 말로 바꿔 생각할 수 있습니다. 아래 사진을 보면 직관적으로 파란색 노드가 빨간색 노드보다 더 중요할 것 같다라고 생각할 수 있습니다. <em>왜 그렇게 보일까요?</em> 아직 노드의 중요성에 대해 정의하지 않았지만 그래프에서 각 노드를 중심으로 뻗어있는 edge(link)의 수가 한눈에 비교되기 때문에 직관적으로 파악할 수 있는 것입니다. 이처럼 웹 그래프의 <strong>link structure</strong>를 가지고 우리는 각 페이지들(node)의 <strong>ranking</strong>을 매길 수 있습니다.</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%205.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/FvyCCna.png?1" alt="Imgur"></p>
 
 <h1 id="link-analysis-algorithms">
 <a class="anchor" href="#link-analysis-algorithms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Link Analysis Algorithms</h1>
@@ -234,13 +235,15 @@ window.onload = wrap_img;
   <li>$<strong>r_j</strong>$는 <strong>j</strong>노드의 out-link를 통해 flow하게 되는데 out-link의 수, 즉 3으로 나누어져 <strong>$\frac{r_j}{3}$</strong> 값이 각각의 <strong>다음 노드들</strong>로 <strong>$r_j$</strong>값이 전달되게 됩니다.</li>
 </ol>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%206.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/mKnAS4F.png?1" alt="Imgur"></p>
 
 <p>이처럼 importance가 높은 페이지로부터 in-link된 페이지는 영향을 받아 importance가 높아짐을 알 수 있습니다. <strong>노드 $j$의 rank</strong>, $r_j$를 정의하면 다음과 같이 수식으로 나타낼 수 있습니다. (이때 $d_i$는 노드 i의 out-degree를 말합니다.)</p>
 
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>→</mo><mi>j</mi></mrow></munder><mfrac><msub><mi>r</mi><mi>i</mi></msub><msub><mi>d</mi><mi>i</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">r_{j}=\sum_{i \rightarrow j} \frac{r_{i}}{d_{i}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5213em;vertical-align:-1.4138em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">→</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
 
 <p>다음과 같은 예시에서 각 <code class="language-plaintext highlighter-rouge">기준 노드</code>를 가지고 <code class="language-plaintext highlighter-rouge">in-link</code>들을 고려하여 “Flow equation”을 계산해보면 다음과 같다.</p>
+
+<p><img src="https://i.imgur.com/PMaaDM4.png?1" alt="Imgur"></p>
 
 <ul>
   <li>노드 y : y에서 오는 링크 + a에서 오는 링크</li>
@@ -259,8 +262,6 @@ window.onload = wrap_img;
 </ul>
 
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>m</mi></msub><mo>=</mo><mfrac><msub><mi>r</mi><mi>a</mi></msub><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">r_m = \frac{r_a}{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
-
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%207.png" alt="Untitled"></p>
 
 <aside>
 ➕ 3 Unknowns, 3 Equations 이기 때문에 4번째 constraint로 $r_y + r_a + r_m =1$로 scale관련 constraint를 추가하여 Gaussian elimination을 사용하여 선형방정식으로 풀려고 하는 생각은 좋지 않다. 왜냐하면 importance는 이런식으로 scalable하지 않기 때문이다. (It’s not scalable) 좀 더 정교한 설계가 필요하다.
@@ -285,7 +286,7 @@ window.onload = wrap_img;
 <strong>column 기준 stochastic</strong> : 열 방향의 모든 값들을 더하면 1이 되는 확률값이 됩니다.</li>
 </ul>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/1.png" alt="1.png"></p>
+<p><img src="https://i.imgur.com/MwU2yRF.png?1" alt="Imgur"></p>
 
 <p><strong>Rank Vector</strong> $r$</p>
 
@@ -306,9 +307,9 @@ window.onload = wrap_img;
 
 <p>앞서 살펴본 간단한 그래프 예시를 가져와서 flow equation을 매트릭스 연산으로 표현해보면 아래와 같습니다. (flow equation은 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">앞내용을 참고</a>)</p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%208.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/jCDl5an.png?1" alt="Imgur"></p>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%209.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/j0z5Qm7.png?1" alt="Imgur"></p>
 
 <h1 id="connection-to-random-walk">
 <a class="anchor" href="#connection-to-random-walk" aria-hidden="true"><span class="octicon octicon-link"></span></a>Connection to Random Walk</h1>
@@ -322,7 +323,7 @@ window.onload = wrap_img;
   <li>이 과정(1~3)을 무한으로 반복합니다.</li>
 </ol>
 
-<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2010.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/mFB2J6y.png?1" alt="Imgur"></p>
 
 <p>여기에서 우리는 <code class="language-plaintext highlighter-rouge">시점</code> 의 개념을 고려하여 새로운 개념 정의를 하나 할 수 있습니다.</p>
 
