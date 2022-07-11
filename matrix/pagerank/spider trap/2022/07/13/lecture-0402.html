@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 4.2 - PageRank, How to Solve? | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 4.2 - PageRank, How to Solve?" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224w Lecture 4. Graph as Matrix" />
+<meta property="og:description" content="CS224w Lecture 4. Graph as Matrix" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-13T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 4.2 - PageRank, How to Solve?" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-13T00:00:00-05:00","datePublished":"2022-07-13T00:00:00-05:00","description":"CS224w Lecture 4. Graph as Matrix","headline":"Lecture 4.2 - PageRank, How to Solve?","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Us</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 4.2 - PageRank, How to Solve?</h1><p class="page-description">CS224w Lecture 4. Graph as Matrix</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-13T00:00:00-05:00" itemprop="datePublished">
+        Jul 13, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#spider trap">spider trap</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#power-iteration-method">Power Iteration Method</a></li>
+<li class="toc-entry toc-h1"><a href="#three-questions">Three Questions</a></li>
+<li class="toc-entry toc-h1"><a href="#problems">Problems</a></li>
+<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
+<li class="toc-entry toc-h1"><a href="#the-google-matrix">The Google Matrix</a></li>
+<li class="toc-entry toc-h1"><a href="#random-teleports-beta08">Random Teleports ($\beta$=0.8)</a></li>
+<li class="toc-entry toc-h1"><a href="#solving-pagerank-정리">Solving PageRank 정리</a></li>
+</ul><p>이전의 강의에서 Powe iteration 방법으로 반복적인 매트릭스 곱 연산으로 $\mathbf{r}$을 구할 수 있음을 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">확인</a>했습니다. 이 방법에 대해 조금 더 구체적으로 살펴보겠습니다.</p>
+
+<h1 id="power-iteration-method">
+<a class="anchor" href="#power-iteration-method" aria-hidden="true"><span class="octicon octicon-link"></span></a>Power Iteration Method</h1>
+
+<p>power iteration은 2가지 표현식이 있는데 하나는 벡터의 요소 관점에서의 업데이트 식(왼쪽)과 다른 하나는 매트릭스 관점의 업데이트 식(오른쪽)으로 나타낼 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2011.png" alt="Untitled"></p>
+
+<p><strong>과정</strong>을 살펴보면 다음과 같습니다.</p>
+
+<ol>
+  <li>처음 초기화로 모든 노드의 importance score를 똑같은 값으로 만들어 줍니다.(반복적인 연산으로 수렴을 보장하므로 사실 어떤 값으로 초기화하든 상관없습니다.) 
+$\boldsymbol{r}^{(0)}=[1 / N, \ldots ., 1 / N]^{T}$</li>
+  <li>반복적인 연산을 하면서 $\mathbf{r}$ 값을 업데이트합니다.
+$\boldsymbol{r}^{(t+1)}=\boldsymbol{M} \cdot \boldsymbol{r}^{(t)}$</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>수렴조건 $\left</td>
+          <td>\boldsymbol{r}^{(\boldsymbol{t}+\mathbf{1})}-\boldsymbol{r}^{(t)}\right</td>
+          <td>_{1}&lt;\varepsilon$을 만족할 때까지 2번 과정의 연산을 진행합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ol>
+
+<p>예시 그래프에서의 power iteration 과정은 다음과 같습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2012.png" alt="Untitled"></p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2013.png" alt="Untitled"></p>
+
+<h1 id="three-questions">
+<a class="anchor" href="#three-questions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Three Questions</h1>
+
+<ol>
+  <li>
+<strong>Does this converge?</strong> 반복적인 연산과정을 통해 값이 수렴하는가?</li>
+  <li>
+<strong>Does it converge to what we want?</strong> 수렴한 값이 우리가 원하는 값인가?</li>
+  <li>
+<strong>Are results reasonable?</strong> 연산 결과가 합당한가?(말이 되는가?)</li>
+</ol>
+
+<p><em>(어색한 한국어 번역보다 영어로된 질문에서 얻어가는 insight가 좋을 것 같습니다.)</em></p>
+
+<h1 id="problems">
+<a class="anchor" href="#problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems</h1>
+
+<p>PageRank에는 2가지의 문제가 있습니다.</p>
+
+<ol>
+  <li><strong>Dead Ends</strong></li>
+</ol>
+
+<p>out-link를 가지지 않는 일부 페이지(노드)들에서 생기는 문제로 이런 페이지들에서 importance가 <code class="language-plaintext highlighter-rouge">leak out</code> 됩니다. leak out의 <code class="language-plaintext highlighter-rouge">세어나가다</code> 라는 뜻 그대로 importance flow의 흐름에서 값이 세어나가는 문제를 말합니다.</p>
+
+<p>아래의 예시에서 페이지 b에서 나가는 out-link가 없다보니 importance update를 한 결과가 $r_a = 0, r_b=0$이 됨을 확인할 수 있습니다. 이는 앞서 page rank $\mathbf{r}$ vector의 정의에서 약속한 <a href="https://www.notion.so/Lecture-4-e67385f44f854b349a176ba32c9e3045">모든 노드의 importance의 합이 1이 된다</a>는 <code class="language-plaintext highlighter-rouge">column stochastic</code> 수학적 전제에서 벗어난 결과 입니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2014.png" alt="Untitled"></p>
+
+<ol>
+  <li><strong>Spider traps</strong></li>
+</ol>
+
+<p>그래프의 모든 out-link들이 빠져나갈 곳이 없는 순환구조를 이룰 때 발생합니다. 결국 spider trap 페이지가 모든 importance 값을 독차지하게 됩니다.</p>
+
+<p>아래의 예시에서 a에서 walk를 시작하더라고 b로 이동한 후 b에서 빠져나올 수 없습니다. 이런 경우 importance update 결과 모든 importance를 페이지 b가 가지게 되어 $r_a = 0, r_b=1$이 됩니다. 이런 경우 페이지 a에 아무리 큰 웹 그래프가 연결되어 있다고 하더라도 이동할 수 없습니다. 사실 spider trap은 <code class="language-plaintext highlighter-rouge">column stochastic</code>을 만족하기 때문에 수학적으로 문제되진 않습니다. 하지만 <code class="language-plaintext highlighter-rouge">우리가 원하지 않는 값에 수렴하는 문제</code>로 볼 수 있습니다.</p>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2015.png" alt="Untitled"></p>
+
+<h1 id="solutions">
+<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
+
+<p>위의 2가지 문제들 모두 <strong>Teleports</strong>로 해결할 수 있습니다.</p>
+
+<ol>
+  <li>
+    <p><strong>Dead Ends</strong>를 Teleports로 해결하기</p>
+
+    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/2.png" alt="2.png"></p>
+  </li>
+  <li>
+    <p><strong>Spider Traps</strong>를 Teleports로 해결하기</p>
+
+    <p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2016.png" alt="Untitled"></p>
+  </li>
+</ol>
+
+<h1 id="the-google-matrix">
+<a class="anchor" href="#the-google-matrix" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Google Matrix</h1>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>→</mo><mi>j</mi></mrow></munder><mi>β</mi><mfrac><msub><mi>r</mi><mi>i</mi></msub><msub><mi>d</mi><mi>i</mi></msub></mfrac><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>β</mi><mo stretchy="false">)</mo><mfrac><mn>1</mn><mi>N</mi></mfrac></mrow><annotation encoding="application/x-tex">r_{j}=\sum_{i \rightarrow j} \beta \frac{r_{i}}{d_{i}}+(1-\beta) \frac{1}{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.5213em;vertical-align:-1.4138em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">→</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mclose">)</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>G</mi><mo>=</mo><mi>β</mi><mi>M</mi><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>β</mi><mo stretchy="false">)</mo><msub><mrow><mo fence="true">[</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><mo fence="true">]</mo></mrow><mrow><mi>N</mi><mo>×</mo><mi>N</mi></mrow></msub></mrow><annotation encoding="application/x-tex">G=\beta M+(1-\beta)\left[\frac{1}{N}\right]_{N \times N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">G</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">βM</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.5081em;vertical-align:-1.0581em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:-0.5214em;"><span style="top:-1.7003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span><span class="mbin mtight">×</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.0581em;"><span></span></span></span></span></span></span></span></span></span></span>
+
+<h1 id="random-teleports-beta08">
+<a class="anchor" href="#random-teleports-beta08" aria-hidden="true"><span class="octicon octicon-link"></span></a>Random Teleports ($\beta$=0.8)</h1>
+
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2017.png" alt="Untitled"></p>
+
+<h1 id="solving-pagerank-정리">
+<a class="anchor" href="#solving-pagerank-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solving PageRank 정리</h1>
+
+<ul>
+  <li>PageRank $\mathbf{r} = \mathbf{G} \mathbf{r}$을 power iteration method로 풀 수 있다.</li>
+  <li>PageRank에서 생길 수 있는 문제들인 <strong>Dead Ends와 Spider Traps</strong>를 <strong>Random Uniform Teleportation</strong>으로 해결할 수 있다.</li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" target="_blank" title="fastai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" target="_blank" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

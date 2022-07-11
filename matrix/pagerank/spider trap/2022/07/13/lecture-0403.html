@@ -4,20 +4,21 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Tags | CS224W-KOR</title>
+<title>Lecture 4.3 - Random Walk with Restarts | CS224W-KOR</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Tags" />
+<meta property="og:title" content="Lecture 4.3 - Random Walk with Restarts" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="CS224W 강의를 공부하는 글또 그래프 스터디 블로그" />
-<meta property="og:description" content="CS224W 강의를 공부하는 글또 그래프 스터디 블로그" />
-<link rel="canonical" href="https://cs224w-kor.github.io/blog/categories/" />
-<meta property="og:url" content="https://cs224w-kor.github.io/blog/categories/" />
+<meta name="description" content="CS224w Lecture 4. Graph as Matrix" />
+<meta property="og:description" content="CS224w Lecture 4. Graph as Matrix" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html" />
 <meta property="og:site_name" content="CS224W-KOR" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-13T00:00:00-05:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Tags" />
+<meta property="twitter:title" content="Lecture 4.3 - Random Walk with Restarts" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"CS224W 강의를 공부하는 글또 그래프 스터디 블로그","headline":"Tags","url":"https://cs224w-kor.github.io/blog/categories/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-13T00:00:00-05:00","datePublished":"2022-07-13T00:00:00-05:00","description":"CS224w Lecture 4. Graph as Matrix","headline":"Lecture 4.3 - Random Walk with Restarts","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -85,130 +86,92 @@ window.onload = wrap_img;
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 4.3 - Random Walk with Restarts</h1><p class="page-description">CS224w Lecture 4. Graph as Matrix</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-13T00:00:00-05:00" itemprop="datePublished">
+        Jul 13, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
 
-<h2>Contents</h2>
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#spider trap">spider trap</a>
+        
+      
+      </p>
+    
 
-  
-  
-  
+    </header>
 
-  <ul>
-  
-    <li><a href="#jupyter">jupyter</a></li>
-  
-    <li><a href="#markdown">markdown</a></li>
-  
-    <li><a href="#matrix">matrix</a></li>
-  
-    <li><a href="#pagerank">pagerank</a></li>
-  
-    <li><a href="#spider trap">spider trap</a></li>
-  
-  </ul>
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#recommendation">Recommendation</a></li>
+<li class="toc-entry toc-h1"><a href="#bipartite-user-item-graph">Bipartite User-Item Graph</a></li>
+<li class="toc-entry toc-h1"><a href="#node-proximity-measurements">Node proximity Measurements</a></li>
+<li class="toc-entry toc-h1"><a href="#node-proximity-measurements-1">Node proximity Measurements</a></li>
+<li class="toc-entry toc-h1"><a href="#proximity-on-graphs">Proximity on Graphs</a></li>
+</ul><h1 id="recommendation">
+<a class="anchor" href="#recommendation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recommendation</h1>
 
-  
-      <h3 id ="jupyter"><i class="fas fa-tags category-tags-icon"></i></i> jupyter</h3>
-      <a name="jupyter"></a>
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/jupyter/2020/02/20/test.html">Fastpages Notebook Blog Post</a>  • Feb 20, 2020</p>
-        </article>
-        
-      
-  
-      <h3 id ="markdown"><i class="fas fa-tags category-tags-icon"></i></i> markdown</h3>
-      <a name="markdown"></a>
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/markdown/2022/07/06/lecture-01.html">Lecture 1</a>  • Jul 6, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/markdown/2020/01/14/test-markdown-post.html">An Example Markdown Post</a>  • Jan 14, 2020</p>
-        </article>
-        
-      
-  
-      <h3 id ="matrix"><i class="fas fa-tags category-tags-icon"></i></i> matrix</h3>
-      <a name="matrix"></a>
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0404.html">Lecture 4.4 - Matrix Factorization and Node Embeddings</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html">Lecture 4.3 - Random Walk with Restarts</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html">Lecture 4.2 - PageRank, How to Solve?</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0401.html">Lecture 4.1 - PageRank</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-  
-      <h3 id ="pagerank"><i class="fas fa-tags category-tags-icon"></i></i> pagerank</h3>
-      <a name="pagerank"></a>
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0404.html">Lecture 4.4 - Matrix Factorization and Node Embeddings</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html">Lecture 4.3 - Random Walk with Restarts</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html">Lecture 4.2 - PageRank, How to Solve?</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0401.html">Lecture 4.1 - PageRank</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-  
-      <h3 id ="spider trap"><i class="fas fa-tags category-tags-icon"></i></i> spider trap</h3>
-      <a name="spider trap"></a>
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0404.html">Lecture 4.4 - Matrix Factorization and Node Embeddings</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html">Lecture 4.3 - Random Walk with Restarts</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0402.html">Lecture 4.2 - PageRank, How to Solve?</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-        <article class="archive-item">
-          <p class="post-meta post-meta-title"><a class="page-meta" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0401.html">Lecture 4.1 - PageRank</a>  • Jul 13, 2022</p>
-        </article>
-        
-      
-  
+<p><img src="Lecture%204%208aae44bf2bf6452b85f2f86b70ac16d1/Untitled%2018.png" alt="Untitled"></p>
 
+<h1 id="bipartite-user-item-graph">
+<a class="anchor" href="#bipartite-user-item-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bipartite User-Item Graph</h1>
 
+<h1 id="node-proximity-measurements">
+<a class="anchor" href="#node-proximity-measurements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node proximity Measurements</h1>
 
+<h1 id="node-proximity-measurements-1">
+<a class="anchor" href="#node-proximity-measurements-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node proximity Measurements</h1>
 
-</div>
+<h1 id="proximity-on-graphs">
+<a class="anchor" href="#proximity-on-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Proximity on Graphs</h1>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html" hidden></a>
+</article>
+
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/blog/"></data>
