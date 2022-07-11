@@ -331,7 +331,7 @@ img.emoji { display: inline !important; vertical-align: baseline !important; }
 
 .page-content { -webkit-font-smoothing: antialiased !important; text-rendering: optimizeLegibility !important; font-family: "Segoe UI", SegoeUI, Roboto, "Segoe WP", "Helvetica Neue", "Helvetica", "Tahoma", "Arial", sans-serif !important; }
 
-.post-content p, .post-content li { font-size: 20px; color: #515151; }
+.post-content p, .post-content li { font-size: 18px; color: #515151; }
 
 .post-link { font-weight: normal; }
 
@@ -421,7 +421,7 @@ table th { text-align: center !important; }
 
 .code_cell { margin: 1.5rem 0px !important; }
 
-pre code { font-size: 15px !important; }
+pre code { font-size: 17px !important; }
 
 .youtube-iframe-wrapper { position: relative; padding-bottom: 56.10%; height: 0; overflow: hidden; }
 
@@ -482,6 +482,6 @@ pre code { font-size: 15px !important; }
 
 .highlight .gd { color: #ff5555; }
 
-p code { font-size: 19px; }
+p code { font-size: 15px; }
 
 /*# sourceMappingURL=style.css.map */
