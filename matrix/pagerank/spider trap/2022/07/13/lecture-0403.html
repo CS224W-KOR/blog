@@ -8,8 +8,8 @@
 <meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Lecture 4.3 - Random Walk with Restarts" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="CS224w Lecture 4. Graph as Matrix" />
-<meta property="og:description" content="CS224w Lecture 4. Graph as Matrix" />
+<meta name="description" content="CS224W Lecture 4. Graph as Matrix" />
+<meta property="og:description" content="CS224W Lecture 4. Graph as Matrix" />
 <link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html" />
 <meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html" />
 <meta property="og:site_name" content="CS224W-KOR" />
@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Lecture 4.3 - Random Walk with Restarts" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-13T00:00:00-05:00","datePublished":"2022-07-13T00:00:00-05:00","description":"CS224w Lecture 4. Graph as Matrix","headline":"Lecture 4.3 - Random Walk with Restarts","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-13T00:00:00-05:00","datePublished":"2022-07-13T00:00:00-05:00","description":"CS224W Lecture 4. Graph as Matrix","headline":"Lecture 4.3 - Random Walk with Restarts","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/2022/07/13/lecture-0403.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -89,13 +89,13 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Lecture 4.3 - Random Walk with Restarts</h1><p class="page-description">CS224w Lecture 4. Graph as Matrix</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-13T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 4.3 - Random Walk with Restarts</h1><p class="page-description">CS224W Lecture 4. Graph as Matrix</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-13T00:00:00-05:00" itemprop="datePublished">
         Jul 13, 2022
       </time>
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      2 min read
     
 </span></p>
 
@@ -119,26 +119,82 @@ window.onload = wrap_img;
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
 <li class="toc-entry toc-h1"><a href="#recommendation">Recommendation</a></li>
-<li class="toc-entry toc-h1"><a href="#bipartite-user-item-graph">Bipartite User-Item Graph</a></li>
 <li class="toc-entry toc-h1"><a href="#node-proximity-measurements">Node proximity Measurements</a></li>
-<li class="toc-entry toc-h1"><a href="#node-proximity-measurements-1">Node proximity Measurements</a></li>
 <li class="toc-entry toc-h1"><a href="#proximity-on-graphs">Proximity on Graphs</a></li>
+<li class="toc-entry toc-h1"><a href="#random-walks">Random Walks</a></li>
+<li class="toc-entry toc-h1"><a href="#pagerank-varients-정리">PageRank Varients 정리</a></li>
 </ul><h1 id="recommendation">
 <a class="anchor" href="#recommendation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recommendation</h1>
 
-<p><img src="https://i.imgur.com/G3dopX8.png?1" alt="Imgur"></p>
+<p>추천 시스템에서 이분그래프(Bipartite graph)로 user와 item의 (구매)관계를 나타낸 <strong>Bipartite User-Item Graph</strong>는 다음 그림과 같습니다. 여기에서 <strong><code class="language-plaintext highlighter-rouge">특정 item Q를 구매한 user에게 어떤 item을 추천해주는 것이 좋을지</code></strong>를 고민한다면, 직관적으로 item Q가 item P와 비슷하게 user들과 관계를 가지고 있을 때 item P를 이 유저에게 추천하는 것이 좋을 것이라고 생각할 수 있습니다. 즉, <strong>item Q와 item P가 얼마나 가까운 관계인지 판단하는 것</strong>이 중요합니다.</p>
 
-<h1 id="bipartite-user-item-graph">
-<a class="anchor" href="#bipartite-user-item-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bipartite User-Item Graph</h1>
+<p><img src="https://i.imgur.com/G3dopX8.png?1" alt="Imgur"></p>
 
 <h1 id="node-proximity-measurements">
 <a class="anchor" href="#node-proximity-measurements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node proximity Measurements</h1>
 
-<h1 id="node-proximity-measurements-1">
-<a class="anchor" href="#node-proximity-measurements-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node proximity Measurements</h1>
+<p>노드 근접성(proximity) 측정에 대해 생각해보기 위해 아래의 3가지 케이스를 보겠습니다. <code class="language-plaintext highlighter-rouge">A-A’</code>은 <code class="language-plaintext highlighter-rouge">B-B’</code>보다 더 가까운 관계를 가지고 있다고 할 수 있습니다. 왜냐하면 <code class="language-plaintext highlighter-rouge">A-A’</code> path에서 user을 한번만 거치는데 반해, <code class="language-plaintext highlighter-rouge">B-B’</code>path에서는 B-user-item-user-B’ 로 path의 길이가 더 길기 때문입니다. 
+<code class="language-plaintext highlighter-rouge">A-A’</code>와 <code class="language-plaintext highlighter-rouge">C-C’</code>를 비교해보면 <code class="language-plaintext highlighter-rouge">C-C’</code>이 더 가까운 관계를 가지고 있다고 판단할 수 있는데 그 이유는 <code class="language-plaintext highlighter-rouge">C-C’</code>이 <code class="language-plaintext highlighter-rouge">A-A’</code>보다 더 많은 공통의 이웃(Common Neighbors)를 가지고 있기 때문입니다. <code class="language-plaintext highlighter-rouge">C-C’</code>은 <code class="language-plaintext highlighter-rouge">A-A’</code>의 shortest path가 2개있는 것으로도 볼 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/H1VOUBR.png?1" alt="Imgur"></p>
 
 <h1 id="proximity-on-graphs">
 <a class="anchor" href="#proximity-on-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Proximity on Graphs</h1>
+
+<p>이전에 PageRank를 다시 떠올려보면, (1) rank는 node의 “importance”를 정의하며 (2) 그래프의 모든 node들에 균일 분포로 teleport 이동을 할 수 있는 알고리즘이었습니다.</p>
+
+<p>여기에 좀 더 아이디어를 덧붙여서 <strong><code class="language-plaintext highlighter-rouge">Personalized PageRank</code></strong> 알고리즘을 생각해 볼 수 있습니다. 그래프의 모든 노드들에 대해 균일 분포로 teleport 이동을 하는 것이 아닌, <strong>그래프 노드들의 부분집합(subset) $\mathbf{S}$의 노드들로만</strong> teleport 이동을 하도록 할 수 있습니다. 모든 노드들로 랜덤하게 teleport하지 않고 <strong>좀 더 연관성이 높은 노드들로 teleport할 수 있도록</strong> 하는 것입니다. item Q와 item P가 더 연관성이 높다는 것(Node proxmity ↑)을 어떻게 알 수 있을까요? 이는 <strong>Random Walks</strong>로 확인해볼 수 있습니다.</p>
+
+<h1 id="random-walks">
+<a class="anchor" href="#random-walks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Random Walks</h1>
+
+<p>item Q가 우리가 알고싶은 item 노드들의 집합인 <code class="language-plaintext highlighter-rouge">QUERY_NODES</code>집합에 속해있다고 해봅시다. <strong>Bipartite User-Item Graph 상에서</strong> <code class="language-plaintext highlighter-rouge">QUERY_NODES</code> 집합에 속해 있는 어떤 노드(item Q)에서 시작하여 랜덤하게 움직이면서 과정을 기록합니다. 이 과정을 기록한다는 것은 item↔user 사이를 계속 랜덤하게 움직이면서 방문(visit)하게 된 item 노드에는 +1 count를 하는 것을 의미합니다. 이렇게 랜덤하게 움직이면서 이동을 결정할 때마다 일정 확률 <code class="language-plaintext highlighter-rouge">ALPHA</code> 만큼 재시작을 하게되는데, 재시작시에는 <code class="language-plaintext highlighter-rouge">QUERY_NODES</code>집합에 속해 있는 하나의 노드로 이동해서 다시 랜덤하게 움직이기 시작합니다. (아래 pseudo code 참고)</p>
+
+<p><img src="https://i.imgur.com/kG31TGo.png?1" alt="Imgur"></p>
+
+<p>이렇게 계속 Random Walks를 하다보면 item 노드의 visit 수가 높을수록 query item Q와 높은 관계성을 가진것으로 판단할 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/U4WkIHE.png?1" alt="Imgur">
+<strong>Benefits</strong></p>
+
+<p>이와 같은 Random Walks를 통한 시뮬레이션과 visit 수로 노드들간의 근접성(proximity)을 판단하는데 좋은 이유는 다음과 같은 사항들을 고려하여 similarity를 나타낼 수 있는 방법이기 때문입니다.</p>
+
+<ul>
+  <li>Multiple connnections</li>
+  <li>Multiple paths</li>
+  <li>Direct and Indirect connections</li>
+  <li>Degree of the node</li>
+</ul>
+
+<h1 id="pagerank-varients-정리">
+<a class="anchor" href="#pagerank-varients-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>PageRank Varients 정리</h1>
+
+<p>PageRank와 이를 변형한 총 3가지 알고리즘들을 정리하면 다음과 같습니다.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>PageRank</th>
+      <th>Personalized PR</th>
+      <th>Random Walk /w Restarts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>모든 노드들에 같은 확률로 teleport 이동</td>
+      <td>특정 노드들로 특정 확률을 가지고 teleport 이동</td>
+      <td>항상 똑같은 1개의 노드로 이동</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://i.imgur.com/7wAbphB.png?1" alt="Imgur"></p>
+
+<hr>
+
+<blockquote>
+  <p>Original Lecture Video : <a href="https://youtu.be/HbzQzUaJ_9I">CS224W: Machine Learning with Graphs 2021 Lecture 4.3 - Random Walk with Restarts</a></p>
+</blockquote>
 
   </div><!-- from https://github.com/utterance/utterances
 <script src="https://utteranc.es/client.js"
