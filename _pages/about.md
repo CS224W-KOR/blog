@@ -1,13 +1,21 @@
 ---
 layout: page
-title: About Us
+title: Questions
 permalink: /about/
 ---
 
-안녕하세요. 글또 그래프 스터디 모임입니다.
+스터디에서 같이 공부하며 나왔던 질문들에 대해 정리해보았습니다. 토의하며 정리한 것이니 절대적인 답은 아님을 주의해주세요.
+
+| Q: QUESTION
+
+| A: blabla
 
 
-# Contributers: 
+
+
+
+
+### Contributers
 > Alphabetical order
 
 - [JungYeon Lee](https://github.com/curieuxjy)
