@@ -121,7 +121,7 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
-<li class="toc-entry toc-h1"><a href="#lecture-63---deep-learning-for-graphs">**Lecture 6.3 - Deep Learning for Graphs**</a>
+<li class="toc-entry toc-h1"><a href="#lecture-63---deep-learning-for-graphs">Lecture 6.3 - Deep Learning for Graphs</a>
 <ul>
 <li class="toc-entry toc-h3"><a href="#setup">Setup</a></li>
 <li class="toc-entry toc-h3"><a href="#naive-approach">Naive Approach</a></li>
@@ -135,8 +135,9 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h3"><a href="#summary">Summary</a></li>
 </ul>
 </li>
-</ul><blockquote>
-  <p><strong>Lecture 6. Graph Neural Networks 1: GNN Model</strong></p>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 6. Graph Neural Networks (1) GNN Model</strong></p>
 
   <ul>
     <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 6.1 - Introduction to Graph Neural Networks</a></li>
@@ -149,7 +150,8 @@ window.onload = wrap_img;
 <hr>
 
 <h1 id="lecture-63---deep-learning-for-graphs">
-<a class="anchor" href="#lecture-63---deep-learning-for-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 6.3 - Deep Learning for Graphs</strong>**</h1>
+<a class="anchor" href="#lecture-63---deep-learning-for-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 6.3 - Deep Learning for Graphs</strong>
+</h1>
 
 <p>이제 본격적으로 이번 강의의 메인 주제였던 딥러닝을 활용한 그래프 데이터 임베딩 방법에 대해 공부해 봅시다. 참고로 Deep Encoder은 그래프 뉴럴 네트워크(GNN)으로도 부르기 때문에 혼재해서 사용하더라도 헷갈리지 않으시길 바랍니다.</p>
 
@@ -161,17 +163,7 @@ window.onload = wrap_img;
 <ul>
   <li>$V$: 노드 집합</li>
   <li>$A$: 인접 행렬 (Adjacency matrix)</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>$X \in \mathbb{R}^{m\times</td>
-          <td>V</td>
-          <td>}$: 노드 features</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>$X \in \mathbb{R}^{m\times |V|}$: 노드 features</li>
   <li>$v$: 노드 집합에 포함된 한 노드,   $N(v)$: $v$의 이웃 노드</li>
 </ul>
 
@@ -184,14 +176,13 @@ window.onload = wrap_img;
     <ul>
       <li>노드의 one-hot 인코딩 벡터</li>
       <li>상수 벡터 [1, 1, …, 1]</li>
-      <li>노드 차수(degree)
-#
-        <h3 id="naive-approach">
-<a class="anchor" href="#naive-approach" aria-hidden="true"><span class="octicon octicon-link"></span></a>Naive Approach</h3>
-      </li>
+      <li>노드 차수(degree)</li>
     </ul>
   </li>
 </ul>
+
+<h3 id="naive-approach">
+<a class="anchor" href="#naive-approach" aria-hidden="true"><span class="octicon octicon-link"></span></a>Naive Approach</h3>
 
 <p>딥러닝 모델을 활용하여 그래프 및 노드를 임베딩 하기 위해 가장 쉽게 생각할 수 있는 방법은 단순하게 그래프의 구조적인 특성을 나타내는 인접 행렬과 노드 feature 행렬을 그냥 이어 붙여서 딥러닝 모델에 던져주는 것입니다.</p>
 
@@ -200,34 +191,21 @@ window.onload = wrap_img;
 <p>위와 같은 undirected 그래프의 각 노드가 2차원의 feature를 각각 가지고 있다면, 단순히 두 행렬을 이어 붙여서 만든 7차원의 벡터를 뉴럴 네트워크에 전달하면 각 노드를 간단히 임베딩 할 수 있을 것입니다. 하지만 이러한 방법에는 다음과 같은 문제가 존재합니다.</p>
 
 <ul>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>**$O(</td>
-          <td>V</td>
-          <td>)$ 파라미터가 필요함**</td>
-        </tr>
-        <tr>
-          <td>
-<br>노드 feature이 $d$차원이라고 가정하면, 각 노드가 뉴럴 네트워크에 입력되는 차원이 $</td>
-          <td>V</td>
-          <td>+d$ 이겠죠? 따라서 그래프의 노드 갯수에 비례하여 모델의 파라미터가 증가합니다.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li><strong>$O(|V|)$ 파라미터가 필요함</strong></li>
+</ul>
+
+<p><br>노드 feature이 $d$차원이라고 가정하면, 각 노드가 뉴럴 네트워크에 입력되는 차원이 $|V|+d$ 이겠죠? 따라서 그래프의 노드 갯수에 비례하여 모델의 파라미터가 증가합니다.</p>
+<ul>
   <li>
 <strong>다른 사이즈의 그래프에는 적용할 수 없음</strong>
 <br>위와 같은 그래프에 대해 뉴럴 네트워크를 기껏 학습시켜 놓았는데, 100개의 노드로 구성된 새로운 그래프가 인풋으로 들어온다면, 인풋 차원이 맞지 않아 학습시킨 임베딩 모델을 활용할 수 없을 것입니다.</li>
   <li>
 <strong>노드 순서가 바뀌면 동일 노드의 임베딩이 달라질 수 있음</strong>
-<br>위 그래프에서 노드 순서를 A→B→C→D→E에서 B→E→A→C→D 등으로 바꾼다면, 이에 따라 인접 행렬도 바뀌게 됩니다. 이렇게 된다면 같은 A 노드를 임베딩 하기 위해 인풋으로 활용되는 7차원의 벡터가 달라지기 때문에 임베딩 결과 값도 달라질 것입니다.
-#
-    <h3 id="from-images-to-graphs">
-<a class="anchor" href="#from-images-to-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>From Images to Graphs</h3>
-  </li>
+<br>위 그래프에서 노드 순서를 A→B→C→D→E에서 B→E→A→C→D 등으로 바꾼다면, 이에 따라 인접 행렬도 바뀌게 됩니다. 이렇게 된다면 같은 A 노드를 임베딩 하기 위해 인풋으로 활용되는 7차원의 벡터가 달라지기 때문에 임베딩 결과 값도 달라질 것입니다.</li>
 </ul>
+
+<h3 id="from-images-to-graphs">
+<a class="anchor" href="#from-images-to-graphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>From Images to Graphs</h3>
 
 <p>그렇다면 기존 CNN 모델에서 아이디어를 차용해보는 건 어떨까요?</p>
 
@@ -243,8 +221,8 @@ window.onload = wrap_img;
 
 <p><strong>그렇다면 그래프를 임베딩 할 때 타겟 노드의 이웃 노드에서 정보를 전달받아 이를 활용하여 타겟 노드의 임베딩을 업데이트 하되, 타겟 노드마다 이웃 노드의 갯수가 다를 수 있는 점을 고려하여 각기 다른 computation graph를 갖도록 하는 것이 좋겠습니다!</strong></p>
 
-<p>다음과 같은 아이디어를 근간으로 Graph Convolutional Network가 등장하게 되었습니다. 남은 강의에서는 이 GCN을 디테일하게 설명하고 있습니다.
-#</p>
+<p>다음과 같은 아이디어를 근간으로 Graph Convolutional Network가 등장하게 되었습니다. 남은 강의에서는 이 GCN을 디테일하게 설명하고 있습니다.</p>
+
 <h3 id="idea-aggregate-neighbors">
 <a class="anchor" href="#idea-aggregate-neighbors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Idea: Aggregate Neighbors</h3>
 
@@ -263,8 +241,8 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/25YNtNb.png?1" alt="Imgur"></p>
 
-<p>아닙니다. 노드마다 이웃 노드의 갯수와 종류가 다르기 때문에 당연히 <strong>노드마다 서로 다른 computation graph를 가지게 됩니다.</strong>
-#</p>
+<p>아닙니다. 노드마다 이웃 노드의 갯수와 종류가 다르기 때문에 당연히 <strong>노드마다 서로 다른 computation graph를 가지게 됩니다.</strong></p>
+
 <h3 id="deep-model-many-layers">
 <a class="anchor" href="#deep-model-many-layers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deep Model: Many Layers</h3>
 
@@ -280,8 +258,8 @@ window.onload = wrap_img;
 
 <p><strong>Aggregator 함수</strong></p>
 
-<p>여기서 타겟 노드 A가 이웃 노드 B, C, D의 메시지를 aggregation 할 때, 노드 B, C, D의 순서와 관계 없이 aggregate된 메시지는 동일해야 합니다. 즉, 메시지를 aggregate하는 함수는 <strong>permutation-invariant</strong>한 속성을 가져야 한다는 말입니다. 일반적인 GNN은 주로 <strong>합, 평균, 맥스 풀링</strong>등의 aggregator를 활용합니다.
-#</p>
+<p>여기서 타겟 노드 A가 이웃 노드 B, C, D의 메시지를 aggregation 할 때, 노드 B, C, D의 순서와 관계 없이 aggregate된 메시지는 동일해야 합니다. 즉, 메시지를 aggregate하는 함수는 <strong>permutation-invariant</strong>한 속성을 가져야 한다는 말입니다. 일반적인 GNN은 주로 <strong>합, 평균, 맥스 풀링</strong>등의 aggregator를 활용합니다.</p>
+
 <h3 id="the-math-deep-encoder">
 <a class="anchor" href="#the-math-deep-encoder" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Math: Deep Encoder</h3>
 
@@ -303,12 +281,11 @@ window.onload = wrap_img;
   <li>
 <strong>노란색 수식 블럭</strong> : 최종적으로 비선형 함수를 적용해서 $l+1$번째 layer에서의 타겟 노드 임베딩을 구합니다.</li>
   <li>
-<strong>보라색 수식 블럭</strong> : 노드 임베딩 업데이트 과정을 $L$번 반복합니다. 이 때 최종적으로 형성된 노드 임베딩은 본인으로부터 L-hop 떨어진 노드의 정보까지 활용하여 만든 것입니다.
-#
-    <h3 id="matrix-formulation">
-<a class="anchor" href="#matrix-formulation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matrix Formulation</h3>
-  </li>
+<strong>보라색 수식 블럭</strong> : 노드 임베딩 업데이트 과정을 $L$번 반복합니다. 이 때 최종적으로 형성된 노드 임베딩은 본인으로부터 L-hop 떨어진 노드의 정보까지 활용하여 만든 것입니다.</li>
 </ol>
+
+<h3 id="matrix-formulation">
+<a class="anchor" href="#matrix-formulation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matrix Formulation</h3>
 
 <p>이전에 Random Walk를 행렬 형태로 표현했듯이, 벡터식으로 다뤘던 GNN도 행렬식으로 다시 표현해보겠습니다.</p>
 
@@ -350,8 +327,8 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/b0ih789.png?1" alt="Imgur"></p>
 
-<p>벡터식으로 이해하기도 어려웠는데 왜 굳이 사서 행렬식으로 변환하냐고요? 사실 행렬식이 가지는 구현상의 이점이 있기 때문입니다. <strong>행렬식을 사용한다면 각 노드에 대한 임베딩을 따로 따로 업데이트 하지 않고 하나의 행렬로써 한번에 업데이트 할 수 있으며, 이 과정에서 $\tilde{A}$가 희소 행렬이기 때문에 보다 더 효율적인 행렬 연산이 가능하기 때문에 구현할 때는 행렬식이 더 선호됩니다.</strong>
-#</p>
+<p>벡터식으로 이해하기도 어려웠는데 왜 굳이 사서 행렬식으로 변환하냐고요? 사실 행렬식이 가지는 구현상의 이점이 있기 때문입니다. <strong>행렬식을 사용한다면 각 노드에 대한 임베딩을 따로 따로 업데이트 하지 않고 하나의 행렬로써 한번에 업데이트 할 수 있으며, 이 과정에서 $\tilde{A}$가 희소 행렬이기 때문에 보다 더 효율적인 행렬 연산이 가능하기 때문에 구현할 때는 행렬식이 더 선호됩니다.</strong></p>
+
 <h3 id="how-to-train-a-gnn">
 <a class="anchor" href="#how-to-train-a-gnn" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to train a GNN</h3>
 
@@ -410,7 +387,6 @@ window.onload = wrap_img;
   </li>
 </ol>
 
-<p>#</p>
 <h3 id="model-design-overview">
 <a class="anchor" href="#model-design-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model Design: Overview</h3>
 
@@ -441,7 +417,6 @@ window.onload = wrap_img;
 
 </aside>
 
-<p>#</p>
 <h3 id="summary">
 <a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h3>
 

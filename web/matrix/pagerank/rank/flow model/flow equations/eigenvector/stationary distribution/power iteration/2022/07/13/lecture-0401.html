@@ -147,14 +147,9 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#the-stationary-distribution">The Stationary Distribution</a></li>
 <li class="toc-entry toc-h1"><a href="#eigenvector-formulation">Eigenvector Formulation</a></li>
 <li class="toc-entry toc-h1"><a href="#pagerank-정리">PageRank 정리</a></li>
-</ul><blockquote>
+</ul><hr>
+<blockquote>
   <p><strong>Lecture 4. Graph as Matrix</strong></p>
-
-  <p>4강에서는 Graph를 <strong>매트릭스(선형대수) 관점</strong>으로 바라보는 것에 대해 이야기 합니다.</p>
-
-  <p><img src="https://i.imgur.com/aU2bZOQ.png?1" alt="Imgur"></p>
-
-  <p>다음 3가지 키워드, <strong>Random walk(Node Importance), Matrix Factorization, Node embedding</strong>를 중심으로 공부합니다. 강의는 총 4파트로 나누어져 진행됩니다.</p>
 
   <ul>
     <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 4.1 - PageRank</a></li>
@@ -166,6 +161,12 @@ window.onload = wrap_img;
 </blockquote>
 
 <hr>
+
+<p>4강에서는 Graph를 <strong>매트릭스(선형대수) 관점</strong>으로 바라보는 것에 대해 이야기 합니다.</p>
+
+<p><img src="https://i.imgur.com/aU2bZOQ.png?1" alt="Imgur"></p>
+
+<p>다음 3가지 키워드, <strong>Random walk(Node Importance), Matrix Factorization, Node embedding</strong>를 중심으로 공부합니다. 강의는 총 4파트로 나누어져 진행됩니다.</p>
 
 <h1 id="the-web-as-a-directed-graph">
 <a class="anchor" href="#the-web-as-a-directed-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Web as a Directed Graph</h1>
@@ -358,7 +359,7 @@ window.onload = wrap_img;
 <h1 id="the-stationary-distribution">
 <a class="anchor" href="#the-stationary-distribution" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Stationary Distribution</h1>
 
-<p>앞서 정의한 $\mathbf{p(t)}$를 가지고 이 유저가 시점 $<strong>t+1$에 있을 확률분포는</strong> 다음과 같이 계산합니다.</p>
+<p>앞서 정의한 $\mathbf{p(t)}$를 가지고 이 유저가 시점 <strong>$t+1$에 있을 확률분포는</strong> 다음과 같이 계산합니다.</p>
 
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo>+</mo><mn mathvariant="bold">1</mn><mo stretchy="false">)</mo></mrow><mo>=</mo><mi mathvariant="bold">M</mi><mo>⋅</mo><mrow><mi mathvariant="bold">p</mi><mo stretchy="false">(</mo><mi mathvariant="bold">t</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{p(t+1)}=\mathbf{M} \cdot \mathbf{p(t)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">1</span><span class="mclose">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="mopen">(</span><span class="mord mathbf">t</span><span class="mclose">)</span></span></span></span></span></span>
 

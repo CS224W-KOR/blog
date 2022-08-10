@@ -126,7 +126,23 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#randomwalk-based-similarity">RandomWalk-based Similarity</a></li>
 <li class="toc-entry toc-h1"><a href="#limitations">Limitations</a></li>
 <li class="toc-entry toc-h1"><a href="#algorithms-정리">Algorithms 정리</a></li>
-</ul><h1 id="recall-node-embeddings--embedding-matrix">
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 4. Graph as Matrix</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 4.1 - PageRank</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 4.2 - PageRank, How to Solve?</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 4.3 - Random Walk with Restarts</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 4.4 - Matrix Factorization and Node Embeddings</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="recall-node-embeddings--embedding-matrix">
 <a class="anchor" href="#recall-node-embeddings--embedding-matrix" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recall: Node Embeddings &amp; Embedding matrix</h1>
 
 <p>이전 강의에서 배웠던 embedding matrix $\mathbf{Z}$에 대해 다시 떠올려봅시다. 이 매트릭스는 그래프의 각 노드들을 잠재변수 공간(embedding space)으로 encoding하는 행렬로 열의 차원은 embedding하는 크기, 행의 차원은 그래프에 있는 노드의 수가 됩니다. 이 매트릭스의 한 열은 특정 노드 $u$의 embedding vector $\mathbf{z}_u$를 나타내게 됩니다.</p>
