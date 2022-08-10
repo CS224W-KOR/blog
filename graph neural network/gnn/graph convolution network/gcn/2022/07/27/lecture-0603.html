@@ -140,9 +140,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 6. Graph Neural Networks (1) GNN Model</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 6.1 - Introduction to Graph Neural Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 6.2 - Basics of Deep Learning</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 6.3 - Deep Learning for Graphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0601.html">Lecture 6.1 - Introduction to Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0602.html">Lecture 6.2 - Basics of Deep Learning</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0603.html">Lecture 6.3 - Deep Learning for Graphs</a></li>
   </ul>
 
 </blockquote>
@@ -291,15 +291,7 @@ window.onload = wrap_img;
 
 <p>모든 노드 임베딩 벡터를 한데 모아 노드 임베딩 행렬을 만든다면, 이는 아래와 같이 표현할 수 있습니다.</p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>$H^{L} = {[h_{1}^{(l)}  …  h_{</td>
-      <td>V</td>
-      <td>}^{(l)}]}^T$</td>
-    </tr>
-  </tbody>
-</table>
+<p>$H^{L} = {[h_{1}^{(l)}  …  h_{|V|}^{(l)}]}^T$</p>
 
 <p>그렇다면 이웃 노드의 임베딩을 합산하는 과정은 그래프의 인접 행렬을 사용하여 아래와 같이 간단하게 나타낼 수 있습니다.</p>
 
@@ -307,17 +299,7 @@ window.onload = wrap_img;
 
 <p>만약 대각 행렬을 이렇게 정의한다면, 이 대각 행렬의 역행렬은 다음과 같기 때문에,</p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>$D_{v,v} = Deg(v) =</td>
-      <td>N(v)</td>
-      <td>$ ,     $D_{v,v}^{-1} = 1/</td>
-      <td>N(v)</td>
-      <td>$</td>
-    </tr>
-  </tbody>
-</table>
+<p>$D_{v,v} = Deg(v) = |N(v)|$ ,     $D_{v,v}^{-1} = 1/|N(v)|$</p>
 
 <p>이를 활용하면 이웃 노드의 임베딩을 평균내는 연산을 행렬식으로 간단하게 표현할 수 있습니다.</p>
 
@@ -378,10 +360,9 @@ window.onload = wrap_img;
 
         <aside>
   💡 원본 그래프에서 similar한 노드는 → similar한 임베딩을 갖도록 합니다
-        
-  ![Imgur](https://i.imgur.com/UyyVLbR.png?1)
-        
   </aside>
+
+        <p><img src="https://i.imgur.com/UyyVLbR.png?1" alt="Imgur"></p>
       </li>
     </ul>
   </li>

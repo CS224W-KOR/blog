@@ -121,7 +121,7 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
-<li class="toc-entry toc-h1"><a href="#lecture-62---basics-of-deep-learning">**Lecture 6.2 - Basics of Deep Learning**</a>
+<li class="toc-entry toc-h1"><a href="#lecture-62---basics-of-deep-learning">Lecture 6.2 - Basics of Deep Learning</a>
 <ul>
 <li class="toc-entry toc-h3"><a href="#machine-learning-as-optimization">Machine Learning as Optimization</a></li>
 <li class="toc-entry toc-h3"><a href="#gradient-descent">Gradient Descent</a></li>
@@ -137,9 +137,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 6. Graph Neural Networks (1) GNN Model</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 6.1 - Introduction to Graph Neural Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 6.2 - Basics of Deep Learning</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 6.3 - Deep Learning for Graphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0601.html">Lecture 6.1 - Introduction to Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0602.html">Lecture 6.2 - Basics of Deep Learning</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/27/lecture-0603.html">Lecture 6.3 - Deep Learning for Graphs</a></li>
   </ul>
 
 </blockquote>
@@ -147,7 +147,8 @@ window.onload = wrap_img;
 <hr>
 
 <h1 id="lecture-62---basics-of-deep-learning">
-<a class="anchor" href="#lecture-62---basics-of-deep-learning" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**Lecture 6.2 - Basics of Deep Learning</strong>**</h1>
+<a class="anchor" href="#lecture-62---basics-of-deep-learning" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 6.2 - Basics of Deep Learning</strong>
+</h1>
 
 <p>이번 파트는 본격적으로 그래프 데이터를 위한 딥러닝을 설명하기에 앞서 딥러닝에 익숙하지 않은 사람들을 위해 <strong>딥러닝의 기본 개념</strong>을 간단하게 설명하는 부분입니다. 많은 내용을 커버하긴 하지만 딥러닝 초심자들은 CS231n과 같은 딥러닝 강의를 먼저 수강하고 오심을 추천드립니다!</p>
 
@@ -165,15 +166,7 @@ window.onload = wrap_img;
 
 </blockquote>
 
-<table>
-  <tbody>
-    <tr>
-      <td>최종적으로 우리가 학습하고자 하는 파라미터 값입니다. 예를 들어 앞의 Shallow Encoder에서는 학습으로 결정되는 $</td>
-      <td>V</td>
-      <td>\times d$ 사이즈의 임베딩 look-up table이 $\theta$에 해당하겠죠.</td>
-    </tr>
-  </tbody>
-</table>
+<p>최종적으로 우리가 학습하고자 하는 파라미터 값입니다. 예를 들어 앞의 Shallow Encoder에서는 학습으로 결정되는 $|V|\times d$ 사이즈의 임베딩 look-up table이 $\theta$에 해당하겠죠.</p>
 
 <blockquote>
   <p><strong>$\mathcal{L}$ : Loss 함수</strong></p>
@@ -196,8 +189,8 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/JouDoxA.png" alt="Imgur"></p>
 
-<p>그럼 이제 위에서 공부한 각 구성 요소를 바탕으로 다시 이 최적화 식을 해석해 봅시다. 결국 우리가 풀고자 하는 머신러닝 문제는, <strong>정답 label $y$와 모델이 예측한 label $f(x)$의 차이를 나타내는 loss 함수를  최소화 하는 방향으로 모델 파라미터 $\theta$를 최적화하는 문제</strong>로 해석할 수 있습니다.
-#</p>
+<p>그럼 이제 위에서 공부한 각 구성 요소를 바탕으로 다시 이 최적화 식을 해석해 봅시다. 결국 우리가 풀고자 하는 머신러닝 문제는, <strong>정답 label $y$와 모델이 예측한 label $f(x)$의 차이를 나타내는 loss 함수를  최소화 하는 방향으로 모델 파라미터 $\theta$를 최적화하는 문제</strong>로 해석할 수 있습니다.</p>
+
 <h3 id="gradient-descent">
 <a class="anchor" href="#gradient-descent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradient Descent</h3>
 
@@ -223,8 +216,8 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/83JjnS5.png?1" alt="Imgur"></p>
 
-<p>위 식에서 $\eta$는 learning rate로, 한번 파라미터를 업데이트 시 얼마나 변경할 것인지 보폭을 나타내는 값입니다. 이는 학습 과정 동안 동일하게 유지할 수도 있고, 목적에 따라 계속 변하게 할 수도 있습니다. 이론적으로 모델 파라미터의 업데이트는 loss 함수의 local minimum에 도달하여 gradient가 0이 될 때까지 진행하는 것이 맞지만, 실전에서는 검증 데이터셋에서의 성능이 더 이상 증가하지 않는 기점에서 모델 파라미터 업데이트를 중단합니다.
-#</p>
+<p>위 식에서 $\eta$는 learning rate로, 한번 파라미터를 업데이트 시 얼마나 변경할 것인지 보폭을 나타내는 값입니다. 이는 학습 과정 동안 동일하게 유지할 수도 있고, 목적에 따라 계속 변하게 할 수도 있습니다. 이론적으로 모델 파라미터의 업데이트는 loss 함수의 local minimum에 도달하여 gradient가 0이 될 때까지 진행하는 것이 맞지만, 실전에서는 검증 데이터셋에서의 성능이 더 이상 증가하지 않는 기점에서 모델 파라미터 업데이트를 중단합니다.</p>
+
 <h3 id="stochastic-gradient-descent-sgd">
 <a class="anchor" href="#stochastic-gradient-descent-sgd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stochastic Gradient Descent (SGD)</h3>
 
@@ -243,8 +236,8 @@ window.onload = wrap_img;
 
 </aside>
 
-<p><br>오늘날의 최적화 optimizer은 SGD의 여러 발전된 형태로써, Adam, Adagrad, Adadelta, RMSprop 등이 있습니다.
-#</p>
+<p><br>오늘날의 최적화 optimizer은 SGD의 여러 발전된 형태로써, Adam, Adagrad, Adadelta, RMSprop 등이 있습니다.</p>
+
 <h3 id="back-propagation">
 <a class="anchor" href="#back-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Back-propagation</h3>
 
@@ -283,15 +276,15 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/QO3D2Tl.png?1" alt="Imgur"></p>
 
-<p>연쇄법칙에 따라 gradient가 $\mathcal{L}$ → $f(x)$ → $W_{2}$ → $W_{1}$ 을 따라 차례로 거꾸로 흐르면서 계산됩니다. 이렇게 말단에서부터 앞쪽까지 gradient가 흘러오기 때문에 역전파(back-propagation)이라는 이름이 붙었다고 합니다.
-#</p>
+<p>연쇄법칙에 따라 gradient가 $\mathcal{L}$ → $f(x)$ → $W_{2}$ → $W_{1}$ 을 따라 차례로 거꾸로 흐르면서 계산됩니다. 이렇게 말단에서부터 앞쪽까지 gradient가 흘러오기 때문에 역전파(back-propagation)이라는 이름이 붙었다고 합니다.</p>
+
 <h3 id="non-linearity">
 <a class="anchor" href="#non-linearity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Non-linearity</h3>
 
 <p>지금까지 예시로써 다뤄본 두 케이스는 사실 모두 선형 모델로써, 비선형적인 데이터를 잘 모델링할 수 없습니다. 따라서 오늘날의 머신러닝 모델은 비선형적인 활성 함수(Activation function)를 도입함으로써 이러한 문제를 해결합니다. 대표적인 비선형 함수로는 <strong>ReLU, Sigmoid</strong> 등이 있습니다.</p>
 
-<p><img src="https://i.imgur.com/9F5rpJS.png?1" alt="Imgur">
-#</p>
+<p><img src="https://i.imgur.com/9F5rpJS.png?1" alt="Imgur"></p>
+
 <h3 id="multi-layer-perceptron-mlp">
 <a class="anchor" href="#multi-layer-perceptron-mlp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multi-layer Perceptron (MLP)</h3>
 
@@ -299,8 +292,8 @@ window.onload = wrap_img;
 
 <p><strong>MLP란 한 layer마다 선형 변환과 비선형 변환이 합쳐진 가장 기본적인 형태의 머신러닝 모델</strong>이라고 볼 수 있습니다. 위 식은 MLP 한 layer을 나타내는데, layer $l$ 의 인풋으로 들어온 $x^{(l)}$에 $W_{l}$이 곱해져  선형 변환 된 후 bias 항이 더해집니다. 최종적으로 비선형 함수를 거친 아웃풋이 layer $l+1$의 인풋으로 전달됩니다. 이를 그림으로 나타내면 다음과 같습니다.</p>
 
-<p><img src="https://i.imgur.com/54tlQil.png?1" alt="Imgur">
-#</p>
+<p><img src="https://i.imgur.com/54tlQil.png?1" alt="Imgur"></p>
+
 <h3 id="summary">
 <a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h3>
 
