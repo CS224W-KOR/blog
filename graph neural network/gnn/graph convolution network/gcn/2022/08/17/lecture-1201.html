@@ -138,9 +138,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 12</strong></p>
 
   <ul>
-    <li><a href="">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
-    <li><a href="">Lecture 12.2 - Neural Subgraph Matching</a></li>
-    <li><a href="">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html">Lecture 12.2 - Neural Subgraph Matching</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1203.html">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
   </ul>
 
 </blockquote>
@@ -151,10 +151,13 @@ window.onload = wrap_img;
 <a class="anchor" href="#lecture-121---fast-neural-subgraph-matching--counting" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</strong>
 </h1>
 
-<p>Subgraphs와 Motifs는 그래프의 구조적 insights를 제공해주는 중요한 concepts이기 때문에, Subgraphs와 Motifs의 개수를 셈으로써 우리는 노드나 그래프의 features로 사용할 수 있다. 따라서 우리는 Subgraphs와 motifs의 개수를 세는 방법을 이번 목차에 다룰 것이며, Motifs를 Subgraphs에 포함되거나 동일한 개념으로 이해하시면 됩니다.</p>
+<p>Subgraphs와 Motifs는 그래프의 구조적 insights를 제공해주는 중요한 concepts이기 때문에, Subgraphs와 Motifs의 개수를 셈으로써 우리는 노드나 그래프의 features로 사용할 수 있다.</p>
+
+<p>따라서 우리는 Subgraphs와 motifs의 개수를 세는 방법을 이번 목차에 다룰 것이며, Motifs를 Subgraphs에 포함되거나 동일한 개념으로 이해하시면 됩니다.</p>
 
 <h2 id="subgraphs">
-<a class="anchor" href="#subgraphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgraphs</h2>
+<a class="anchor" href="#subgraphs" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Subgraphs</strong>
+</h2>
 
 <p align="center">
     <img src="https://i.imgur.com/XtxGdxJ.png" width="450xp">
@@ -200,7 +203,8 @@ window.onload = wrap_img;
 왼쪽 그림은 그래프의 크기가 4인 모든 비동형, 연결된 비방향 그래프의 예시이며, 오른쪽은, 크기가 3인 모든 비동형 연결 방향 그래프의 예시입니다.</p>
 
 <h2 id="network-motifs">
-<a class="anchor" href="#network-motifs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Network Motifs</h2>
+<a class="anchor" href="#network-motifs" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Network Motifs</strong>
+</h2>
 
 <p align="center">
     <img src="https://i.imgur.com/2H6HTZg.png" width="700xp">
@@ -221,7 +225,8 @@ window.onload = wrap_img;
 <p>Motif가 필요한 이유는 이러한 Motif을 통해 <strong>그래프의 작동방식을 이해할 수 있으며 예측하는데 도움</strong>이 되며, 예를 들어, feed-forward loop는 noise를 제거하는 용도로 뇌의 뉴런 네트워크에서 흔히 볼 수 있으며, parallel loops는 먹이사슬 관계에서 볼 수 있으며, Single-input module는 유전자 제어 네트워크에서 흔히 볼 수 있다고 합니다.</p>
 
 <h2 id="subgraph-frequency">
-<a class="anchor" href="#subgraph-frequency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgraph Frequency</h2>
+<a class="anchor" href="#subgraph-frequency" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Subgraph Frequency</strong>
+</h2>
 
 <p align="center">
     <img src="https://i.imgur.com/mOPWyUE.png" width="400xp">
@@ -237,7 +242,7 @@ window.onload = wrap_img;
 <p>데이터 셋에 여러 개의 그래프가 포함되어 있고 데이터 세트에서 하위 그래프의 빈도를 계산하려는 경우에는 데이터 셋이 여러개의 그래프를 가진다면 연결되지 않은 부분을 가진 하나의 거대 그래프 $G_T$로 보고 빈도를 계산한다고 합니다.</p>
 
 <h2 id="motif-significance">
-<a class="anchor" href="#motif-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motif <strong>Significance</strong>
+<a class="anchor" href="#motif-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Motif Significance</strong>
 </h2>
 
 <p align="center">
@@ -271,7 +276,8 @@ window.onload = wrap_img;
 </ul>
 
 <h2 id="z-score-for-statistical-significance">
-<a class="anchor" href="#z-score-for-statistical-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Z-score for Statistical Significance</h2>
+<a class="anchor" href="#z-score-for-statistical-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Z-score for Statistical Significance</strong>
+</h2>
 
 <p>$Z_{i}$는 모티프 $i$의 통계적 중요성을 포착 :</p>
 
@@ -327,7 +333,8 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
 따라서 우리는 network significance profile을 통해서 해당 도메인의 고유한 특성에 대한 insight를 얻을 수 있습니다.</p>
 
 <h2 id="summary">
-<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Summary</strong>
+</h2>
 
 <ul>
   <li>Subgraphs and motifs are the building blocks of graphs (motifs는 graphs의 일부분)
@@ -340,39 +347,16 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
     <h2 id="use-random-graphs-as-null-model-to-evaluate-the-significance-of-motif-via-z-score-random-graphs는-motif의-significance를-평가하기-위한-null-model로써-사용됨">
 <a class="anchor" href="#use-random-graphs-as-null-model-to-evaluate-the-significance-of-motif-via-z-score-random-graphs%EB%8A%94-motif%EC%9D%98-significance%EB%A5%BC-%ED%8F%89%EA%B0%80%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-null-model%EB%A1%9C%EC%8D%A8-%EC%82%AC%EC%9A%A9%EB%90%A8" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use random graphs as null model to evaluate the significance of motif via Z-score (random graphs는 motif의 significance를 평가하기 위한 null model로써 사용됨)</h2>
     <h1 id="reference">
-<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h1>
+<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Reference</strong>
+</h1>
   </li>
 </ul>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting](https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34">CS224W: Machine Learning with Graphs 2021 Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.2 - Neural Subgraph Matching](https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35">CS224W: Machine Learning with Graphs 2021 Lecture 12.2 - Neural Subgraph Matching</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.3 - Finding Frequent Subgraphs](https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36">CS224W: Machine Learning with Graphs 2021 Lecture 12.3 - Finding Frequent Subgraphs</a></p>
 
 <p><a href="https://velog.io/@kimkj38/CS224W-Lecture12.-Frequent-Subgraph-Mining-with-GNNs">Lecture 12. Frequent Subgraph Mining with GNNs</a></p>
 

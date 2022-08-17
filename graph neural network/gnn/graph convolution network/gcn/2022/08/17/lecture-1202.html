@@ -136,9 +136,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 12</strong></p>
 
   <ul>
-    <li><a href="">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
-    <li><a href="">Lecture 12.2 - Neural Subgraph Matching</a></li>
-    <li><a href="">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html">Lecture 12.2 - Neural Subgraph Matching</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1203.html">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
   </ul>
 
 </blockquote>
@@ -185,7 +185,7 @@ window.onload = wrap_img;
 
 <p>Subgraph isomorphism relationship 은 3종류로 다음과 같이 embedding space에 Representation 된다.</p>
 
-<p>Transitivity는 ${\color{yellow}\square}$ $\preccurlyeq<span class="katex-error" title="ParseError: KaTeX parse error: Can't use function '$' in math mode at position 23: …{green}\square}$̲, ${\color{gree…" style="color:#cc0000">{\color{green}\square}$, ${\color{green}\square}</span>\preccurlyeq<span class="katex-error" title="ParseError: KaTeX parse error: Can't use function '$' in math mode at position 21: …or{red}\square}$̲ 인 경우 ${\color{…" style="color:#cc0000">{\color{red}\square}$ 인 경우 ${\color{yellow}\square}$ $\preccurlyeq</span>{\color{red}\square}$의 관계를 가지는 형태로 ${\color{yellow}\square}$ 은 ${\color{green}\square}$의 Subgraph이고 ${\color{green}\square}$은 ${\color{red}\square}$의 Subgraph이고 ${\color{yellow}\square}$ 은 ${\color{red}\square}$의 Subgraph인 관계이다.</p>
+<p>Transitivity는 ${\color{yellow}\square}$ $\preccurlyeq$ ${\color{green}\square}$, ${\color{green}\square}$ $\preccurlyeq$ ${\color{red}\square}$ 인 경우 ${\color{yellow}\square}$ $\preccurlyeq$ ${\color{red}\square}$의 관계를 가지는 형태로 ${\color{yellow}\square}$ 은 ${\color{green}\square}$의 Subgraph이고 ${\color{green}\square}$은 ${\color{red}\square}$의 Subgraph이고 ${\color{yellow}\square}$ 은 ${\color{red}\square}$의 Subgraph인 관계이다.</p>
 
 <p>Anti-symmetry는 ${\color{yellow}\square}$  == ${\color{green}\square}$ 의 관계를 가지는 형태로 ${\color{yellow}\square}$ 과 ${\color{green}\square}$이 서로 동일한 그래프인 관계이다.</p>
 
@@ -209,7 +209,8 @@ window.onload = wrap_img;
 <p>$E\left(G_{q}, G_{t}\right)=0$ (왼쪽 그래프)이면 $G_{q}$ 는 $G_{t}$ 의 Subgraph가 이고 $E\left(G_{q}, G_{t}\right)&gt;0$ (오른쪽 그래프)이면 $G_{q}$ 는 $G_{t}$ 의 Subgraph가 아님을 나타냅니다.</p>
 
 <h2 id="training">
-<a class="anchor" href="#training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training</h2>
+<a class="anchor" href="#training" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Training</strong>
+</h2>
 
 <ul>
   <li>학습 데이터셋 $\left(G_{q}, G_{t}\right)$는 $G_{t}$ 의 subgraph인 $G_{q}$가 반, 그렇지 않은 것이 반이 되도록 구성해야 한다.</li>
@@ -248,7 +249,8 @@ window.onload = wrap_img;
 <p>Negative example은 $G_{Q}$로부터 노드/엣지들은 제거하거나 추가하여 만든다.</p>
 
 <h2 id="summary">
-<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Summary</strong>
+</h2>
 
 <ul>
   <li>Neural subgraph matching uses a machine learning based approach to learn the NP-hard problem of subgraph isomorphism (NP-hard 문제인 Subgraph matching를 해결하기 위해서 ML 기반의 접근법을 사용)
@@ -267,35 +269,11 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting](https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34">CS224W: Machine Learning with Graphs 2021 Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.2 - Neural Subgraph Matching](https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35">CS224W: Machine Learning with Graphs 2021 Lecture 12.2 - Neural Subgraph Matching</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.3 - Finding Frequent Subgraphs](https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36">CS224W: Machine Learning with Graphs 2021 Lecture 12.3 - Finding Frequent Subgraphs</a></p>
 
 <p><a href="https://velog.io/@kimkj38/CS224W-Lecture12.-Frequent-Subgraph-Mining-with-GNNs">Lecture 12. Frequent Subgraph Mining with GNNs</a></p>
 

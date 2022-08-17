@@ -134,9 +134,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 12</strong></p>
 
   <ul>
-    <li><a href="">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
-    <li><a href="">Lecture 12.2 - Neural Subgraph Matching</a></li>
-    <li><a href="">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html">Lecture 12.2 - Neural Subgraph Matching</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1203.html">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
   </ul>
 
 </blockquote>
@@ -148,7 +148,8 @@ window.onload = wrap_img;
 </h1>
 
 <h2 id="problem">
-<a class="anchor" href="#problem" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problem</h2>
+<a class="anchor" href="#problem" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Problem</strong>
+</h2>
 <p align="center">
     <img src="https://i.imgur.com/OQy1SD7.png" width="400xp">
 </p>
@@ -163,7 +164,8 @@ window.onload = wrap_img;
 따라서 우리는 이러한 문제를 Representation learning을 통해서 해결한다. GNN을 이용하여 그래프의 임베딩을 서로 비교하면서 두 그래프의 관계를 찾아서 해결한다.</p>
 
 <h2 id="spminier">
-<a class="anchor" href="#spminier" aria-hidden="true"><span class="octicon octicon-link"></span></a>SPMinier</h2>
+<a class="anchor" href="#spminier" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>SPMinier</strong>
+</h2>
 
 <p align="center">
     <img src="https://i.imgur.com/YSrSV1a.png" width="700xp">
@@ -176,7 +178,7 @@ window.onload = wrap_img;
     <img src="https://i.imgur.com/XPfOhmp.png" width="450xp">
 </p>
 
-<p>Order embedding space에서는 subgraph의 여부를 쉽게 알 수 있으며 위 그림에서 붉은색 영역 내의 모든 <strong>노란 점들은 $<em>G_Q</em>$를 포함하는 모든 $<em>G_T</em>$의 neighborhoods</strong>가 된다.</p>
+<p>Order embedding space에서는 subgraph의 여부를 쉽게 알 수 있으며 위 그림에서 붉은색 영역 내의 모든 <strong>노란 점들은 $G_Q$를 포함하는 모든 $G_T$의 neighborhoods</strong>가 된다.</p>
 
 <p align="center">
     <img src="https://i.imgur.com/bjYQ0hA.png" width="700xp">
@@ -185,7 +187,8 @@ window.onload = wrap_img;
 <p>SPMiner 목표는 k step 마다 가장 많은 eighborhood embeddings를 포함하는 Motif를 찾는 것이고, 학습은 무작위로 한개의 노드를 초기의 값으로 선택한 후$(S = u)$에 각 step 마다의 subgraph를 저장하는 과정($S$의 이웃 노드들을 골라 점진적으로 늘려 Motif의 사이즈를 키워간다 = 스텝을 진행하면서 motif를 성장시켜 더 큰 motif를 찾는 것이 목표이며, 위의 그림의 빨간 점에 속하는 <strong>neighborhoods의 수를 최대화하는 것이 목표</strong>)으로 이루어지고, 지정한 $k$(원하는 mofit 크기)에 도달하면 학습을 멈추며 Subgraph를 도출한다.</p>
 
 <h2 id="summary">
-<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Summary</strong>
+</h2>
 
 <ul>
   <li>
@@ -209,35 +212,11 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting](https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34">CS224W: Machine Learning with Graphs 2021 Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.2 - Neural Subgraph Matching](https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35">CS224W: Machine Learning with Graphs 2021 Lecture 12.2 - Neural Subgraph Matching</a></p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 12.3 - Finding Frequent Subgraphs](https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36">CS224W: Machine Learning with Graphs 2021 Lecture 12.3 - Finding Frequent Subgraphs</a></p>
 
 <p><a href="https://velog.io/@kimkj38/CS224W-Lecture12.-Frequent-Subgraph-Mining-with-GNNs">Lecture 12. Frequent Subgraph Mining with GNNs</a></p>
 
