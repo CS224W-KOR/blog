@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 11.3 - Query2box Reasoning over KGs | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 11.3 - Query2box Reasoning over KGs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
+<meta property="og:description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-17T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 11.3 - Query2box Reasoning over KGs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings","headline":"Lecture 11.3 - Query2box Reasoning over KGs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html"},"url":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 11.3 - Query2box Reasoning over KGs</h1><p class="page-description">CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-17T00:00:00-05:00" itemprop="datePublished">
+        Aug 17, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#motivation">Motivation</a></li>
+<li class="toc-entry toc-h1"><a href="#box-embeddings">Box Embeddings</a></li>
+<li class="toc-entry toc-h1"><a href="#projection-operator">Projection Operator</a></li>
+<li class="toc-entry toc-h1"><a href="#intersection-operator">Intersection Operator</a></li>
+<li class="toc-entry toc-h1"><a href="#entity-to-box-distance">Entity-to-Box Distance</a></li>
+<li class="toc-entry toc-h1"><a href="#embedding-and-or-queries">Embedding AND-OR Queries</a></li>
+<li class="toc-entry toc-h1"><a href="#disjunctive-normal-form">Disjunctive Normal Form</a></li>
+<li class="toc-entry toc-h1"><a href="#training">Training</a></li>
+<li class="toc-entry toc-h1"><a href="#query-generation-from-templates">Query Generation from Templates</a></li>
+<li class="toc-entry toc-h1"><a href="#visualization-embedding-space">Visualization Embedding Space</a></li>
+<li class="toc-entry toc-h1"><a href="#11강-정리">11강 정리</a></li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 11. Reasoning in Knowledge Graphs using Embeddings</strong></p>
+
+  <ul>
+    <li><a href="">Lecture 11.1 - Reasoning in Knowledge Graphs</a></li>
+    <li><a href="">Lecture 11.2 - Answering Predictive Queries</a></li>
+    <li><a href="">Lecture 11.3 - Query2box Reasoning over KGs</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="motivation">
+<a class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h1>
+
+<p>(11.2의 마지막과 같은 내용이므로 skip 해도 됩니다.)</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2015.png" alt="Untitled"></p>
+
+<p><em>logical conjunction operation → and</em></p>
+
+<ol>
+  <li>중간 노드들은 entities의 집합이 될텐데 어떻게 나타낼 수 있을것인가?</li>
+  <li>latent space에서 교집합(intersection) 연산(operation)을 어떻게 나타낼 수 있을 것인가?</li>
+</ol>
+
+<h1 id="box-embeddings">
+<a class="anchor" href="#box-embeddings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Box Embeddings</h1>
+
+<p>latent space에 query를 hyper-rectangles(boxes)로 나타낼 수 있습니다. 박스는 중심점과 크기를 나타내는 offset의 값으로 정의하고 나타낼 수 있습니다. 따라서 이를 수식으로 나타내면 아래와 같습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2016.png" alt="Untitled"></p>
+
+<p>임베딩 공간에서 나타내보면 아래 그림과 같을 것 입니다. 이렇게 box형식의 표현이 좋은 점은 앞서 motivation에서 살펴보았던 2가지 고민에 대한 좋은 해결책이 되기 때문입니다. (1) 해당 query에 속하는 node들의 set을 손쉽게 box안에 표현하면 되는 것이고 (2) intersection 또한 각 query를 나타내는 box area의 교집합 부분으로 나타낼 수 있기 때문입니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2017.png" alt="Untitled"></p>
+
+<p>query를 box로 나타내기로 한 다음 이제 다른 부분들은 자동으로 다음과 같이 embedding space에 표현됩니다.</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+<strong>Entity embedding</strong>: entity는 zero-volume box(하나의 점)로 나타냅니다. 파라미터 수는 $d</td>
+          <td>V</td>
+          <td>$ 입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+<strong>Relation embedding</strong>: 하나의 box에서 다른 새로운 box로 매칭하는 것으로 표현됩니다. 파라미터 수는 $2d</td>
+          <td>R</td>
+          <td>$ 입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+<strong>Intersection operator</strong> $f$: 인풋은 box들이고 아웃풋으로는 하나의 box가 나옵니다. 인풋으로 들어가는 box들의 교집합 부분을 구하는 모델입니다.</li>
+</ul>
+
+<h1 id="projection-operator">
+<a class="anchor" href="#projection-operator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projection Operator</h1>
+
+<p>하나의 query 영역에서 relation을 통해 다음의 query 영역으로 이동하는 것을 다음과 같이 <strong>Projection Operator</strong>를 이용해서 표현할 수 있습니다. 새로운 query $q’$의 center와 offset 모두 projection operator를 통해 이전 query $q$와 relation $r$로부터 구할 수 있습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2018.png" alt="Untitled"></p>
+
+<p>이를 앞서 conjunctive query에서 intersection을 구하기 전까지의 query plan 과정을 embedding space에서 나타내면 다음과 같습니다. <code class="language-plaintext highlighter-rouge">ESR2</code>와 <code class="language-plaintext highlighter-rouge">Short of Breath</code>에서 각각 출발하여 relation과정(projection 연산)을 통해 query box가 embedding space에서 움직이는 것을 볼 수 있습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2019.png" alt="Untitled"></p>
+
+<h1 id="intersection-operator">
+<a class="anchor" href="#intersection-operator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Intersection Operator</h1>
+
+<p>query box들의 교집합 부분은 Intersection operator를 통해서 구할 수 있습니다. 이를  embedding space에서의 그림으로 나타내면 아래와 같습니다. Intersection operator는 앞서 살펴봤던 것처럼 인풋으로는 여러개의 box들을 받고 아웃풋으로는 하나의 box를 출력합니다. 따라서 아웃풋인 <strong>새로운 box의 center point와 offset을 어떻게 구할지</strong> 설계해야 합니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2020.png" alt="Untitled"></p>
+
+<ol>
+  <li><strong>Center point</strong></li>
+</ol>
+
+<p>embedding space에서 <strong>여러개의 box들의 intersection이 되는 부분의 중심점은 box들의 center point들과 가깝다</strong>는 insight를 활용합니다. 따라서 여러개 box들의 center point들로 만들어지는 경계 박스(아래 그림에서 분홍색 box) 안에 intersection box의 center point가 있을 것입니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2021.png" alt="Untitled"></p>
+
+<p>따라서 수식적으로 새로운 intersection box의 중심점은 인풋이 되는 box들의 중심점들의 위치를 weighted sum을 하여 구합니다. 이때 weight $\mathbf{w}<em>i$는 Neural network인 $f</em>{cen}$을 통해 training되는 trainable한 값이며 각 center point들에 대한 <strong>self-attention score</strong>를 나타낸다고 볼 수 있습니다. 즉, 아래의 수식과 같이 box들의 center point인 $Cen(q_i)$가 NN $f_{cen}$을 통해 나온 아웃풋을 softmax를 통해 구한 값이 weight $\mathbf{w}_i$가 되는 것입니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_14.png" alt="Group 14.png"></p>
+
+<ol>
+  <li><strong>Offset (Box size)</strong></li>
+</ol>
+
+<p>당연히 <strong>intersection이 되는 영역은 인풋이 되는 box들의 크기보다 작아질 것</strong> 입니다.(shrinking) intersection의 offset은 아래와 같은 수식으로 표현되는데, <code class="language-plaintext highlighter-rouge">min()</code>에서 아웃풋의 박스가 줄어드는 것을 보장하며 Neural Network $f_{off}$에 box들의 offset들을 넣어서 나온 값에다가 sigmoid 함수를 통과하여 나온 0~1 사이의 값을 곱하여 <strong>intersection box의 offset을 결정</strong>하게 됩니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_15.png" alt="Group 15.png"></p>
+
+<p>이렇게 intersection operator까지 구하는 법을 배웠으니 앞서 진행한 conjunctive query plan을 embedding space에서의 연산 과정으로 나타내면 다음과 같습니다. 최종적으로 빗금쳐진 intersection이 answer 영역이 됩니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2022.png" alt="Untitled"></p>
+
+<h1 id="entity-to-box-distance">
+<a class="anchor" href="#entity-to-box-distance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Entity-to-Box Distance</h1>
+
+<p>Embedding 공간에서 앞으로 여러 연산과 계산을 하기 위해 <strong>거리를 정의</strong>할 수 있어야 할 것 입니다. <strong>Entity(하나의 점)과 Box(query)사이의 거리를 어떻게 구하는 것이 좋을까요?</strong></p>
+
+<p>우선 entity는 zero-volume의 점이므로 하나의 위치로 나타낼 수 있습니다. 이와 같은 맥락으로 box는 중심점을 대표 위치로 나타낼 수 있습니다. 하지만 box는 점이 아닌 하나의 <strong>영역</strong>이므로 <strong>박스 안과 밖을 구분</strong>할 수 있고 따라서 이를 구분하여 점-박스 사이의 거리 $d_{box}$를 계산하게 됩니다. <strong>box 안에 있는 경우,</strong> 거리 $d_{in}$에 0~1사이의 값인 weight $\alpha$를 곱해주어 계산합니다. 수식으로 나타내면 아래와 같습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2023.png" alt="Untitled"></p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_16.png" alt="Group 16.png"></p>
+
+<p>이렇게 정의한 점-박스 사이의 거리 $d_{box}$를 기반으로 <strong>score function</strong> $f_q(v)$는 다음과 같이 정의할 수 있습니다. 거리가 멀수록 bad score이어야 하므로 $-$를 붙여 음수로 만들어줍니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2024.png" alt="Untitled"></p>
+
+<h1 id="embedding-and-or-queries">
+<a class="anchor" href="#embedding-and-or-queries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embedding AND-OR Queries</h1>
+
+<p>Union operation중 하나인 <code class="language-plaintext highlighter-rouge">or</code> 에 대해 생각해봅시다. 예를 들어 <code class="language-plaintext highlighter-rouge">유방암 **또는** 폐암을 치료할 수 있는 약물은 무엇일까?</code>와 같은 질문에 필요한 연산일 것 입니다. <strong>Conjunctive query와 disjunction을 결합</strong>한 것을 <strong>E</strong>xistential <strong>P</strong>ositive <strong>F</strong>irst-<strong>o</strong>rder (EPFO) query라고도 합니다. 여기에서는 앞으로 <strong>AND-OR query</strong>라고 지칭하겠습니다. 여기서 고민해야 할 부분은 다음과 같습니다.</p>
+
+<ol>
+  <li>
+<strong>disjunction operator</strong>를 어떻게 설계할 것인가?</li>
+  <li>
+<strong>저차원</strong>의 vector space에서 <strong>AND-OR query</strong>들을 어떻게 나타낼 것인가?</li>
+</ol>
+
+<p>우선 2번째 고민에 대한 해결책은 없습니다. <strong>임의의 query들의 합집합(union)을 나타내기 위해서는</strong> <strong>고차원의 embedding이 필요</strong>하기 때문입니다. 아래의 예시를 보면서 이해해보겠습니다.</p>
+
+<hr>
+
+<p>총 3개의 query가 주어져 있고 각 query에 해당하는 answer node들이 있다고 해봅시다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2025.png" alt="Untitled"></p>
+
+<p>그러면 우선 각 query를 box로 나타내어 answer에 맞도록 그려보면 다음과 같을 것입니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_17.png" alt="Group 17.png"></p>
+
+<p>다음으로 query의 합집합 연산 v에 대한 query box를 그려보면 다음과 같습니다. 아직까지는 answer(positive)와 answer가 아닌(negative) entity들을 구분하는 영역을 그리는 것이 가능합니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_20.png" alt="Group 20.png"></p>
+
+<p>하지만 다음과 같이 entity가 4개인 경우가 된다면 answer와 answer가 아닌 것들을 구분하는 box embedding을 구할 수 없게 됩니다. 이처럼 non-overlapping answer들을 가지고 있는 query들의 갯수가 증가할 수록 이들의 OR 연산자를 다룰 수 있는 공간의 차원도 높아지게 되어 <strong>저차원에서의 AND-OR query를 나타낼 수 없는 것입니다.</strong></p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2026.png" alt="Untitled"></p>
+
+<p>하지만 저차원의 AND-OR 연산자를 나타낼 수 없다고 해서 이를 아예 해결할 방법이 없는 것은 아닙니다. 여기서 핵심 아이디어는 <strong>맨 마지막 step의 union만 제외하고 다른 union 연산들은 다 풀어서 표현해주면 된다는 것</strong>입니다. 아래의 그림에서 처럼 앞 step에 있던 union을 풀어서 더 여러개의 relation으로 표현해준 다음 맨 마지막 단계에서 union을 넣어주어 동치인 상황을 만들어줍니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2027.png" alt="Untitled"></p>
+
+<h1 id="disjunctive-normal-form">
+<a class="anchor" href="#disjunctive-normal-form" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disjunctive Normal Form</h1>
+
+<p>AND-OR query는 동치인 Disjunctive Normal form, <strong>DNF</strong>로 치환될 수 있습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_21.png" alt="Group 21.png"></p>
+
+<p>Entity와 DNF $q=q_{1} \vee q_{2} \vee \cdots \vee q_{m}$ 사이의 거리는 다음과 같이 정의 됩니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2028.png" alt="Untitled"></p>
+
+<ul>
+  <li>query q의 AND-OR embedding 과정
+    <ol>
+      <li>query $q$를 동치인 <strong>DNF</strong> $q=q_{1} \vee q_{2} \vee \cdots \vee q_{m}$로 만든다.</li>
+      <li>$q_1$~ $q_m$ 모두 embedding 한다.</li>
+      <li>(box) distance $d_{box}(\mathbf{q}_i, \mathbf{v})$를 계산한다.</li>
+      <li>3번에서 구한 distance들 중에서 최솟값 min을 구한다.</li>
+      <li>final score인 $f_q(v)=-d_{box}(\mathbf{q}, \mathbf{v})$를 구한다.</li>
+    </ol>
+  </li>
+</ul>
+
+<h1 id="training">
+<a class="anchor" href="#training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training</h1>
+
+<p>학습으로 training할 수 있는 부분은 다음과 같습니다.</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>파라미터 수가 $d</td>
+          <td>V</td>
+          <td>$ 인 <strong>Entity embedding</strong>
+</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>파라미터 수가 $2d</td>
+          <td>R</td>
+          <td>$ 인 <strong>Relation embedding</strong>
+</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+<strong>Intersection operator</strong> $f$</li>
+</ul>
+
+<p><strong>학습 과정</strong> 은 다음과 같습니다.</p>
+
+<ol>
+  <li>training graph인 $G_{train}$에서 학습할 query $\mathbf{q}$를 샘플링 합니다. 이때 정답이 되는 $v \in \llbracket q \rrbracket_{G_{train}}$과 정답이 아닌 negative sample인  $v’ \notin \llbracket q \rrbracket_{G_{train}}$ 모두 샘플링 합니다.</li>
+  <li>샘플링 된 query $\mathbf{q}$를 embedding 합니다.</li>
+  <li>score function을 이용하여 $f_q(v)$와 $f_q(v’)$을 계산합니다.</li>
+  <li>아래와 같이 정의된 loss function $l$을 이용하여 <strong>positive sample의 score는 최대화</strong>, <strong>negative sample의 score는 최소화</strong>하는 방향으로 학습합니다.</li>
+</ol>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2029.png" alt="Untitled"></p>
+
+<h1 id="query-generation-from-templates">
+<a class="anchor" href="#query-generation-from-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Query Generation from Templates</h1>
+
+<p>training set에는 다음과 같이 다양한 multiple query template들을 생성해서 넣어줄 수 있습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2030.png" alt="Untitled"></p>
+
+<p>answer node에서 시작해서 <strong>backward</strong>하는 방식으로 training sample들을 만들어 낼 수 있습니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2031.png" alt="Untitled"></p>
+
+<p>위와 같은 KG에서 answer node인 <strong>Fulvestrant</strong>를 하나 선택합니다. 이 노드에서부터 TreatedBy, Assoc relation을 통해 backward를 하게 되면 <code class="language-plaintext highlighter-rouge">[Anchor1, (Relation1, Realtion2)]</code> template인 <strong>[ESR2, (Assoc, TreatedBy)]</strong>의 sample을 하나 얻게 되는 것입니다. 이와 같은 매커니즘으로 CausedBy relation으로 backward하게 되면 <code class="language-plaintext highlighter-rouge">[Anchor1, (Relation1)]</code> template의 sample 하나를 얻게 됩니다.</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2032.png" alt="Untitled"></p>
+
+<p>이러한 backward를 통해 positive sample인 $\llbracket q \rrbracket_{G}$를 얻게 되고, negative sample은 KG에서 random 하게 샘플링하게 만들어지게 되는데 이때 random하게 만들어진 negative sample이 positive sample과 겹치지 않는지 주의할 필요가 있습니다.</p>
+
+<h1 id="visualization-embedding-space">
+<a class="anchor" href="#visualization-embedding-space" aria-hidden="true"><span class="octicon octicon-link"></span></a>Visualization Embedding Space</h1>
+
+<p>실제로 box embedding이 무엇을 배우는지 확인해보기 위해 t-SNE를 이용하여 시각화 해봅시다. (고차원에서 box embedding이 이루어지고 2차원의 t-sne로 나타내는 것이므로 box 영역으로 나타내어지지 않습니다.)</p>
+
+<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2033.png" alt="Untitled"></p>
+
+<h1 id="11강-정리">
+<a class="anchor" href="#11%EA%B0%95-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>11강 정리</h1>
+
+<ul>
+  <li>큰 KG에서의 predictive query의 answer를 찾는 방법에 대해 알아보았습니다.</li>
+  <li>핵심은 <strong>query를 embedding</strong>함으로써 latent space에서의 탐색을 가능하게 했다는 점입니다.
+    <ul>
+      <li>embedding된 query들을 가지고 할 수 있는 다양한 <strong>operator</strong>들에 대해 알아보았습니다.</li>
+      <li>query box embedding을 통해 embedding space에서 answer를 구할 수 있습니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<blockquote>
+  <p>Original Lecture Video : <a href="https://youtu.be/Nt66M2OsbCw">CS224W: Machine Learning with Graphs 2021 Lecture 11.3 - Query2box: Reasoning over KGs</a></p>
+</blockquote>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/2022/08/17/lecture-1103.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
