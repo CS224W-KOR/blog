@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 12.2 - Neural Subgraph Matching | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 12.2 - Neural Subgraph Matching" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 12." />
+<meta property="og:description" content="CS224W Lecture 12." />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-17T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 12.2 - Neural Subgraph Matching" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 12.","headline":"Lecture 12.2 - Neural Subgraph Matching","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 12.2 - Neural Subgraph Matching</h1><p class="page-description">CS224W Lecture 12.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-17T00:00:00-05:00" itemprop="datePublished">
+        Aug 17, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Neural Network">Graph Neural Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Convolution Network">Graph Convolution Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GCN">GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#lecture-122---neural-subgraph-matching">Lecture 12.2 - Neural Subgraph Matching</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#subgraph-matching">Subgraph Matching</a></li>
+<li class="toc-entry toc-h2"><a href="#order-embedding-space">Order Embedding Space</a></li>
+<li class="toc-entry toc-h2"><a href="#loss-function">Loss Function</a></li>
+<li class="toc-entry toc-h2"><a href="#training">Training</a></li>
+<li class="toc-entry toc-h2"><a href="#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#reference">Reference</a></li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 12</strong></p>
+
+  <ul>
+    <li><a href="">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
+    <li><a href="">Lecture 12.2 - Neural Subgraph Matching</a></li>
+    <li><a href="">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="lecture-122---neural-subgraph-matching">
+<a class="anchor" href="#lecture-122---neural-subgraph-matching" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 12.2 - Neural Subgraph Matching</strong>
+</h1>
+
+<h2 id="subgraph-matching">
+<a class="anchor" href="#subgraph-matching" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Subgraph Matching</strong>
+</h2>
+
+<p><strong>Subgraph matching</strong>이란: <strong>query 그래프가 target 그래프의 subgraph isomorphism인지 확인</strong>하는 task</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/J0IqcHf.png" width="350xp">
+</p>
+
+<p>우리는 다음과 같이 Query와 Target 그래프가 주어졌을때 Query가 Target의 subgraph 인지 판단하기 위해서 embedding space의 geometric shape을 활용하며, 여기서 embedding space의 geometric shape을 구하기 위해서 GNN을 활용합니다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/uDoSPen.png" width="700xp">
+</p>
+
+<p>Node anchor를 활용하여 query의 노드 $v$와 target의 노드 $u$의 임베딩이 동일한지 확인하며, Query의 anchor node가 k-hop을 가질 때 k-hop 내에 있는 이웃노드들의 임베딩 또한 비교한다.</p>
+
+<h2 id="order-embedding-space">
+<a class="anchor" href="#order-embedding-space" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Order Embedding Space</strong>
+</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/QVAVuWv.png" width="650xp">
+</p>
+
+<p>다음과 같이 embedding space 안에 ${\color{red}\square}$과 ${\color{green}\bigcirc}$, ${\color{yellow}\bigcirc}$를 Representation했을 때 ${\color{green}\bigcirc}$은 ${\color{green}\bigcirc}<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⩽</mo></mrow><annotation encoding="application/x-tex">\leqslant</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7733em;vertical-align:-0.1367em;"></span><span class="mrel amsrm">⩽</span></span></span></span>{\color{red}\square}$의 관계를 가지기 때문에 Target의 Subgraph라고 할 수 있다.</p>
+
+<p>그러나 Query2는 ${\color{yellow}\bigcirc}<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⋠</mo></mrow><annotation encoding="application/x-tex">\npreceq</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0966em;vertical-align:-0.3027em;"></span><span class="mrel amsrm">⋠</span></span></span></span>{\color{red}\square}$이기 때문에 Target과 다른 그래프라고 할 수 있다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/vJbHh91.png" width="700xp">
+</p>
+
+<p>Subgraph isomorphism relationship 은 3종류로 다음과 같이 embedding space에 Representation 된다.</p>
+
+<p>Transitivity는 ${\color{yellow}\square}$ $\preccurlyeq<span class="katex-error" title="ParseError: KaTeX parse error: Can't use function '$' in math mode at position 23: …{green}\square}$̲, ${\color{gree…" style="color:#cc0000">{\color{green}\square}$, ${\color{green}\square}</span>\preccurlyeq<span class="katex-error" title="ParseError: KaTeX parse error: Can't use function '$' in math mode at position 21: …or{red}\square}$̲ 인 경우 ${\color{…" style="color:#cc0000">{\color{red}\square}$ 인 경우 ${\color{yellow}\square}$ $\preccurlyeq</span>{\color{red}\square}$의 관계를 가지는 형태로 ${\color{yellow}\square}$ 은 ${\color{green}\square}$의 Subgraph이고 ${\color{green}\square}$은 ${\color{red}\square}$의 Subgraph이고 ${\color{yellow}\square}$ 은 ${\color{red}\square}$의 Subgraph인 관계이다.</p>
+
+<p>Anti-symmetry는 ${\color{yellow}\square}$  == ${\color{green}\square}$ 의 관계를 가지는 형태로 ${\color{yellow}\square}$ 과 ${\color{green}\square}$이 서로 동일한 그래프인 관계이다.</p>
+
+<p>Closure under intersection은 ${\color{yellow}\square}$ 이 ${\color{red}\square}$과 ${\color{green}\square}$의 부분적인 Subgraph인 관계이며, 음수를 가지는 임베딩은 없으며, 여기서 ${\color{yellow}\square}$  유효한 값을 가진다.</p>
+
+<h2 id="loss-function">
+<a class="anchor" href="#loss-function" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Loss Function</strong>
+</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/moRLt3j.png" width="220xp">
+    <img src="https://i.imgur.com/uMkkEuK.png" width="200xp">
+</p>
+
+<p>Subgraph 속성이 순서 임베딩 공간에서 보존되도록 순서 제약 조건을 지정하며, 이를 위해서 max-margin loss를 사용하게되며 이를 GNN에 학습하여 embedding space 구합니다. 해당 loss function은 아래와 같습니다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mrow><mo fence="true">(</mo><msub><mi>G</mi><mi>q</mi></msub><mo separator="true">,</mo><msub><mi>G</mi><mi>t</mi></msub><mo fence="true">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>D</mi></munderover><msup><mrow><mo fence="true">(</mo><mi>max</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mn>0</mn><mo separator="true">,</mo><msub><mi>z</mi><mi>q</mi></msub><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo fence="true">)</mo></mrow><mo fence="true">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E\left(G_{q}, G_{t}\right)=\sum_{i=1}^{D}\left(\max \left(0, z_{q}[i]-z_{t}[i]\right)\right)^{2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mop">max</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>
+
+<p>위의 수식을 그래프 $G_{q}$와 $G_{t}$ 사이의 “margin”로 정의합니다.</p>
+
+<p>$E\left(G_{q}, G_{t}\right)=0$ (왼쪽 그래프)이면 $G_{q}$ 는 $G_{t}$ 의 Subgraph가 이고 $E\left(G_{q}, G_{t}\right)&gt;0$ (오른쪽 그래프)이면 $G_{q}$ 는 $G_{t}$ 의 Subgraph가 아님을 나타냅니다.</p>
+
+<h2 id="training">
+<a class="anchor" href="#training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training</h2>
+
+<ul>
+  <li>학습 데이터셋 $\left(G_{q}, G_{t}\right)$는 $G_{t}$ 의 subgraph인 $G_{q}$가 반, 그렇지 않은 것이 반이 되도록 구성해야 한다.</li>
+  <li>Positive sample에 대해서는 $E\left(G_{q}, G_{t}\right)$ 를 최소화하도록 negative smaple에 대해서는 $\max \left(0, \alpha-E\left(G_{q}, G_{t}\right)\right)$ 를 최소화하도록 학습하는데 이는 모델이 임베딩을 너무 멀리 이동시키는 것을 방지하기 위함이다.
+    <ul>
+      <li>For positive examples: $G_{q}$가 $G_{t}$의 subgraph일 때 $E\left(G_{q}, G_{t}\right)$ 최소화</li>
+      <li>For negative examples: $\max \left(0, \alpha-E\left(G_{q}, G_{t}\right)\right)$ 최소화</li>
+    </ul>
+  </li>
+  <li>데이터셋 $G$ 로부터 학습을 위한 $G_{T}$ 와 $G_{Q}$ 를 샘플링하는 과정이 필요하다.
+    <ul>
+      <li>매번 반복할 때마다 새로운 training pairs을 샘플링한다.</li>
+      <li>이점: 반복할 때마다 모델은 다른 Subgraph example를 볼 수 있다.</li>
+      <li>샘플링되는 Subgraph가 기하급수적으로 많기 때문에 성능은 향상되고, 과적합이 방지된다.</li>
+    </ul>
+  </li>
+  <li>$G_{T}$는 무작위로 anchor 노드 $v$ 를 뽑은 뒤 거리가 $K$ 인 모든 노드를 포함시켜 만든다.</li>
+  <li>Positive example $G_{Q}$는 BFS 샘플링을 거친다.
+    <ul>
+      <li>일반적으로 데이터 집합의 크기에 따라 3-5를 사용한다.</li>
+      <li>런타임과 성능을 절출하는 하이퍼파라미터</li>
+    </ul>
+  </li>
+</ul>
+
+<p align="center">
+    <img src="https://i.imgur.com/64EEA3N.png" width="700xp">
+</p>
+
+<ol>
+  <li>$S=v, V=\phi$ 로 초기화한다.</li>
+  <li>매 스텝마다 $S$ 의 모든 이웃 노드 집합 $N(S)$의 $10 \%$ 를 샘플링하여 $S$ 로 업데이트하며 나머지 노드들은 $V$ 로 업데이트 한다.</li>
+  <li>$K$ 스텝을 거치면 $G_{Q}$를 얻게 된다.</li>
+</ol>
+
+<p>Negative example은 $G_{Q}$로부터 노드/엣지들은 제거하거나 추가하여 만든다.</p>
+
+<h2 id="summary">
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+
+<ul>
+  <li>Neural subgraph matching uses a machine learning based approach to learn the NP-hard problem of subgraph isomorphism (NP-hard 문제인 Subgraph matching를 해결하기 위해서 ML 기반의 접근법을 사용)
+    <ul>
+      <li>Given query and target graph, it embeds both graphs into an order embedding space
+  (쿼리와 그래프가 주어지면 모두 order embedding space에 포함시킨다.)</li>
+      <li>Using these embeddings, it then computes $E\left(G_{q}, G_{t}\right)$ to determine whether query is a subgraph of the target
+  (이러한 임베딩을 사용하여 $E\left(G_{q}, G_{t}\right)$을 계산하여 Subgraph인지 확인한다.)</li>
+    </ul>
+  </li>
+  <li>Embedding graphs within an order embedding space allows subgraph isomorphism to be efficiently represented and tested by the relative positions of graph embeddings
+(order embedding space를 통해 Subgraph를 효율적으로 표현하였으며, graph embedding의 상대적 위치에 의해 테스트 된다.)
+—
+    <h1 id="reference">
+<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h1>
+  </li>
+</ul>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting](https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34)</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.2 - Neural Subgraph Matching](https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35)</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.3 - Finding Frequent Subgraphs](https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="https://velog.io/@kimkj38/CS224W-Lecture12.-Frequent-Subgraph-Mining-with-GNNs">Lecture 12. Frequent Subgraph Mining with GNNs</a></p>
+
+<p><a href="https://velog.io/@tobigsgnn1415/12.-Frequent-Subgraph-Mining-with-GNNs">12. Frequent Subgraph Mining with GNNs</a></p>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1202.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

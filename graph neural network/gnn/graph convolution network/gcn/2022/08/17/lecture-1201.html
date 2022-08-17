@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 12." />
+<meta property="og:description" content="CS224W Lecture 12." />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-17T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 12.","headline":"Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</h1><p class="page-description">CS224W Lecture 12.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-17T00:00:00-05:00" itemprop="datePublished">
+        Aug 17, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Neural Network">Graph Neural Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Convolution Network">Graph Convolution Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GCN">GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#lecture-121---fast-neural-subgraph-matching--counting">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#subgraphs">Subgraphs</a></li>
+<li class="toc-entry toc-h2"><a href="#network-motifs">Network Motifs</a></li>
+<li class="toc-entry toc-h2"><a href="#subgraph-frequency">Subgraph Frequency</a></li>
+<li class="toc-entry toc-h2"><a href="#motif-significance">Motif Significance</a></li>
+<li class="toc-entry toc-h2"><a href="#z-score-for-statistical-significance">Z-score for Statistical Significance</a></li>
+<li class="toc-entry toc-h2"><a href="#summary">Summary</a></li>
+<li class="toc-entry toc-h2"><a href="#use-random-graphs-as-null-model-to-evaluate-the-significance-of-motif-via-z-score-random-graphs는-motif의-significance를-평가하기-위한-null-model로써-사용됨">Use random graphs as null model to evaluate the significance of motif via Z-score (random graphs는 motif의 significance를 평가하기 위한 null model로써 사용됨)</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#reference">Reference</a></li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 12</strong></p>
+
+  <ul>
+    <li><a href="">Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</a></li>
+    <li><a href="">Lecture 12.2 - Neural Subgraph Matching</a></li>
+    <li><a href="">Lecture 12.3 - Finding Frequent Subgraphs</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="lecture-121---fast-neural-subgraph-matching--counting">
+<a class="anchor" href="#lecture-121---fast-neural-subgraph-matching--counting" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 12.1 - Fast Neural Subgraph Matching &amp; Counting</strong>
+</h1>
+
+<p>Subgraphs와 Motifs는 그래프의 구조적 insights를 제공해주는 중요한 concepts이기 때문에, Subgraphs와 Motifs의 개수를 셈으로써 우리는 노드나 그래프의 features로 사용할 수 있다. 따라서 우리는 Subgraphs와 motifs의 개수를 세는 방법을 이번 목차에 다룰 것이며, Motifs를 Subgraphs에 포함되거나 동일한 개념으로 이해하시면 됩니다.</p>
+
+<h2 id="subgraphs">
+<a class="anchor" href="#subgraphs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgraphs</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/XtxGdxJ.png" width="450xp">
+    <img src="https://i.imgur.com/BbTGKko.png" width="450xp">
+</p>
+
+<p>Subgraph는 네트워크의 구성 요소이며, 이를 통해서 네트워크를 구성할 수 있기 때문에 building blocks of networks이며, Subgraph를 레고 블럭으로 생각한다면, 레고들이 모여서 큰 레고를 형성하듯이 네트워크를 구성하게 됩니다. 이렇게 레고 블럭과 같이 많은 영역에서 반복되는 구조의 구성요소를 통하여 그래프의 기능 및 동작을 결정합니다.</p>
+
+<p>이러한  Subgraph 구성 기준에 있어 2가지 방법이 있는데, 첫번째는 노드를 중심으로 Subset을 구성하면 “Node-induced subgraph”이며, “induced subgraph”라고 부르기도 합니다.</p>
+
+<p>두번째로 엣지를 중심으로 구성하면 “Edge-induced subgraph”라고 하며, “non-induced subgraph” or just “subgraph”라고 부르기도 합니다.</p>
+
+<p>이러한 두 가지의 구성 기준은 도메인에 따라 두 방식 중 하나가 선택되어 사용되며 예를 들어 chemistry는 노드가 중요하므로 node-induced를 knowledge graph에서는 엣지가 중요하므로 edge-induced를 활용합니다.</p>
+
+<p>Graph에서는 두 개의 그래프가 서로 같은 지를 아는 것이 중요한데, 이러한 문제를 Graph isomorphism problem 라고 하며, 이 문제는 NP-hard입니다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/fcBFiCS.png" width="400xp">
+</p>
+
+<p>예를 들어서 위와 같은 그래프가 주어졌을때, 우리는 두 개의 그래프가 완전히 다르다고 말할 수 있을까요? 우리는 대부분 $G_2$ 안 에 $G_1$ 이 포함되어 있다고 말할 것이며, 이러한 그래프의 isomorphism을 조금 더 확실하게 구분하기 위해서는 Node와 Edge를 가지고 서로 두 그래프를 비교해보는 것입니다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/pR8wlKR.png" width="750xp">
+</p>
+
+<p>위 처럼 두 그래프는 시각적으로 모두 다른 그래프 처럼 보이지만 첫번째 그래프의 경우에는 각 노드와 연결된 엣지를 기준으로 비교해본다면 서로 같은 그래프이다. 
+두번째 그래프의 경우 각 노드에 연결된 엣지가 다르니 다른 그래프이다. 이처럼 Node와 Edge를 가지고 서로 두 그래프를 비교하면 두 그래프의 isomorphism 판단할 수 있다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/5xgZk7W.png" width="550xp">
+</p>
+
+<p>$G_1$과 $G_2$의 node를 각각 match 시키면 우리는 $G_1$과 $G_2$ 사이에 동일한 subgraph를 가진다는 것을 알 수 있다. 
+따라서 우리는 $G_1$과 $G_2$는 다른 그래프지만 $G_1$은 $G_2$의 subgraph 라고 할 수 있다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/Gkdv2xl.png" width="265xp">
+    <img src="https://i.imgur.com/EPyS0IU.png" width="450xp">
+</p>
+
+<p>왼쪽 이미지처럼 그래프의 크기가 같더라도 엣지의 수 및 방향에 따라 다양한 non-isomorphic 그래프가 존재합니다. 
+왼쪽 그림은 그래프의 크기가 4인 모든 비동형, 연결된 비방향 그래프의 예시이며, 오른쪽은, 크기가 3인 모든 비동형 연결 방향 그래프의 예시입니다.</p>
+
+<h2 id="network-motifs">
+<a class="anchor" href="#network-motifs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Network Motifs</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/2H6HTZg.png" width="700xp">
+</p>
+
+<p><strong>Network motifs</strong>는 <strong>“recurring, significant patterns of interconnections”라고</strong> 정의하며 Network Motifs를 정의하기 위해서는 3가지 개념을 알아야 합니다.</p>
+
+<p><strong>1. Pattern:</strong> 찾고자 하는 node-induced subgraph로 <strong>motif</strong>이라고도 부르며, 그림에 Induced subgraph of interest 와 같은 유도될 수 있는 subgraph의 패턴이다.</p>
+
+<p><strong>2. Recurring:</strong> pattern이 전체 그래프에서 나타나는 <strong>빈도</strong>를 의미한다.</p>
+
+<p><strong>3. Significant: real graph와 random으로 생성된 graph를 비교를 통해</strong> 랜덤하게 생성된 그래프에서 <strong>기대보다 빈번하게 있는가</strong>를 의미한다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/ifikCBA.png" width="700xp">
+</p>
+
+<p>Motif가 필요한 이유는 이러한 Motif을 통해 <strong>그래프의 작동방식을 이해할 수 있으며 예측하는데 도움</strong>이 되며, 예를 들어, feed-forward loop는 noise를 제거하는 용도로 뇌의 뉴런 네트워크에서 흔히 볼 수 있으며, parallel loops는 먹이사슬 관계에서 볼 수 있으며, Single-input module는 유전자 제어 네트워크에서 흔히 볼 수 있다고 합니다.</p>
+
+<h2 id="subgraph-frequency">
+<a class="anchor" href="#subgraph-frequency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgraph Frequency</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/mOPWyUE.png" width="400xp">
+    <img src="https://i.imgur.com/CAvB1LY.png" width="230xp">
+</p>
+
+<p>왼쪽 이미지처럼 <strong>Graph-level</strong>에서는 <strong>거대 그래프 $G_T$에 포함되는 작은 그래프 $G_Q$의 개수</strong>로 빈도를 정의할 수 있으며, 오른쪽 이미지처럼 <strong>Node-level</strong>에서는 $G_Q$의 anchor 노드를 $v$라 할 때 $G_Q$와 isomorphicg한 $G_T$의 <strong>subgraph들 중 $u$로 맵핑되는 노드 $v$의 개수</strong>를 빈도로 정의하며, 이러한 방식은 outlier에 더 robust하다고 합니다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/xwKM31P.png" width="300xp">
+</p>
+
+<p>데이터 셋에 여러 개의 그래프가 포함되어 있고 데이터 세트에서 하위 그래프의 빈도를 계산하려는 경우에는 데이터 셋이 여러개의 그래프를 가진다면 연결되지 않은 부분을 가진 하나의 거대 그래프 $G_T$로 보고 빈도를 계산한다고 합니다.</p>
+
+<h2 id="motif-significance">
+<a class="anchor" href="#motif-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motif <strong>Significance</strong>
+</h2>
+
+<p align="center">
+    <img src="https://i.imgur.com/IswYM9u.png" width="500xp">
+</p>
+
+<p>Motif Significance는 랜덤으로 생성된 network와 비교하고자 하는 network(real)에서 주어진 motif의 발생 빈도를 비교하여 계산한다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/s6K4TMi.png" width="500xp">
+</p>
+
+<p>Random Graphs를 정의하는 방법은 위의 그림 처럼 3가지로 정의가능하며,  첫번째 방법은 Erdős–Rényi random graphs라고 하며, n개의 노드를 정하고 각 노드를 연결하는 엣지를 생성할 확률 p를 정하여 random graph를 생성하는 방법이다.</p>
+
+<p>또 다른 방법은 Configuration model라고 하며, Configuration model은 주어진 degree sequence를 사용하여 random graph를 생성하는 방법이다. 
+하나의 노드가 주어지면 각 노드는 degree(=spokes)가 존재한다. 이 각 노드에 존재하는 edge의 개수, 즉 degree를 하나의 작은 node로 생각하여 각 노드를 무작위로 연결한다. 
+이 연결선이 1개 이상 존재하면 마지막과 같이 그래프의 Node를 연결하여 random graph를 생성한다.</p>
+
+<p>또 다른 방법은 Switching이라 하며,  Switching은 그림과 같이 A-&gt;B / C-&gt;D 로 연결되는 edge를 무작위로 선택한 후, 두 edge의 endpoint를 서로 교환하여 A-&gt;D / C-&gt;B 로 연결되는 edge로 바꾸어 random graph를 생성하는 방법이다. 
+따라서 Switching은 random으로 생성된 그래프와 비교될 그래프의 node degree가 서로 같다는 특징을 가진다. Configuration model은 node degree가 달라질 수 있다.</p>
+
+<p>Motif Significant를 계산하는 과정은 총 3 Step으로 이루어 진다.</p>
+
+<p>지금까지는 1, 2단계를 다뤘고 이제 각각의 모티브가 통계적으로 얼마나 유의한지에 대하여 측정하는 방법인 3단계를 배울 것임</p>
+
+<ul>
+  <li>1단계: 주어진 그래프 $\left(G^{\text {real}}\right)$의 모티프 수</li>
+  <li>2단계: 유사한 통계(예: 노드 수, 에지 수, 정도 순서)를 가진 랜덤 그래프 생성 및 랜덤 그래프에서 모티브 수 계산</li>
+  <li>3단계: 통계적 측정을 사용하여 각 모티프가 얼마나 유의한지 평가합니다.</li>
+  <li>Z-점수 사용</li>
+</ul>
+
+<h2 id="z-score-for-statistical-significance">
+<a class="anchor" href="#z-score-for-statistical-significance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Z-score for Statistical Significance</h2>
+
+<p>$Z_{i}$는 모티프 $i$의 통계적 중요성을 포착 :</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>Z</mi><mi>i</mi></msub><mo>=</mo><mrow><mo fence="true">(</mo><msubsup><mi>N</mi><mi>i</mi><mtext>real </mtext></msubsup><mo>−</mo><mover accent="true"><mi>N</mi><mo>ˉ</mo></mover><msup><mi>i</mi><mtext>rand </mtext></msup><mo fence="true">)</mo></mrow><mi mathvariant="normal">/</mi><mi mathvariant="normal">std</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mi>N</mi><msup><mi>i</mi><mtext>rand </mtext></msup><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">Z_{i}=\left(N_{i}^{\text {real }}-\bar{N}{i}^{\text {rand }}\right) / \operatorname{std}\left(N{i}^{\text {rand }}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2491em;vertical-align:-0.35em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-2.453em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">real </span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal">i</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">rand </span></span></span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">/</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mord mathrm">std</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">(</span></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord"><span class="mord mathnormal">i</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">rand </span></span></span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">)</span></span></span></span></span></span></span>
+
+<ul>
+  <li>$N_{i}^{\text {real }}$은 graph $G^{\text {real }}$에서 motif $i$의 수</li>
+  <li>$\bar{N}_{i}^{\text {rand }}$ random graph들의 motif $<em>i</em>$의 수의 평균이다.</li>
+</ul>
+
+<p>Network significance profile (SP):</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>S</mi><msub><mi>P</mi><mi>i</mi></msub><mo>=</mo><msub><mi>Z</mi><mi>i</mi></msub><mi mathvariant="normal">/</mi><msqrt><mrow><munder><mo>∑</mo><mi>j</mi></munder><msubsup><mi>Z</mi><mi>j</mi><mn>2</mn></msubsup></mrow></msqrt></mrow><annotation encoding="application/x-tex">S P_{i}=Z_{i} / \sqrt{\sum_{j} Z_{j}^{2}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.04em;vertical-align:-1.588em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.452em;"><span class="svg-align" style="top:-5em;"><span class="pstrut" style="height:5em;"></span><span class="mord" style="padding-left:1em;"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.4231em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.413em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.412em;"><span class="pstrut" style="height:5em;"></span><span class="hide-tail" style="min-width:1.02em;height:3.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="3.08em" viewbox="0 0 400000 3240" preserveaspectratio="xMinYMin slice"><path d="M473,2793
+c339.3,-1799.3,509.3,-2700,510,-2702 l0 -0
+c3.3,-7.3,9.3,-11,18,-11 H400000v40H1017.7
+s-90.5,478,-276.2,1466c-185.7,988,-279.5,1483,-281.5,1485c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2c0,-1.3,-5.3,-32,-16,-92c-50.7,-293.3,-119.7,-693.3,-207,-1200
+c0,-1.3,-5.3,8.7,-16,30c-10.7,21.3,-21.3,42.7,-32,64s-16,33,-16,33s-26,-26,-26,-26
+s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,104,
+606zM1001 80h400000v40H1017.7z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.588em;"><span></span></span></span></span></span></span></span></span></span>
+
+<ul>
+  <li>$SP_i$는 정규화된 Z-점수의 벡터이다.</li>
+  <li>$SP_i$의 차원은 motifs의 수가 된다.</li>
+  <li>SP emphasizes relative significance of subgraphs:
+    <ul>
+      <li>크기가 다른 네트워크를 비교하는 데 중요</li>
+      <li>일반적으로 큰 그래프일 수록 Z-score의 값이 커진다.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<p>Motif Significant는 Z-score와 비슷한 개념이다. 랜덤으로 생성된 network의 motif의 발생 빈도의 평균과 표준편차를 사용하고 여기서 랜덤으로 생성된 network를 모집단으로 사용하여 Z-score를 구하며, 우리는 Network significance profile를 정규화된 Z-score의 벡터로 구할 수 있다. 
+일반적으로 큰 그래프일 수록 Z-score의 값이 커진다.</p>
+
+<p>우리는 Z-score를 통해서 각 Subgraph에 Significance(음수 값은 표현이 부족함, 양수 값은 과표현)를 분류할 수 있으며, 이를 통해 network significance profile(모든 하위 그래프 유형에 대한 값이 있는 형상 벡터)을 만들 수 있으며, 다음으로는 여러 그래프의 프로파일을 랜덤 그래프와 비교합니다.</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/V0MEJLn.png" width="700xp">
+</p>
+
+<ul>
+  <li>규제망(유전자 규제)</li>
+  <li>뉴런 네트워크(시냅스 연결)</li>
+  <li>언어 네트워크(단어 인접)</li>
+  <li>월드 와이드 웹(페이지 간 하이퍼링크)</li>
+  <li>소셜 네트워크(우정)</li>
+</ul>
+
+<p>비교를 통해 서로 다른 도메인의 network는 서로 다른 network significance profile를 가진다는 것을 알 수 있고 서로 같은 도메인의 network는 서로 같은 network significance profile을 가진다는 것을 확인할 수 있다. 
+따라서 우리는 network significance profile을 통해서 해당 도메인의 고유한 특성에 대한 insight를 얻을 수 있습니다.</p>
+
+<h2 id="summary">
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h2>
+
+<ul>
+  <li>Subgraphs and motifs are the building blocks of graphs (motifs는 graphs의 일부분)
+    <ul>
+      <li>Subgraph isomorphism and counting are NP-hard ( isomorphism and counting은 NP-hard 단계의 어려움을 같는다.)</li>
+    </ul>
+  </li>
+  <li>Understanding which motifs are frequent or significant in a dataset gives insight into the unique characteristics of that domain (motifs의 significant를 통해서 우리는 해당 도메인의 고유한 특성에 대한 insight를 얻을 수 있음)</li>
+  <li>
+    <h2 id="use-random-graphs-as-null-model-to-evaluate-the-significance-of-motif-via-z-score-random-graphs는-motif의-significance를-평가하기-위한-null-model로써-사용됨">
+<a class="anchor" href="#use-random-graphs-as-null-model-to-evaluate-the-significance-of-motif-via-z-score-random-graphs%EB%8A%94-motif%EC%9D%98-significance%EB%A5%BC-%ED%8F%89%EA%B0%80%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-null-model%EB%A1%9C%EC%8D%A8-%EC%82%AC%EC%9A%A9%EB%90%A8" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use random graphs as null model to evaluate the significance of motif via Z-score (random graphs는 motif의 significance를 평가하기 위한 null model로써 사용됨)</h2>
+    <h1 id="reference">
+<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h1>
+  </li>
+</ul>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.1-Fast Neural Subgraph Matching &amp; Counting](https://www.youtube.com/watch?v=lRCDpfJoMiE&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=34)</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.2 - Neural Subgraph Matching](https://www.youtube.com/watch?v=4Ia5QzQ_QNI&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=35)</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 12.3 - Finding Frequent Subgraphs](https://www.youtube.com/watch?v=kUv4gY5e0hg&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=36)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="https://velog.io/@kimkj38/CS224W-Lecture12.-Frequent-Subgraph-Mining-with-GNNs">Lecture 12. Frequent Subgraph Mining with GNNs</a></p>
+
+<p><a href="https://velog.io/@tobigsgnn1415/12.-Frequent-Subgraph-Mining-with-GNNs">12. Frequent Subgraph Mining with GNNs</a></p>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/17/lecture-1201.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
