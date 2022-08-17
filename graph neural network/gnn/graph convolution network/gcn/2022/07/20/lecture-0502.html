@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 5.1 - Relational and Iterative Classification | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 5.1 - Relational and Iterative Classification" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 5." />
+<meta property="og:description" content="CS224W Lecture 5." />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-20T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 5.1 - Relational and Iterative Classification" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-20T00:00:00-05:00","datePublished":"2022-07-20T00:00:00-05:00","description":"CS224W Lecture 5.","headline":"Lecture 5.1 - Relational and Iterative Classification","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 5.1 - Relational and Iterative Classification</h1><p class="page-description">CS224W Lecture 5.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-20T00:00:00-05:00" itemprop="datePublished">
+        Jul 20, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      13 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Neural Network">Graph Neural Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Convolution Network">Graph Convolution Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GCN">GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#52---relational-and-iterative-classification">5.2 - Relational and Iterative Classification</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#relational-classification">Relational Classification</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#probabilistic-relational-classifier">Probabilistic Relational Classifier</a></li>
+<li class="toc-entry toc-h3"><a href="#example-initialization">Example: Initialization</a></li>
+<li class="toc-entry toc-h3"><a href="#example-1st-iteration-update-node-3">Example: $1^{st}$ Iteration, Update Node 3</a></li>
+<li class="toc-entry toc-h3"><a href="#example-1st-iteration-update-node-4">Example: $1^{st}$ Iteration, Update Node 4</a></li>
+<li class="toc-entry toc-h3"><a href="#example-1st-iteration-update-node-5">Example: $1^{st}$ Iteration, Update Node 5</a></li>
+<li class="toc-entry toc-h3"><a href="#example-after-1st-iteration">Example: After $1^{st}$ Iteration</a></li>
+<li class="toc-entry toc-h3"><a href="#example-after-2nd-iteration">Example: After $2^{nd}$ Iteration</a></li>
+<li class="toc-entry toc-h3"><a href="#example-after-3rd-iteration">Example: After $3^{rd}$ Iteration</a></li>
+<li class="toc-entry toc-h3"><a href="#example-after-4th-iteration">Example: After $4^{th}$ Iteration</a></li>
+<li class="toc-entry toc-h3"><a href="#example-convergence">Example: Convergence</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#iterative-classification">Iterative Classification</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#iterative-classification-1">Iterative Classification</a></li>
+<li class="toc-entry toc-h3"><a href="#computing-the-summary-z_v">Computing the Summary $z_v$</a></li>
+<li class="toc-entry toc-h3"><a href="#architecture-of-iterative-classifiers">Architecture of Iterative Classifiers</a></li>
+<li class="toc-entry toc-h3"><a href="#example-web-page-classification">Example: Web Page Classification</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---step-1">Iterative Classifier - Step 1</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---step-2">Iterative Classifier - Step 2</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---step-31">Iterative Classifier - Step 3.1</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---step-32">Iterative Classifier - Step 3.2</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---iterate">Iterative Classifier - Iterate</a></li>
+<li class="toc-entry toc-h3"><a href="#iterative-classifier---final-prediction">Iterative Classifier - Final Prediction</a></li>
+<li class="toc-entry toc-h3"><a href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 5</strong></p>
+
+  <ul>
+    <li><a href="">Lecture 5.1 - Message passing and Node Classification</a></li>
+    <li><a href="">Lecture 5.2 - Relational and Iterative Classification</a></li>
+    <li><a href="">Lecture 5.3 - Collective Classification : Belief Propagation</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="52---relational-and-iterative-classification">
+<a class="anchor" href="#52---relational-and-iterative-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 - Relational and Iterative Classification</h1>
+
+<h2 id="relational-classification">
+<a class="anchor" href="#relational-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relational Classification</h2>
+
+<h3 id="probabilistic-relational-classifier">
+<a class="anchor" href="#probabilistic-relational-classifier" aria-hidden="true"><span class="octicon octicon-link"></span></a>Probabilistic Relational Classifier</h3>
+
+<ul>
+  <li>Idea: Propagate node labels across the network
+    <ul>
+      <li>Class probability $Y_v$ of node $v$ is a weighted average of class probabilities of its neighbors.</li>
+    </ul>
+  </li>
+  <li>For labeled nodes $v$, initialize label $Y_v$ with ground-truth label $Y^*_v$.</li>
+  <li>For unlabeled nodes, initialize $Y_v$ = 0.5.</li>
+  <li>Update all nodes in a random order until convergence or until maximum number of iterations is reached.</li>
+  <li>
+    <p>Update for each node $v$ and label $c$ (e.g. 0 or 1 )</p>
+
+    <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>⁍</mtext></mrow><annotation encoding="application/x-tex">⁍</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0em;"></span><span class="mord">⁍</span></span></span></span></span>
+
+    <ul>
+      <li>If edges have strength/weight information, $A_{v, u}$ can be the edge weight between $v$ and $u$</li>
+      <li>$P\left(Y_{v}=c\right)$ is the probability of node $v$ having label $c$</li>
+    </ul>
+  </li>
+  <li>Challenges:
+    <ul>
+      <li>Convergence is not guaranteed</li>
+      <li>Model cannot use node feature information</li>
+    </ul>
+  </li>
+  <li>아이디어: 노드 레이블을 네트워크에 전파
+    <ul>
+      <li>노드 $v$의 클래스 확률 $Y_v$는 이웃의 클래스 확률에 대한 가중 평균이다.</li>
+    </ul>
+  </li>
+  <li>레이블링된 노드 $v$의 경우 지상 실측 레이블 $Y^*_v$로 레이블 $Y_v$를 초기화한다.</li>
+  <li>레이블이 없는 노드의 경우 $Y_v$ = 0.5를 초기화합니다.</li>
+  <li>수렴할 때까지 또는 최대 반복 횟수에 도달할 때까지 모든 노드를 임의의 순서로 업데이트합니다.</li>
+  <li>
+    <p>각 노드 $v$ 및 레이블 $c$에 대한 업데이트(예: 0 또는 1)</p>
+
+    <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo>=</mo><mi>c</mi><mo fence="true">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><munder><mo>∑</mo><mrow><mo stretchy="false">(</mo><mi>v</mi><mo separator="true">,</mo><mi>u</mi><mo stretchy="false">)</mo><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>A</mi><mrow><mi>v</mi><mo separator="true">,</mo><mi>u</mi></mrow></msub></mrow></mfrac><munder><mo>∑</mo><mrow><mo stretchy="false">(</mo><mi>v</mi><mo separator="true">,</mo><mi>u</mi><mo stretchy="false">)</mo><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>A</mi><mrow><mi>v</mi><mo separator="true">,</mo><mi>u</mi></mrow></msub><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>u</mi></msub><mo>=</mo><mi>c</mi><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">P\left(Y_{v}=c\right)=\frac{1}{\sum_{(v, u) \in E} A_{v, u}} \sum_{(v, u) \in E} A_{v, u} P\left(Y_{u}=c\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">c</span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.8374em;vertical-align:-1.516em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2253em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">u</span><span class="mclose mtight">)</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight" style="margin-right:0.05764em;">E</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4747em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.1607em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.809em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">u</span><span class="mclose mtight">)</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight" style="margin-right:0.05764em;">E</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.516em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal">c</span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span></span>
+
+    <ul>
+      <li>가장자리의 강도/무게 정보가 있는 경우 $A_{v,u}$는 $v$와 $u$ 사이의 에지 가중치일 수 있습니다.</li>
+      <li>$P\left(Y_{v}=c\right)$는 노드 $v$가 $c$ 레이블을 가질 확률이다.</li>
+    </ul>
+  </li>
+  <li>과제:
+    <ul>
+      <li>수렴이 보장되지 않음</li>
+      <li>모델은 노드 피쳐 정보를 사용할 수 없습니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<aside>
+💬 기본 아이디어 : `노드 $v$의 레이블 확률 $Y_v$는 노드 $v$의 주변노드의 레이블 확률의 가중평균과 같다.`
+
+즉, 레이블이 없는 노드에 대해 이웃 노드들의 레이블 확률을 가중평균하여 예측하게 된다. 
+
+이진 분류문제라 가정하고, 모든 노드에 레이블 확률이 존재해야 하기 때문에, 레이블이 없는 노드는 0.5의 확률로 초기화하여 시작하게 된다.
+
+업데이트는 반복적으로 진행되며, 모든 노드에 대해 수렴하거나 반복횟수에 도달할 경우 멈추게 된다.
+
+노드 $*v*$에 대한 확률을 계산하는 법은 위 수식과 같다. 
+
+이때 행렬 A는 인접행렬에 해당한다. 
+
+즉, 주변의 이웃노드의 확률 $*P\left(Y_{v}=c\right)*$를 평균하여 사용하되, 해당 이웃노드와 연결된 degree만큼 가중치, $*A_{v,u}*$를 주게 된다.
+
+이때 두가지 문제점이 있다.
+
+1. 위 수식은 수렴이 보장되지 않는다.
+2. 모델이 노드의 변수를 활용하지 않는다.
+
+이에 대해선 이후 모델을 통해 개선될 것이라 기대해보자.
+
+</aside>
+
+<h3 id="example-initialization">
+<a class="anchor" href="#example-initialization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Initialization</h3>
+
+<p>Initialization:</p>
+
+<ul>
+  <li>All labeled nodes with their labels</li>
+  <li>All unlabeled nodes 0.5 
+(belonging to class 1 with probability 0.5)</li>
+</ul>
+
+<p>초기화:</p>
+
+<ul>
+  <li><em>라벨이 표시된 모든 노드</em></li>
+  <li>표시되지 않은 모든 노드 0.5
+(확률 0.5의 클래스 1에 속함)</li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled.png" alt="Untitled"></p>
+
+<aside>
+💬 위 그래프에서 본래 레이블이 있는 노드는 녹색과 적색으로 표시가 되어 있다.
+
+이에 대해 이진분류 문제이기 때문에, 녹색을 기준으로 확률을 계산하여, 녹색 노드는 1, 적색 노드는 0, 레이블이 없는 회색노드는 0.5로 초기화한다.
+
+</aside>
+
+<h3 id="example-1st-iteration-update-node-3">
+<a class="anchor" href="#example-1st-iteration-update-node-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: $1^{st}$ Iteration, Update Node 3</h3>
+
+<ul>
+  <li>Update for the $1^{st}$ Iteration:
+    <ul>
+      <li>For node 3, $N_3=[1,2,4]$</li>
+    </ul>
+  </li>
+  <li>$1^{st}$ 반복에 대한 업데이트:
+    <ul>
+      <li>노드 3의 경우 $N_3=[1,2,4]$</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%201.png" alt="Untitled.png"></p>
+
+<aside>
+💬 각 노드별로 이웃노드의 확률을 이용해 순차적으로 확률을 업데이트한다.
+
+위 그래프의 경우 undirected이고 엣지가 각 노드 간 최대 하나만 존재하기 때문에 단순 평균을 통해 새로운 확률을 계산하게 된다.
+
+</aside>
+
+<h3 id="example-1st-iteration-update-node-4">
+<a class="anchor" href="#example-1st-iteration-update-node-4" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: $1^{st}$ Iteration, Update Node 4</h3>
+
+<ul>
+  <li>Update for the $1^{st}$ Iteration:
+    <ul>
+      <li>For node 4, $N_4=[1,3,5,6]$</li>
+    </ul>
+  </li>
+  <li>$1^{st}$ 반복에 대한 업데이트:
+    <ul>
+      <li>노드 4의 경우 $N_4=[1,3,5,6]$</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%202.png" alt="Untitled"></p>
+
+<aside>
+💬 위에서 업데이트된 3번 노드의 확률을 이용해 4번 노드 역시 업데이트하게 된다.
+
+즉, 노드를 업데이트하는 순서에 따라 계산이 조금씩 달라지게 된다.
+
+</aside>
+
+<h3 id="example-1st-iteration-update-node-5">
+<a class="anchor" href="#example-1st-iteration-update-node-5" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: $1^{st}$ Iteration, Update Node 5</h3>
+
+<ul>
+  <li>Update for the $1^{st}$ Iteration:
+    <ul>
+      <li>For node 5, $N_5=[4,6,7,8]$</li>
+    </ul>
+  </li>
+  <li>$1^{st}$ 반복에 대한 업데이트:
+    <ul>
+      <li>노드 5의 경우 $N_5=[4,6,7,8]$</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%203.png" alt="Untitled"></p>
+
+<aside>
+💬 3, 4번 노드를 업데이트하고 나서 5번 노드를 업데이트한다.
+
+이때 역시 업데이트된 4번 노드의 확률을 이용하게 된다.
+
+</aside>
+
+<h3 id="example-after-1st-iteration">
+<a class="anchor" href="#example-after-1st-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $1^{st}$ Iteration</h3>
+
+<p>After Iteration 1 (a round of updates for all unlabeled nodes)</p>
+
+<p>반복 후 1 (라벨이 지정되지 않은 모든 노드에 대한 업데이트 라운딩)</p>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%204.png" alt="Untitled"></p>
+
+<aside>
+💬 첫번째 이터가 종료된 후의 모습니다. 9번 노드의 경우 녹색 노드만 연결되어 있기 때문에 확률이 1로 고정된 모습을 보이고 있다.
+
+이외에 8번 노드 역시 주변에 녹색 노드 2개, 확률이 높은 노드(5번) 한개가 이웃노드이기 때문에 확률이 높은 것을 볼 수 있다. 
+
+하지만 4번 노드의 경우 녹색 노드와 적색 노드 각각 하나씩 연결되어 있고, 녹색과 가까운 노드와 적색과 가까운 노드 하나씩 연결되어 있어 0.5에 가까운 확률을 보이고 있다.
+
+</aside>
+
+<h3 id="example-after-2nd-iteration">
+<a class="anchor" href="#example-after-2nd-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $2^{nd}$ Iteration</h3>
+
+<p>After Iteration 2</p>
+
+<p>반복 후 2</p>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%205.png" alt="Untitled"></p>
+
+<h3 id="example-after-3rd-iteration">
+<a class="anchor" href="#example-after-3rd-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $3^{rd}$ Iteration</h3>
+
+<p>After Iteration 3</p>
+
+<p>반복 후 3</p>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%206.png" alt="Untitled"></p>
+
+<h3 id="example-after-4th-iteration">
+<a class="anchor" href="#example-after-4th-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $4^{th}$ Iteration</h3>
+
+<p>After Iteration 4</p>
+
+<p>반복 후 4</p>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%207.png" alt="Untitled"></p>
+
+<aside>
+💬 이후 0.5보다 확률이 큰 노드들은 class 1이라 분류하고, 0.5보다 작은 노드들은 class 0으로 분류한다.
+
+class 0 : 1, 2, 3
+
+class 1 : 4, 5, 6, 7, 8, 9
+
+</aside>
+
+<h3 id="example-convergence">
+<a class="anchor" href="#example-convergence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Convergence</h3>
+
+<ul>
+  <li>
+    <p>All scores stabilize after 4 iterations.</p>
+
+    <p>We therefore predict:</p>
+
+    <ul>
+      <li>Nodes 4,5,8,9 belong to class 1 ($𝑃_{Y_v}$ &gt; 0.5)</li>
+      <li>Nodes 3 belong to class 0 ($𝑃_{Y_v}$ &lt; 0.5)</li>
+    </ul>
+  </li>
+  <li>
+    <p>4회 반복 후 모든 점수가 안정됩니다.</p>
+
+    <p>따라서 다음과 같이 예측한다.</p>
+
+    <ul>
+      <li>노드 4,5,8,9가 클래스 1($𝑃_{Y_v}$ &gt; 0.5)에 속함</li>
+      <li>노드 3은 클래스 0($𝑃_{Y_v}$ &lt; 0.5)에 속합니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%208.png" alt="Untitled"></p>
+
+<aside>
+💬 몇 번의 iterations을 지나자 모든 확률값이 수렴하고 있는 모습을 보여 종료되었으나 이 모델의 수렴이 보장되지 않는 단점이 존재한다.
+
+이를 이전에 배웠던 개념과 연결지어 생각하자면, Influence가 녹아있는 모델이라고 할 수 있겠다. 
+
+가까운 노드의 영향을 받아 이웃 노드와 비슷한 레이블 분포를 가지도록 업데이트하고 있기 때문이다. 
+
+그 결과 8번 노드는 이웃노드가 녹색일 확률이 높으니 해당 분포와 비슷해지고, 4번 노드는 이웃노드로 녹색과 적색에 가까운 노드들이 모두 있어 0.5에 가까운 확률을 가지게 되었다.
+
+Relational Classification은 그래프의 구조적 정보를 일부 활용하고, 노드 레이블은 활용하지만, 노드의 변수 = node featured information(attributes)를 활용하지 못한다는 단점이 크게 작용한다.
+
+단지 노드의 라벨과 이웃들의 엣지를 이용하는 것인 네트워크 정보만 사용하게 된다.
+
+결국 주어진 정보를 최대한 활용하지 못하는 머신러닝 모델은 부족한 점이 많은 모델일 뿐이다.
+
+</aside>
+
+<h2 id="iterative-classification">
+<a class="anchor" href="#iterative-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classification</h2>
+
+<h3 id="iterative-classification-1">
+<a class="anchor" href="#iterative-classification-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classification</h3>
+
+<ul>
+  <li>Relational classifier does not use node attributes.</li>
+  <li>How can one leverage them?</li>
+  <li>
+    <p>Main idea of iterative classification:</p>
+
+    <p>Classify node $v$ based on its attributes $f_v$ as well as labels $z_v$ of neighbor set $N_v$.</p>
+  </li>
+  <li>Input: Graph
+    <ul>
+      <li>$f_{v}$ : feature vector for node $v$</li>
+      <li>Some nodes $v$ are labeled with $Y_{v}$</li>
+    </ul>
+  </li>
+  <li>Task: Predict label of unlabeled nodes</li>
+  <li>Approach: Train two classifiers:
+$\phi_{1}\left(f_{v}\right)=$ Predict node label based on node feature vector $f_{v}$. This is called base classifier.</li>
+  <li>
+    <p>$\phi_{2}\left(f_{v}, z_{v}\right)=$ Predict label based on node feature vector $f_{v}$ and summary $z_{v}$ of labels of $v’{\text {s }}$ neighbors.</p>
+
+    <p>This is called relational classifier.</p>
+  </li>
+  <li>관계 분류자가 노드 특성을 사용하지 않습니다.</li>
+  <li>어떻게 그들을 활용할 수 있을까?</li>
+  <li>
+    <p>반복 분류의 주요 개념:</p>
+
+    <p>노드 $v$는 속성 $f_v$와 인접 세트 $N_v$의 레이블 $z_v$를 기준으로 분류한다.</p>
+  </li>
+  <li>입력: 그래프
+    <ul>
+      <li>$f_{v}$ : 노드 $v$의 피쳐 벡터</li>
+      <li>일부 노드 $v$는 $Y_{v}$로 레이블 지정됨</li>
+    </ul>
+  </li>
+  <li>작업: 레이블이 없는 노드의 레이블 예측</li>
+  <li>접근법: 두 가지 분류기 훈련:
+$\phi_{1}\left(f_{v}\right)=$ 노드 특징 벡터 $f_{v}$를 기반으로 노드 레이블을 예측한다. 이를 기본 분류기라고 합니다.</li>
+  <li>
+    <p>$\phi_{2}\left(f_{v}, z_{v}\right)=$ 노드 특징 벡터 $f_{v}$와 $v’{\text {s}}$ 이웃 레이블의 요약 $z_{v}$를 기반으로 레이블을 예측한다.</p>
+
+    <p>이를 관계 분류기라고 합니다.</p>
+  </li>
+</ul>
+
+<aside>
+💬 Relational Classifier는 노드의 변수를 활용하지 않는 것이 단점이라고 했다.
+
+Iterative Classifier는 노드의 변수를 활용하여 이를 개선했다. 핵심 아이디어는 다음과 같다.
+
+&gt; 노드 $`v`$를 분류할 때, 노드의 변수 $`f_v`$를 이웃노드 집합 $`N_v`$의 레이블 $`z_u`$와 함께 사용하자.
+&gt; 
+
+입력은 그래프를 사용하며, $f_v$는 노드 $v$의 변수 벡터를 의미하며, 여기서 일부 노드는 레이블 $Y_v$를 갖는다.
+
+목표는 레이블이 없는 노드에 대해 레이블을 예측하는 것이다.
+
+이를 위해 활용하는 것은 두 개의 분류기를 활용한다.
+
+1. $\phi_{1}\left(f_{v}\right)$ : 노드 $v$의 변수 $f_v$ 만을 이용해 레이블을 예측하는 모델
+2. $\phi_{2}\left(f_{v}, z_{v}\right)$: 노드 $v$의 변수 $*f_v*$와 이웃 노드의 레이블에 대한 기술 통계벡터 $*z_v*$를 이용하여 레이블을 예측하는 모델
+
+$z_u$: 이웃 노드의 라벨을 표현하는 벡터 (라벨의 비율, 개수 등으로 표현된다.)
+
+</aside>
+
+<h3 id="computing-the-summary-z_v">
+<a class="anchor" href="#computing-the-summary-z_v" aria-hidden="true"><span class="octicon octicon-link"></span></a>Computing the Summary $z_v$</h3>
+
+<p>How do we compute the summary $z_v$ of labels of $v’s$ neighbors $N_v$?</p>
+
+<ul>
+  <li>$z_v$ = vector that captures labels around node $v$
+    <ul>
+      <li>Histogram of the number (or fraction) of each label in $N_v$</li>
+      <li>Most common label in $N_v$</li>
+      <li>Number of different labels in $<strong>N_v</strong>$</li>
+    </ul>
+  </li>
+</ul>
+
+<p>$v$의 인접 $N_v$ 레이블의 요약 $z_v$는 어떻게 계산합니까?</p>
+
+<ul>
+  <li>$z_v$ = 노드 $v$ 주변의 레이블을 캡처하는 벡터
+    <ul>
+      <li>$N_v$ 단위의 각 레이블의 숫자(또는 부분) 히스토그램</li>
+      <li>$N_v$의 가장 일반적인 레이블</li>
+      <li>$N_v$의 서로 다른 레이블 수</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%209.png" alt="Untitled.png"></p>
+
+<aside>
+💬 위와 같은 그래프에서 청색 노드에 대한 $z_{v}$ 는 이웃 노드의 색의 count 분포나 존재 유무 분포, 비율 분포 등을 사용해 만들 수 있다.
+
+- count 분포 : [녹색 노드의 수, 적색 노드의 수] = $[2,1]$
+- 존재 유무 분포 : [녹색 노드 존재 여부, 적색 노드 존재 여부]= $[1,1]$
+- 비율 분포 : [녹색 노드 비율, 적색 노드 비율] =$\left[\frac{2}{3}, \frac{1}{3}\right]$
+    
+    두 분류기를 이용하여 학습과 예측 과정이 조금 복잡한데 크게 두 단계로 나눌 수 있다.
+    
+</aside>
+
+<h3 id="architecture-of-iterative-classifiers">
+<a class="anchor" href="#architecture-of-iterative-classifiers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Architecture of Iterative Classifiers</h3>
+
+<ul>
+  <li>Phase 1: Classify based on node attributes alone
+    <ul>
+      <li>On the labeled training set, train two classifiers:
+        <ul>
+          <li>Base classifier: $\phi_{1}\left(f_{v}\right)$ to predict $Y_{v}$ based on $f_{v}$</li>
+          <li>Relational classifier: $\phi_{2}\left(f_{v}, z_{v}\right)$ to predict $Y_{v}$ based on $f_{v}$ and summary $z_{v}$ of labels of $v^{\prime}$s neighbors</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Phase 2: Iterate till convergence
+    <ul>
+      <li>On test set, set labels $Y_{v}$ based on the classifier $\phi_{1}$, compute $z_{v}$ and predict the labels with $\phi_{2}$</li>
+      <li>Repeat for each node $v$ :
+        <ul>
+          <li>Update $z_{v}$ based on $Y_{u}$ for all $u \in N_{v}$</li>
+          <li>Update $Y_{v}$ based on the new $z_{v}\left(\phi_{2}\right)$</li>
+        </ul>
+      </li>
+      <li>Iterate until class labels stabilize or max number of iterations is reached</li>
+      <li>Note: Convergence is not guaranteed</li>
+    </ul>
+  </li>
+  <li>1단계: 노드 속성만을 기준으로 분류
+    <ul>
+      <li>라벨이 부착된 교육 세트에서 두 가지 분류기를 교육합니다.
+        <ul>
+          <li>기본 분류자: $f_{v}$를 기반으로 $Y_{v}$를 예측하기 위한 $\phi_{1}\left(f_{v}\right)$</li>
+          <li>관계 분류자: $f_{v}$와 $v^{\prime}$s 인접 레이블의 요약 $z_{v}$를 기반으로 $Y_{v}$를 예측하기 위한 $\phi_{2}\left(f_{v}, z_{v}\right)$</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>2단계: 수렴될 때까지 반복
+    <ul>
+      <li>테스트 세트에서 $\phi_{1}$ 분류기를 기반으로 레이블 $Y_{v}$을 설정하고 $z_{v}$를 계산하고 $\phi_{2}$로 레이블을 예측한다.</li>
+      <li>각 노드 $v$에 대해 반복:
+        <ul>
+          <li>모든 $u \in N_{v}$에 대해 $Y_{u}$를 기준으로 $z_{v}$ 업데이트</li>
+          <li>새 $z_{v}\left(\phi_{2}\right)$를 기준으로 $Y_{v}$ 업데이트</li>
+        </ul>
+      </li>
+      <li>클래스 레이블이 안정되거나 최대 반복 횟수에 도달할 때까지 반복</li>
+      <li>참고: 수렴이 보장되지 않음</li>
+    </ul>
+  </li>
+</ul>
+
+<aside>
+💬 Phase 1 : **Train**
+
+학습 데이터의 경우에 모든 노드에 레이블이 달려있다고 간주하고 두 분류기를 학습한다.
+
+1. $\phi_{1}\left(f_{v}\right): f_{v}$ 를 이용해 $Y_{v}$ 를 예측한다.
+    
+    : 노드 피쳐 정보들만을 이용하여 노드라벨을 예측하는 모델
+    
+2. $\phi_{2}\left(f_{v}, z_{v}\right): f_{v}$ 와 $z_{v}$ 를 이용해 $Y_{v}$ 를 예측한다. 이때, $z_{v}$ 는 실제 레이블을 이용해 구성한다.
+    
+    : 노드 피쳐 정보 + 이웃들의 라벨정보를 이용하여 노드 라벨을 예측하는 모델
+    
+
+Phase 2 : **Inference**
+
+테스트 데이터의 경우엔 일부 노드에만 레이블이 달려있다고 간주한다. 
+
+혹은 레이블이 아예 없을 수도 있다고 간주한다.
+
+이때 $\phi_{1}\left(f_{v}\right)$ 는 $f_{v}$ 가 변하지 않기 때문에 초기에 한번만 계산하여 라벨 $Y_{v}$ 를 예측한다. 
+
+이를 통해 모든 노드에 $Y_{v}$ 가 할당된다.
+
+모든 노드에 $Y_{v}$ 가 할당된 후 다음과 같은 과정을 수렴하거나 최대반복횟수에 도달할 때까지 반복한다.
+
+1. 새로운 $Y_{v}$ 에 맞추어 $z_{u}$ 를 업데이트한다. $\left(u \in N_{v}\right)$
+2. 새로운 $z_{u}$ 에 맞추어 $Y_{z}=\phi_{2}\left(f_{v}, z_{v}\right)$ 를 업데이트한다.
+
+다만, 해당 모델 또한 수렴을 보장하지 않기에, 최대 반복 횟수를 지정한다.
+
+</aside>
+
+<h3 id="example-web-page-classification">
+<a class="anchor" href="#example-web-page-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Web Page Classification</h3>
+
+<ul>
+  <li>Input: Graph of web pages</li>
+  <li>Node: Web page</li>
+  <li>Edge: Hyper-link between web pages
+    <ul>
+      <li>Directed edge: a page points to another page</li>
+    </ul>
+  </li>
+  <li>Node features: Webpage description
+    <ul>
+      <li>For simplicity, we only consider two binary features</li>
+    </ul>
+  </li>
+  <li>Task: Predict the topic of the webpage</li>
+  <li>
+    <p>Baseline: Train a classifier (e.g., linear classifier) to classify pages based on node attributes.</p>
+  </li>
+  <li>입력: 웹페이지 그래프</li>
+  <li>노드: 웹 페이지</li>
+  <li>가장자리: 웹 페이지 간의 하이퍼링크 (Directed Edge)
+    <ul>
+      <li>방향 가장자리: 한 페이지가 다른 페이지를 가리키다</li>
+    </ul>
+  </li>
+  <li>노드 기능: 웹 페이지 설명 
+(TF-IDF 등의 토큰 정보, 여기선 2차원 벡터로 표현)
+    <ul>
+      <li>단순성을 위해 두 개의 이진 기능만 고려한다.</li>
+    </ul>
+  </li>
+  <li>작업: 웹 페이지의 주제 예측</li>
+  <li>기준: 노드 속성을 기준으로 페이지를 분류하도록 분류기(예: 선형 분류기)를 훈련합니다.</li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2010.png" alt="Untitled"></p>
+
+<aside>
+💬 Web Page의 주제를 예측하여 분류하기 위해서 아래의 데이터가 사용된다.
+
+- Input : 웹페이지 그래프
+- Node : 웹페이지
+- Edge : 웹페이지 간 하이퍼링크(Directed Edge)
+- Node Features : 웹페이지 정보(TF-IDF 등의 토큰 정보, 여기선 2차원 벡터로 표현)
+- Task : 각 웹페이지의 주제 예측
+</aside>
+
+<ul>
+  <li>Each node maintains vectors $z_v$ of neighborhood labels:
+    <ul>
+      <li>$I$ = Incoming neighbor label information vector.</li>
+      <li>$O$ = Outgoing neighbor label information vector.
+        <ul>
+          <li>
+            <p>$I_0$ = 1 if at least one of the incoming pages is labelled 0.</p>
+
+            <p>Similar definitions for $I_0$, $O_0$, and $O_1$</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>각 노드는 이웃 레이블의 벡터 $z_v$를 유지한다.
+    <ul>
+      <li>$I$ = 들어오는 인접 레이블 정보 벡터.</li>
+      <li>$O$ = 나가는 인접 레이블 정보 벡터.
+        <ul>
+          <li>
+            <p>$I_0$ = 1 (수신 페이지 중 하나 이상이 0으로 표시된 경우)</p>
+
+            <p>$I_0$, $O_0$ 및 $O_1$에 대한 유사한 정의</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2011.png" alt="Untitled"></p>
+
+<aside>
+💬 $f_{v}$ : 변수 벡터 (TF_IDF등)
+
+$I$ : incoming neighbor 레이블에 대한 기술 통계치 벡터([0인 이웃노드 유무, 1인 이웃노드 유무
+
+$O$ : outgoing neighbor 레이블에 대한 기술 통계치 벡터([0인 이웃노드 유무, 1인 이웃노드 유무
+
+$*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수로 설정하기로 한다. 
+
+따라서 회색 노드에서는 1번인 초록 노드에서만 엣지가 들어오고 0번 클래스인 노드에서 들어오는것이 없으므로 $I=[0,1]$이 된다. 
+
+또한 0번, 1번 클래스 노드로 모두 나가므로 $O=[1,1]$으로 구성한다.
+
+</aside>
+
+<h3 id="iterative-classifier---step-1">
+<a class="anchor" href="#iterative-classifier---step-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Step 1</h3>
+
+<ul>
+  <li>On training labels, train two classifiers:
+    <ul>
+      <li>Node attribute vector only: $\phi_1(f_v)$</li>
+      <li>Node attribute and link vectors $z_v$: $\phi_2(f_v,z_v)$</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Train classifiers</p>
+  </li>
+  <li>Apply classifier to unlab. set</li>
+  <li>
+    <p>Iterate</p>
+  </li>
+  <li>Update relational features $z_v$</li>
+  <li>Update label $Y_v$</li>
+</ol>
+
+<ul>
+  <li>교육 라벨에서 두 가지 분류기를 교육합니다.
+    <ul>
+      <li>노드 속성 벡터만: $\phi_1(f_v)$</li>
+      <li>노드 속성 및 링크 벡터 $z_v$: $\phi_2(f_v,z_v)$</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>분류기 학습</p>
+  </li>
+  <li>
+    <p>레이블 해제 세트에 분류자 적용</p>
+  </li>
+  <li>
+    <p>반복</p>
+  </li>
+  <li>
+    <p>관계 기능 업데이트 $z_v$</p>
+  </li>
+  <li>
+    <p>레이블 업데이트 $Y_v$</p>
+  </li>
+</ol>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2012.png" alt="Untitled"></p>
+
+<aside>
+💬 $\phi_1(f_v)$에서는 피쳐 정보($f_v$)만을 사용하며, $\phi_2(f_v,z_v)$는 피쳐 정보($f_v$)와 이웃라벨 정보($I,O)$를 이용하여 학습한다.
+
+</aside>
+
+<h3 id="iterative-classifier---step-2">
+<a class="anchor" href="#iterative-classifier---step-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Step 2</h3>
+
+<ul>
+  <li>
+<strong>On the unlabeled set:</strong>
+    <ul>
+      <li>Use trained node feature <strong>**vector classifier $</strong>\phi_1<strong>$ to set $</strong>Y_v**$</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Train classifiers</p>
+  </li>
+  <li>
+    <p>Apply classifier to unlab. set</p>
+  </li>
+  <li>
+    <p>Iterate</p>
+  </li>
+  <li>Update relational features $z_v$</li>
+  <li>Update label $Y_v$</li>
+</ol>
+
+<ul>
+  <li>라벨이 없는 세트에서:
+    <ul>
+      <li>훈련된 노드 특징 벡터 분류기 $\phi_1$를 사용하여 $Y_v$ 설정</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>분류기 학습</p>
+  </li>
+  <li>
+    <p>레이블 해제 세트에 분류자 적용</p>
+  </li>
+  <li>
+    <p>반복</p>
+  </li>
+  <li>
+    <p>관계 기능 업데이트 $z_v$</p>
+  </li>
+  <li>
+    <p>레이블 업데이트 $Y_v$</p>
+  </li>
+</ol>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2013.png" alt="Untitled"></p>
+
+<aside>
+💬 $\phi_1$이 부여한 라벨을 이용해 $z_v$를 업데이트한다.
+
+</aside>
+
+<h3 id="iterative-classifier---step-31">
+<a class="anchor" href="#iterative-classifier---step-31" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Step 3.1</h3>
+
+<ul>
+  <li>Update $z_v$ for all nodes:</li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Train classifiers</p>
+  </li>
+  <li>
+    <p>Apply classifier to unlab. set</p>
+  </li>
+  <li>
+    <p>Iterate</p>
+  </li>
+  <li>
+    <p>Update relational features $z_v$</p>
+  </li>
+  <li>
+    <p>Update label $Y_v$</p>
+  </li>
+</ol>
+
+<ul>
+  <li>모든 노드에 대해 $z_v$ 업데이트:</li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>분류기 학습</p>
+  </li>
+  <li>
+    <p>레이블 해제 세트에 분류자 적용</p>
+  </li>
+  <li>
+    <p>반복</p>
+  </li>
+  <li>
+    <p>관계 기능 업데이트 $z_v$</p>
+  </li>
+  <li>
+    <p>레이블 업데이트 $Y_v$</p>
+  </li>
+</ol>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2014.png" alt="Untitled"></p>
+
+<aside>
+💬 $\phi_2$가 업데이트 된 $z_v$와 $I$, $O$ 정보를 사용하여 라벨을 예측한다.
+
+</aside>
+
+<h3 id="iterative-classifier---step-32">
+<a class="anchor" href="#iterative-classifier---step-32" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Step 3.2</h3>
+
+<ul>
+  <li><strong>**Re-classify all nodes with $\phi_2$:</strong></li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Train classifiers</p>
+  </li>
+  <li>
+    <p>Apply classifier to unlab. set</p>
+  </li>
+  <li>
+    <p>Iterate</p>
+  </li>
+  <li>
+    <p>Update relational features $z_v$</p>
+  </li>
+  <li>
+    <p>Update label $Y_v$</p>
+  </li>
+</ol>
+
+<ul>
+  <li>$\phi_2$로 모든 노드를 다시 분류합니다.</li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>분류기 학습</p>
+  </li>
+  <li>
+    <p>레이블 해제 세트에 분류자 적용</p>
+  </li>
+  <li>
+    <p>반복</p>
+  </li>
+  <li>
+    <p>관계 기능 업데이트 $z_v$</p>
+  </li>
+  <li>
+    <p>레이블 업데이트 $Y_v$</p>
+  </li>
+</ol>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2015.png" alt="Untitled"></p>
+
+<aside>
+💬 $\phi_2$에 의해 라벨이 변화했으므로, 다시 $z_v$를 업데이트한다.
+
+</aside>
+
+<h3 id="iterative-classifier---iterate">
+<a class="anchor" href="#iterative-classifier---iterate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Iterate</h3>
+
+<ul>
+  <li>Continue until convergence
+    <ul>
+      <li>Update $z_v$ based on $Y_v$</li>
+      <li>Update $Y_v$ = $\phi_2(f_v,z_v)$</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Train classifiers</p>
+  </li>
+  <li>
+    <p>Apply classifier to unlab. set</p>
+  </li>
+  <li>
+    <p>Iterate</p>
+  </li>
+  <li>
+    <p>Update relational features $z_v$</p>
+  </li>
+  <li>
+    <p>Update label $Y_v$</p>
+  </li>
+</ol>
+
+<ul>
+  <li>
+<em>정합될 때까지 계속합니다</em>
+    <ul>
+      <li>$Y_v$를 기준으로 $z_v$ 업데이트</li>
+      <li>업데이트 $Y_v$<em>= $\phi_2(f_v,z_v)$</em>
+</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ol>
+  <li>
+    <p>분류기 학습</p>
+  </li>
+  <li>
+    <p>레이블 해제 세트에 분류자 적용</p>
+  </li>
+  <li>
+    <p>반복</p>
+  </li>
+  <li>
+    <p>관계 기능 업데이트 $z_v$</p>
+  </li>
+  <li>
+    <p>레이블 업데이트 $Y_v$</p>
+  </li>
+</ol>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2016.png" alt="Untitled"></p>
+
+<aside>
+💬 $z_v$가 업데이트 되었으므로 $\phi_2$가 레이블을 예측한다.
+
+</aside>
+
+<h3 id="iterative-classifier---final-prediction">
+<a class="anchor" href="#iterative-classifier---final-prediction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterative Classifier - Final Prediction</h3>
+
+<ul>
+  <li>Stop iteration
+    <ul>
+      <li>After convergence or when maximum iterations are reached</li>
+    </ul>
+  </li>
+  <li>반복 중지
+    <ul>
+      <li>수렴 후 또는 최대 반복 횟수에 도달한 경우</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2017.png" alt="Untitled"></p>
+
+<aside>
+💬 $\phi_2$를 통한 예측과 $z_v$에 대한 업데이트를 종료 고전에 도달할 때까지 반복한다.
+
+</aside>
+
+<h3 id="summary">
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h3>
+
+<ul>
+  <li>We talked about 2 approaches to collective classification</li>
+  <li>Relational classification
+    <ul>
+      <li>Iteratively update probabilities of node belonging to a label class based on its neighbors</li>
+    </ul>
+  </li>
+  <li>Iterative classification
+    <ul>
+      <li>Improve over collective classification to handle attribute/feature information</li>
+      <li>Classify node 𝑣 based on its features as well as labels of neighbors</li>
+    </ul>
+  </li>
+  <li>집단 분류에 대한 2가지 접근법에 대해 이야기했습니다</li>
+  <li>관계구분
+    <ul>
+      <li>인접 관계에 따라 레이블 클래스에 속하는 노드의 확률을 반복적으로 업데이트합니다.</li>
+    </ul>
+  </li>
+  <li>반복구분
+    <ul>
+      <li>특성/특징 정보를 처리하기 위해 집합 분류보다 개선</li>
+      <li>특징과 이웃의 label을 기준으로 노드 based 분류</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<p><a href="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf.md">5.1 - Message passing and Node Classification</a></p>
+
+<p><a href="5%203%20-%20Collective%20Classification%20Correct%20&amp;%20Smooth%20773edc7e530a4c2e9b9aebb828a5c5d9.md">5.3 - Collective Classification : Correct &amp; Smooth</a></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>[CS224W: Machine Learning with Graphs</td>
+      <td>2021</td>
+      <td>Lecture 5.2 - Relational and Iterative Classification](https://www.youtube.com/watch?v=QUO-HQ44EDc&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=15)</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

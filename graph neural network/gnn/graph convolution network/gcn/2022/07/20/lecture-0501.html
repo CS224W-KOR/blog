@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 5.1 - Message passing and Node Classification | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 5.1 - Message passing and Node Classification" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 5." />
+<meta property="og:description" content="CS224W Lecture 5." />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-20T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 5.1 - Message passing and Node Classification" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-20T00:00:00-05:00","datePublished":"2022-07-20T00:00:00-05:00","description":"CS224W Lecture 5.","headline":"Lecture 5.1 - Message passing and Node Classification","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 5.1 - Message passing and Node Classification</h1><p class="page-description">CS224W Lecture 5.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-20T00:00:00-05:00" itemprop="datePublished">
+        Jul 20, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      10 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Neural Network">Graph Neural Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Convolution Network">Graph Convolution Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GCN">GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#51---message-passing-and-node-classification">5.1 - Message passing and Node Classification</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#message-passing-and-node-classification">Message Passing and Node Classification</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#todays-lecture-outline">Today’s Lecture: outline</a></li>
+<li class="toc-entry toc-h3"><a href="#example-node-classification">Example: Node Classification</a></li>
+<li class="toc-entry toc-h3"><a href="#todays-lecture-outline-1">Today’s Lecture: outline</a></li>
+<li class="toc-entry toc-h3"><a href="#correlations-exist-in-networks">Correlations Exist in Networks</a></li>
+<li class="toc-entry toc-h3"><a href="#social-homophily">Social Homophily</a></li>
+<li class="toc-entry toc-h3"><a href="#homophily-example">Homophily: Example</a></li>
+<li class="toc-entry toc-h3"><a href="#social-influence-example">Social Influence: Example</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#how-do-we-leverage-node-correlations-in-networks">How do we leverage node correlations in networks?</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#classification-with-network-data">Classification with Network Data</a></li>
+<li class="toc-entry toc-h3"><a href="#motivation">Motivation</a></li>
+<li class="toc-entry toc-h3"><a href="#semi-supervised-learning">Semi-supervised Learning</a></li>
+<li class="toc-entry toc-h3"><a href="#problem-setting">Problem Setting</a></li>
+<li class="toc-entry toc-h3"><a href="#example-applications">Example applications:</a></li>
+<li class="toc-entry toc-h3"><a href="#collective-classification-overview-1">Collective Classification Overview (1)</a></li>
+<li class="toc-entry toc-h3"><a href="#collective-classification-overview-2">Collective Classification Overview (2)</a></li>
+<li class="toc-entry toc-h3"><a href="#overview-of-what-is-coming">Overview of What is Coming</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#reference">Reference</a></li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecture 5</strong></p>
+
+  <ul>
+    <li><a href="">Lecture 5.1 - Message passing and Node Classification</a></li>
+    <li><a href="">Lecture 5.2 - Relational and Iterative Classification</a></li>
+    <li><a href="">Lecture 5.3 - Collective Classification : Belief Propagation</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="51---message-passing-and-node-classification">
+<a class="anchor" href="#51---message-passing-and-node-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 - Message passing and Node Classification</h1>
+
+<h2 id="message-passing-and-node-classification">
+<a class="anchor" href="#message-passing-and-node-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Message Passing and Node Classification</h2>
+
+<h3 id="todays-lecture-outline">
+<a class="anchor" href="#todays-lecture-outline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Today’s Lecture: outline</h3>
+
+<p>Main question today: Given a network with labels on some nodes, how do we assign labels to all other nodes in the network?</p>
+
+<p>Example: In a network, some nodes are fraudsters, and some other nodes are fully trusted.</p>
+
+<p>How do you find the other fraudsters and trustworthy nodes?</p>
+
+<p>We already discussed node embeddings as a method to solve this in Lecture 3</p>
+
+<hr>
+
+<p>오늘 주요 질문: 일부 노드에 레이블이 있는 네트워크에서 네트워크의 다른 모든 노드에 레이블을 할당하려면 어떻게 해야 합니까?</p>
+
+<p>예: 네트워크에서 일부 노드는 사기꾼이고 다른 일부 노드는 완전히 신뢰됩니다.</p>
+
+<p>다른 사기꾼과 신뢰할 수 있는 노드를 어떻게 생각하십니까?</p>
+
+<p>우리는 이것을 해결하기 위한 방법으로 노드 임베딩을 이미 강의 3에서 논의하였습니다</p>
+
+<hr>
+
+<aside>
+💬 이번 수업에서 다룬 내용은 한 그래프에서 특정 노드들에 레이블에 매겨져 있을 때, 다른 노드들에 레이블을 매기는 방법에 대해 다루게 된다.
+
+</aside>
+
+<h3 id="example-node-classification">
+<a class="anchor" href="#example-node-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: Node Classification</h3>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled.png" alt="Untitled"></p>
+
+<p>Given labels of some nodes</p>
+
+<p>Let’s predict labels of unlabeled nodes</p>
+
+<p>This is called semi-supervised node classification</p>
+
+<hr>
+
+<p>일부 노드의 지정된 레이블</p>
+
+<p>레이블이 없는 노드의 레이블을 예측해 봅시다.</p>
+
+<p>이를 준지도 노드 분류라고 합니다.</p>
+
+<hr>
+
+<aside>
+💬 위 그림과 같이 그래프 전체에서 일부 노드에 레이블이 있고, 나머지 노드에는 레이블이 없을 때, 이를 예측하는 방법론을 다룬다.
+
+</aside>
+
+<h3 id="todays-lecture-outline-1">
+<a class="anchor" href="#todays-lecture-outline-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Today’s Lecture: outline</h3>
+
+<ul>
+  <li>Main question today: Given a network with labels on some nodes, how do we assign labels to all other nodes in the network?</li>
+  <li>Today we will discuss an alternative framework: Message passing</li>
+  <li>Intuition: Correlations (dependencies) exist in networks.
+    <ul>
+      <li>In other words: Similar nodes are connected.</li>
+      <li>Key concept is collective classification: Idea of assigning labels to all nodes in a network together.</li>
+    </ul>
+  </li>
+  <li>We will look at three techniques today:
+    <ul>
+      <li>Relational classification</li>
+      <li>Iterative classification</li>
+      <li>Correct &amp; Smooth</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ul>
+  <li>오늘 주요 질문: 일부 노드에 레이블이 있는 네트워크에서 네트워크의 다른 모든 노드에 레이블을 할당하려면 어떻게 해야 합니까?</li>
+  <li>오늘은 대체 프레임워크에 대해 논의하겠습니다: 메시지 전달</li>
+  <li>직관: 상관 관계(의존성) 네트워크에 존재하다
+    <ul>
+      <li>즉, 유사한 노드가 연결되어 있습니다.</li>
+      <li>핵심 개념은 집단 분류: 네트워크의 모든 노드에 label을 함께 할당하는 아이디어입니다.</li>
+    </ul>
+  </li>
+  <li>오늘은 세 가지 기법을 살펴보겠습니다.
+    <ul>
+      <li>관계구분</li>
+      <li>반복구분</li>
+      <li>정확하고 매끄러운</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<aside>
+💬 이를 Semi-supervised node classification이라 한다고 한다.
+
+이미 레이블이 있는 정보와, 없는 구조를 학습하여 새로이 레이블을 예측하기 때문으로 보인다.
+
+이를 Message Passing이라는 프레임 워크를 살펴보게 되는데, message passing 의 주요 개념은 상관관계(correlation)이다.
+
+즉, 비슷한 노드 간에는 상관관계가 있을 것이기 때문에, 노드 간에 상관관계를 파악하여 이를 이용해 레이블을 예측하고자 한다. 
+
+여기서 반복적으로 labeling 작업이 발생하기 때문에, 이전 수업인 Pagerank와 비슷한 점이 있다고 넘어가자.
+
+</aside>
+
+<h3 id="correlations-exist-in-networks">
+<a class="anchor" href="#correlations-exist-in-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Correlations Exist in Networks</h3>
+
+<ul>
+  <li>Behaviors of nodes are correlated across the links of the network</li>
+  <li>Correlation: Nearby nodes have the same color (belonging to the same class)</li>
+</ul>
+
+<hr>
+
+<ul>
+  <li>노드의 동작은 네트워크 링크 전체에서 상관됨</li>
+  <li>상관: 근처 노드의 색상은 동일합니다(동일한 클래스에 속함).</li>
+</ul>
+
+<hr>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%201.png" alt="Untitled"></p>
+
+<ul>
+  <li>
+    <p>Two explanations for why behaviors of nodes in networks are correlated:</p>
+  </li>
+  <li>
+    <p>네트워크에서 노드의 동작이 상관되는 이유에 대한 두 가지 설명은 다음과 같다.</p>
+  </li>
+</ul>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%202.png" alt="Untitled"></p>
+
+<hr>
+
+<aside>
+💬 위의 그래프에서, 비슷한 노드(같은 레이블을 가지고 있는 노드, 초록색, 빨간색과 같이)는 근처에 위치하는 것을 알 수 있다.
+
+이와 같이, 노드 간의 관계를 파악하여, 서로 근접한 노드를 찾을 수 있다면, 거기에 비슷한 레이블을 매길 수 있을 것이다. 
+
+여기서 이제 어떻게 노드 간의 상관관계를 이끌어 낼 수 있을지 살펴보자.
+
+노드 간의 상관관계는 Homophily, Influence 두 개념에 의해 정의되어진다. 
+
+두 개념 모두 사회과학 분야에서 social network를 분석하면서 쓰인 개념으로 보이는데, 하나씩 자세히 살펴보도록 하자.
+
+</aside>
+
+<h3 id="social-homophily">
+<a class="anchor" href="#social-homophily" aria-hidden="true"><span class="octicon octicon-link"></span></a>Social Homophily</h3>
+
+<ul>
+  <li>Homophily: The tendency of individuals to associate and bond with similar others</li>
+  <li><em>“Birds of a feather flock together”</em></li>
+  <li>It has been observed in a vast array of network studies, based on a variety of attributes (e.g., age, gender, organizational role, etc.)</li>
+  <li>Example: Researchers who focus on the same research area are more likely to establish a connection (meeting at conferences, interacting in academic talks, etc.)</li>
+</ul>
+
+<hr>
+
+<ul>
+  <li>동성애: 개인이 유사한 타인과 연관되고 유대감을 갖는 경향</li>
+  <li>“깃털 같은 새들”</li>
+  <li>다양한 속성(예: 연령, 성별, 조직 역할 등)을 기반으로 한 광범위한 네트워크 연구에서 관찰되었다.</li>
+  <li>예시: 동일한 연구 분야에 집중하는 연구자는 (학회에서의 회의, 학술 강연에서의 상호작용 등) 연결을 확립할 가능성이 높다.</li>
+</ul>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%203.png" alt="Untitled"></p>
+
+<h3 id="homophily-example">
+<a class="anchor" href="#homophily-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Homophily: Example</h3>
+
+<p>Example of homophily</p>
+
+<ul>
+  <li>Online social network
+    <ul>
+      <li>Nodes = people</li>
+      <li>Edges = friendship</li>
+      <li>Node color = interests (sports, arts, etc.)</li>
+    </ul>
+  </li>
+  <li>People with the same interest are more closely connected due to homophily</li>
+</ul>
+
+<hr>
+
+<p>동음이의 예</p>
+
+<ul>
+  <li>온라인 소셜 네트워크
+    <ul>
+      <li>노드 = 사람</li>
+      <li>가장자리 = 우정</li>
+      <li>노드 색상 = 관심 사항(스포츠, 예술 등)</li>
+    </ul>
+  </li>
+  <li>동종애로 인해 같은 관심사를 가진 사람들이 더 밀접하게 연결되어 있다.</li>
+</ul>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%204.png" alt="Untitled.png"></p>
+
+<hr>
+
+<aside>
+💬 개인의 특징은 나이, 성별, 직업, 취미, 거주지 등 다양한 요소가 있을 것이다.
+
+Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연결되고, 함께 행동하려고 한다는 개념이다. 
+
+예를 들어, 머신러닝 연구자들은 비슷한 학회를 동시에 참여하고, 비슷한 커뮤니티를 읽고 토론하게 되면서 자연스레 친분을 쌓게 된다. 
+
+또한, 가수들은 서로 같이 공연하고, 서로의 앨범을 들으면서 서로 사회적으로 연결되게 된다.
+
+위의 그래프는 한 학교의 학생들을 나타낸 그래프인데, 학생 개인이 노드, 친분이 엣지로 표현되어 있다. 
+
+이때 노드의 레이블인 색은 각 학생의 관심사로 운동, 예술 등이 있다. 
+
+직관적으로 살펴보아도 알 수 있지만 총 4개의 작은 그룹으로 나누어질 수 있으며, 각 그룹은 비슷한 관심사를 가지는 학생들이 모여있는 것을 알 수 있다. 
+
+이를 Homophily라고 할 수 있을 것이다.
+
+</aside>
+
+<h3 id="social-influence-example">
+<a class="anchor" href="#social-influence-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Social Influence: Example</h3>
+
+<ul>
+  <li>Influence: Social connections can influence the individual characteristics of a person.
+    <ul>
+      <li>Example: I recommend my musical preferences to my friends, until one of them grows to like my same favorite genres!</li>
+    </ul>
+  </li>
+  <li>영향: 사회적 관계는 개인의 특성에 영향을 미칠 수 있다.
+    <ul>
+      <li>예시: 친구 중 한 명이 제가 좋아하는 장르를 좋아하게 될 때까지 친구들에게 제 음악적 취향을 추천합니다!</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%205.png" alt="Untitled"></p>
+
+<aside>
+💬 Influence는 사회적으로 연결된 개인 간에는 서로 영향을 주고 받으면서 비슷한 특징을 가지게 된다는 것을 의미한다.
+
+예를 들어, 내가 1, 2학년 때는 경상계열 친구들과 친하게 지내면서, 경제, 사회, 제도 등에 관심을 가지고 해당 직군을 희망했다면, 3, 4학년이 되면서 통계나 수학, 컴퓨터 공학 친구들과 친하게 지내면서 ML, DL, 코딩 등에 관심을 가지고 해당 직군을 희망하게 된 것이 Influence 때문이라고 할 수 있을 것이다.
+
+</aside>
+
+<h2 id="how-do-we-leverage-node-correlations-in-networks">
+<a class="anchor" href="#how-do-we-leverage-node-correlations-in-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>How do we leverage node correlations in networks?</h2>
+
+<h3 id="classification-with-network-data">
+<a class="anchor" href="#classification-with-network-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Classification with Network Data</h3>
+
+<ul>
+  <li>
+    <p>How do we leverage this correlation observed in networks to help predict node labels?</p>
+  </li>
+  <li>
+    <p>네트워크에서 관찰된 이 상관 관계를 활용하여 노드 레이블을 예측하는 방법은 무엇입니까?</p>
+  </li>
+</ul>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%206.png" alt="Untitled"></p>
+
+<p><strong>How do we predict the labels for the nodes in grey?</strong></p>
+
+<p>노드의 레이블을 회색으로 어떻게 예측합니까?</p>
+
+<h3 id="motivation">
+<a class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h3>
+
+<ul>
+  <li>Similar nodes are typically close together or directly connected in the network:
+    <ul>
+      <li>Guilt-by-association: If I am connected to a node with label 𝑋, then I am likely to have label 𝑋 as well.</li>
+      <li>Example: Malicious/benign web page: Malicious web pages link to one another to increase visibility, look credible, and rank higher in search engines</li>
+    </ul>
+  </li>
+  <li>Classification label of a node 𝑣 in network may depend on:
+    <ul>
+      <li>Features of 𝑣</li>
+      <li>Labels of the nodes in 𝑣’s neighborhood</li>
+      <li>Features of the nodes in 𝑣’s neighborhood</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<ul>
+  <li>유사한 노드는 일반적으로 네트워크에서 서로 가까이 있거나 직접 연결됩니다.
+    <ul>
+      <li>연관별 죄책감: 레이블 𝑋이 있는 노드에 연결되어 있다면 레이블 𝑋도 있을 수 있습니다.</li>
+      <li>예: 악성/악성 웹 페이지: 악성 웹 페이지는 가시성을 높이고 신뢰도를 높이며 검색 엔진에서 더 높은 순위를 차지하기 위해 서로 연결됩니다.</li>
+    </ul>
+  </li>
+  <li>네트워크에 있는 노드 $v$의 분류 라벨은 다음 조건에 따라 달라질 수 있습니다.
+    <ul>
+      <li>$v$의 기능</li>
+      <li>$v$의 이웃에 있는 노드의 레이블</li>
+      <li>$v$의 이웃에 있는 노드의 기능</li>
+    </ul>
+  </li>
+</ul>
+
+<aside>
+💬 한 그래프 내에서 비슷한 노드는 가까이 위치하거나 직접 연결되어 있을 것이다.
+
+이를 Guilt-by-association이라고 하는데, 노드 b가 아직 레이블이 없는 상태에서, 이웃노드 x가 1로 레이블 되어 있다면, 이웃노드 x와 가깝기 때문에 노드 b 역시 1로 레이블 될 가능성이 높다는 개념이다.
+
+구체적인 예시로는 스팸 사이트들이 안전한 사이트와의 연결고리는 생성할 수 없기 때문에, 노출도와 신뢰도를 높이기 위해 서로 링크를 연결하는 경향이 있는데, 이를 이용해서 스팸 사이트 하나를 잡을 수 있다면, 서로 연결된 다른 스팸 사이트도 색출 할 수 있다고 한다.
+
+이때, 노드 v의 분류에 이용하는 정보들은 다음과 같다.
+
+1. 노드 v의 변수들
+2. 노드 v의 이웃 노드들의 레이블
+3. 노드 v의 이웃 노드들의 변수들
+</aside>
+
+<h3 id="semi-supervised-learning">
+<a class="anchor" href="#semi-supervised-learning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semi-supervised Learning</h3>
+
+<p><strong>Formal setting:</strong></p>
+
+<p>Given:</p>
+
+<ul>
+  <li>Graph</li>
+  <li>Few labeled nodes</li>
+</ul>
+
+<p>Find: Class (red/green) of remaining nodes</p>
+
+<p>Main assumption: There is homophily in the network</p>
+
+<p><strong>공식 설정:</strong></p>
+
+<p>제공됨:</p>
+
+<ul>
+  <li>그래프</li>
+  <li>레이블이 지정된 노드 몇 개</li>
+</ul>
+
+<p>찾기: 나머지 노드의 클래스(빨간색/녹색)</p>
+
+<p>주요 가정: 네트워크에 동질성이 있습니다.</p>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%207.png" alt="Untitled"></p>
+
+<p>Example task:</p>
+
+<ul>
+  <li>Let 𝑨 be a 𝑛×𝑛 adjacency matrix over 𝑛 nodes</li>
+  <li>Let Y = $[0,1]^n$ be a vector of labels:
+    <ul>
+      <li>$Y_v$ = 1  belongs to Class1</li>
+      <li>$Y_v$ = 0  belongs to Class0</li>
+      <li>There are unlabeled node needs to be classified</li>
+    </ul>
+  </li>
+  <li>Goal: Predict which unlabeled nodes are likely Class 1, and which are likely Class 0</li>
+</ul>
+
+<p><strong>작업 예</strong>:</p>
+
+<ul>
+  <li>A를 n개 노드의 nxn 인접 행렬로 설정</li>
+  <li>Y = $[0,1]^n$ 을 레이블 벡터라고 하자:
+    <ul>
+      <li>$Y_v$ = 1이 클래스 1에 속함</li>
+      <li>$Y_v$ = 0이 클래스 0에 속함</li>
+      <li>라벨이 지정되지 않은 노드가 분류되어야 합니다</li>
+    </ul>
+  </li>
+  <li>목표: 레이블이 없는 노드가 클래스 1일 가능성이 높고 클래스 0일 가능성이 높은 노드를 예측합니다.</li>
+</ul>
+
+<aside>
+💬 실제로 이용하게 되는 입력값은
+
+인접행렬: $A_{n*n}$, 레이블 벡터 $Y=[0,1]^n$, $Y_v$ **= 1이 클래스 1**에 속함, $Y_v$ **= 0이 클래스 0**에 속함이 있으며, 
+
+아직 레이블이 없는 노드에 대해 레이블이 0 혹은 1일 확률을 계산하는 것이 목표이다.
+
+</aside>
+
+<h3 id="problem-setting">
+<a class="anchor" href="#problem-setting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problem Setting</h3>
+
+<p>How to predict the labels $Y_v$ for the unlabeled nodes $v$  (in grey color)?</p>
+
+<p>Each node $v$ has a feature vector $f_v$</p>
+
+<p>Labels for some nodes are given (1 for green, 0 for red)</p>
+
+<p>Task: Find $P(Y_v)$ given all features and the network</p>
+
+<p>라벨이 없는 노드 $v$(회색)에 대한 레이블 $Y_v$를 예측하는 방법</p>
+
+<p>각 노드 $v$에는 특징 벡터 $f_v$가 있습니다.</p>
+
+<p>일부 노드의 라벨이 제공됩니다(녹색은 1, 빨간색은 0).</p>
+
+<p>작업: 모든 기능 및 네트워크가 주어진 $P(Y_v)$ 찾기</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">?</mo></mrow><annotation encoding="application/x-tex">P(Y_v)=?</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mclose">?</span></span></span></span></span>
+
+<p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%208.png" alt="Untitled"></p>
+
+<aside>
+💬
+
+</aside>
+
+<h3 id="example-applications">
+<a class="anchor" href="#example-applications" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example applications:</h3>
+
+<ul>
+  <li>Many applications under this setting:
+    <ul>
+      <li>Document classification</li>
+      <li>Part of speech tagging</li>
+      <li>Link prediction</li>
+      <li>Optical character recognition</li>
+      <li>Image/3D data segmentation</li>
+      <li>Entity resolution in sensor networks</li>
+      <li>Spam and fraud detection</li>
+    </ul>
+  </li>
+  <li>이 설정 아래의 많은 응용 프로그램:
+    <ul>
+      <li>문서구분</li>
+      <li>음성 태그의 일부</li>
+      <li>링크 예측</li>
+      <li>광학식 문자 인식</li>
+      <li>영상/3D 데이터 분할</li>
+      <li>센서 네트워크의 엔티티 해상도</li>
+      <li>스팸 및 부정 행위 탐지</li>
+    </ul>
+  </li>
+</ul>
+
+<aside>
+💬 이러한 방법론은 위와 같은 다양한 분야에 적용이 가능하다.
+
+</aside>
+
+<h3 id="collective-classification-overview-1">
+<a class="anchor" href="#collective-classification-overview-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Collective Classification Overview (1)</h3>
+
+<p>collective classification을 전반적으로 살펴보면 다음과 같다.</p>
+
+<aside>
+📌 Intuition(직관) : 노드 간 상관관계를 이용해 서로 연결된 노드들을 동시에 분류하기
+
+</aside>
+
+<p>이때 1차 마르코프 연쇄를 사용한다.</p>
+
+<p>즉, 노드 $\mathrm{v}$ 의 레이블 $Y_{v}$ 를 예측하기 위해서는 이웃노드 $N_{v}$ 만 필요하다는 것이다.</p>
+
+<p>2차 마르코프 연쇄를 사용할 경우 $N_{v}$ 의 이웃노드 역시 사용할 것이다.</p>
+
+<p>1차 마르포크 연쇄를 사용할 경우 식은 다음과 같아질 것이다.</p>
+
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo fence="true">)</mo></mrow><mo>=</mo><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo>∣</mo><msub><mi>N</mi><mi>v</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">P\left(Y_{v}\right)=P\left(Y_{v} \mid N_{v}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span></span>
+
+<p>collective classification은 하나의 모델을 이용하거나 기존의 분류모델처럼 한번의 과정으로 구성되지 않고 총 세가지 과정으로 구성된다.</p>
+
+<h3 id="collective-classification-overview-2">
+<a class="anchor" href="#collective-classification-overview-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Collective Classification Overview (2)</h3>
+
+<p><strong>Local Classifier</strong></p>
+
+<p>최초로 레이블을 할당하기 위해 사용되는 분류기이다.</p>
+
+<p>즉, 그래프에서 레이블이 없는 노드들에 대해 우선 노드를 생성해야 하기 때문에, 기존의 분류문제와 동일하게 구성된다.</p>
+
+<p>이때 예측 과정은 각 노드의 변수만 사용하여 이미 레이블이 있는 노드로 학습하고, 레이블이 없는 노드로 예측하게 된다.</p>
+
+<p>그래프의 구조적 정보가 사용되지 않는다는 점에 유의하자.</p>
+
+<p><strong>Relational Classifier</strong></p>
+
+<p>노드 간 상관관계를 파악하기 위해 이웃 노드의 레이블과 변수를 사용하는 분류기이다.</p>
+
+<p>이를 통해 이웃 노드의 레이블과 변수와 현재 노드의 변수를 이용해 현재 노드의 레이블을 예측할 수 있다.</p>
+
+<p>이때, 이웃노드의 정보가 사용되기 때문에, 그래프의 구조적 정보가 사용된다.</p>
+
+<p><strong>Collective Inference</strong></p>
+
+<p>Collective Classification은 한번의 예측으로 종료되지 않는 것이 핵심이다.</p>
+
+<p>특정 조건을 만족할 때까지 각 노드에 대해 분류하고 레이블을 업데이트한다.</p>
+
+<p>이때의 조건이란 더이상 레이블이 변하지 않거나, 정해진 횟수를 의미한다.</p>
+
+<p>이때 동일한 변수를 가진 노드라 하더라도 그래프의 구조에 따라 최종 예측이 달라질 수 있다는 점을 유념하자.</p>
+
+<h3 id="overview-of-what-is-coming">
+<a class="anchor" href="#overview-of-what-is-coming" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview of What is Coming</h3>
+
+<ul>
+  <li>We focus on semi-supervised binary node classification</li>
+  <li>We will introduce three approaches:
+    <ul>
+      <li>Relational classification</li>
+      <li>Iterative classification</li>
+      <li>Correct &amp; Smooth</li>
+    </ul>
+  </li>
+  <li>우리는 준지도 이진 노드 분류에 초점을 맞춘다.</li>
+  <li>다음 세 가지 접근 방식을 소개합니다.
+    <ul>
+      <li>관계구분</li>
+      <li>반복구분</li>
+      <li>정확하고 매끄러운</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h1 id="reference">
+<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h1>
+
+<p><a href="https://www.youtube.com/watch?v=6g9vtxUmfwM&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=14">CS224W: Machine Learning with Graphs 2021 Lecture 5.1 - Message passing and Node Classification</a></p>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
