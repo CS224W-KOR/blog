@@ -152,9 +152,9 @@ window.onload = wrap_img;
   <p><strong>Lecture 11. Reasoning in Knowledge Graphs using Embeddings</strong></p>
 
   <ul>
-    <li><a href="">Lecture 11.1 - Reasoning in Knowledge Graphs</a></li>
-    <li><a href="">Lecture 11.2 - Answering Predictive Queries</a></li>
-    <li><a href="">Lecture 11.3 - Query2box Reasoning over KGs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/one-hop%20query/path%20query/conjunctive%20query/predictive%20query/2022/08/17/lecture-1101.html">Lecture 11.1 - Reasoning in Knowledge Graphs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html">Lecture 11.2 - Answering Predictive Queries</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html">Lecture 11.3 - Query2box: Reasoning over KGs</a></li>
   </ul>
 
 </blockquote>
@@ -186,29 +186,9 @@ window.onload = wrap_img;
 
 <ul>
   <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-<strong>Entity embedding</strong>: entity는 zero-volume box(하나의 점)로 나타냅니다. 파라미터 수는 $d</td>
-          <td>V</td>
-          <td>$ 입니다.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+<strong>Entity embedding</strong>: entity는 zero-volume box(하나의 점)로 나타냅니다. 파라미터 수는 $d|V|$ 입니다.</li>
   <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-<strong>Relation embedding</strong>: 하나의 box에서 다른 새로운 box로 매칭하는 것으로 표현됩니다. 파라미터 수는 $2d</td>
-          <td>R</td>
-          <td>$ 입니다.</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+<strong>Relation embedding</strong>: 하나의 box에서 다른 새로운 box로 매칭하는 것으로 표현됩니다. 파라미터 수는 $2d|R|$ 입니다.</li>
   <li>
 <strong>Intersection operator</strong> $f$: 인풋은 box들이고 아웃풋으로는 하나의 box가 나옵니다. 인풋으로 들어가는 box들의 교집합 부분을 구하는 모델입니다.</li>
 </ul>
@@ -273,7 +253,7 @@ window.onload = wrap_img;
 <h1 id="embedding-and-or-queries">
 <a class="anchor" href="#embedding-and-or-queries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embedding AND-OR Queries</h1>
 
-<p>Union operation중 하나인 <code class="language-plaintext highlighter-rouge">or</code> 에 대해 생각해봅시다. 예를 들어 <code class="language-plaintext highlighter-rouge">유방암 **또는** 폐암을 치료할 수 있는 약물은 무엇일까?</code>와 같은 질문에 필요한 연산일 것 입니다. <strong>Conjunctive query와 disjunction을 결합</strong>한 것을 <strong>E</strong>xistential <strong>P</strong>ositive <strong>F</strong>irst-<strong>o</strong>rder (EPFO) query라고도 합니다. 여기에서는 앞으로 <strong>AND-OR query</strong>라고 지칭하겠습니다. 여기서 고민해야 할 부분은 다음과 같습니다.</p>
+<p>Union operation중 하나인 <code class="language-plaintext highlighter-rouge">or</code> 에 대해 생각해봅시다. 예를 들어 <code class="language-plaintext highlighter-rouge">유방암 또는 폐암을 치료할 수 있는 약물은 무엇일까?</code>와 같은 질문에 필요한 연산일 것 입니다. <strong>Conjunctive query와 disjunction을 결합</strong>한 것을 <strong>E</strong>xistential <strong>P</strong>ositive <strong>F</strong>irst-<strong>o</strong>rder (EPFO) query라고도 합니다. 여기에서는 앞으로 <strong>AND-OR query</strong>라고 지칭하겠습니다. 여기서 고민해야 할 부분은 다음과 같습니다.</p>
 
 <ol>
   <li>
@@ -335,30 +315,10 @@ window.onload = wrap_img;
 <p>학습으로 training할 수 있는 부분은 다음과 같습니다.</p>
 
 <ul>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>파라미터 수가 $d</td>
-          <td>V</td>
-          <td>$ 인 <strong>Entity embedding</strong>
-</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>파라미터 수가 $2d</td>
-          <td>R</td>
-          <td>$ 인 <strong>Relation embedding</strong>
-</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>파라미터 수가 $d|V|$ 인 <strong>Entity embedding</strong>
+</li>
+  <li>파라미터 수가 $2d|R|$ 인 <strong>Relation embedding</strong>
+</li>
   <li>
 <strong>Intersection operator</strong> $f$</li>
 </ul>
