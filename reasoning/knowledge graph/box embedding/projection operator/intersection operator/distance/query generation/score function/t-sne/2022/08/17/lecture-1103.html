@@ -10,15 +10,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
 <meta property="og:description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
-<link rel="canonical" href="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html" />
-<meta property="og:url" content="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html" />
 <meta property="og:site_name" content="CS224W-KOR" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-08-17T00:00:00-05:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Lecture 11.3 - Query2box Reasoning over KGs" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings","headline":"Lecture 11.3 - Query2box Reasoning over KGs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html"},"url":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1103.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings","headline":"Lecture 11.3 - Query2box Reasoning over KGs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html"},"url":"https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -100,6 +100,37 @@ window.onload = wrap_img;
 </span></p>
 
     
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#reasoning">reasoning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#knowledge graph">knowledge graph</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#box embedding">box embedding</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#projection operator">projection operator</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#intersection operator">intersection operator</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#distance">distance</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#query generation">query generation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#score function">score function</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#t-sne">t-sne</a>
+        
+      
+      </p>
+    
 
     </header>
 
@@ -133,14 +164,10 @@ window.onload = wrap_img;
 <h1 id="motivation">
 <a class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h1>
 
-<p>(11.2의 마지막과 같은 내용이므로 skip 해도 됩니다.)</p>
-
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2015.png" alt="Untitled"></p>
-
-<p><em>logical conjunction operation → and</em></p>
+<p>11.2의 마지막 부분에서 다음과 같은 해결해야 할 질문들이 있었습니다.</p>
 
 <ol>
-  <li>중간 노드들은 entities의 집합이 될텐데 어떻게 나타낼 수 있을것인가?</li>
+  <li>중간 노드들은 entities의 집합(set)이 될텐데 어떻게 나타낼 수 있을것인가?</li>
   <li>latent space에서 교집합(intersection) 연산(operation)을 어떻게 나타낼 수 있을 것인가?</li>
 </ol>
 
@@ -149,11 +176,11 @@ window.onload = wrap_img;
 
 <p>latent space에 query를 hyper-rectangles(boxes)로 나타낼 수 있습니다. 박스는 중심점과 크기를 나타내는 offset의 값으로 정의하고 나타낼 수 있습니다. 따라서 이를 수식으로 나타내면 아래와 같습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2016.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/oi7liAn.png" alt="Imgur"></p>
 
 <p>임베딩 공간에서 나타내보면 아래 그림과 같을 것 입니다. 이렇게 box형식의 표현이 좋은 점은 앞서 motivation에서 살펴보았던 2가지 고민에 대한 좋은 해결책이 되기 때문입니다. (1) 해당 query에 속하는 node들의 set을 손쉽게 box안에 표현하면 되는 것이고 (2) intersection 또한 각 query를 나타내는 box area의 교집합 부분으로 나타낼 수 있기 때문입니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2017.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/5Ptgbka.png?1" alt="Imgur"></p>
 
 <p>query를 box로 나타내기로 한 다음 이제 다른 부분들은 자동으로 다음과 같이 embedding space에 표현됩니다.</p>
 
@@ -191,18 +218,18 @@ window.onload = wrap_img;
 
 <p>하나의 query 영역에서 relation을 통해 다음의 query 영역으로 이동하는 것을 다음과 같이 <strong>Projection Operator</strong>를 이용해서 표현할 수 있습니다. 새로운 query $q’$의 center와 offset 모두 projection operator를 통해 이전 query $q$와 relation $r$로부터 구할 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2018.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/YS811iq.png?1" alt="Imgur"></p>
 
 <p>이를 앞서 conjunctive query에서 intersection을 구하기 전까지의 query plan 과정을 embedding space에서 나타내면 다음과 같습니다. <code class="language-plaintext highlighter-rouge">ESR2</code>와 <code class="language-plaintext highlighter-rouge">Short of Breath</code>에서 각각 출발하여 relation과정(projection 연산)을 통해 query box가 embedding space에서 움직이는 것을 볼 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2019.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/vQ6dHK5.png?1" alt="Imgur"></p>
 
 <h1 id="intersection-operator">
 <a class="anchor" href="#intersection-operator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Intersection Operator</h1>
 
 <p>query box들의 교집합 부분은 Intersection operator를 통해서 구할 수 있습니다. 이를  embedding space에서의 그림으로 나타내면 아래와 같습니다. Intersection operator는 앞서 살펴봤던 것처럼 인풋으로는 여러개의 box들을 받고 아웃풋으로는 하나의 box를 출력합니다. 따라서 아웃풋인 <strong>새로운 box의 center point와 offset을 어떻게 구할지</strong> 설계해야 합니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2020.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/Rh5OXDi.png?1" alt="Imgur"></p>
 
 <ol>
   <li><strong>Center point</strong></li>
@@ -210,11 +237,11 @@ window.onload = wrap_img;
 
 <p>embedding space에서 <strong>여러개의 box들의 intersection이 되는 부분의 중심점은 box들의 center point들과 가깝다</strong>는 insight를 활용합니다. 따라서 여러개 box들의 center point들로 만들어지는 경계 박스(아래 그림에서 분홍색 box) 안에 intersection box의 center point가 있을 것입니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2021.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/5qJgMPY.png" alt="Imgur"></p>
 
 <p>따라서 수식적으로 새로운 intersection box의 중심점은 인풋이 되는 box들의 중심점들의 위치를 weighted sum을 하여 구합니다. 이때 weight $\mathbf{w}<em>i$는 Neural network인 $f</em>{cen}$을 통해 training되는 trainable한 값이며 각 center point들에 대한 <strong>self-attention score</strong>를 나타낸다고 볼 수 있습니다. 즉, 아래의 수식과 같이 box들의 center point인 $Cen(q_i)$가 NN $f_{cen}$을 통해 나온 아웃풋을 softmax를 통해 구한 값이 weight $\mathbf{w}_i$가 되는 것입니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_14.png" alt="Group 14.png"></p>
+<p><img src="https://i.imgur.com/Oz9GlS0.png?1" alt="Imgur"></p>
 
 <ol>
   <li><strong>Offset (Box size)</strong></li>
@@ -222,11 +249,11 @@ window.onload = wrap_img;
 
 <p>당연히 <strong>intersection이 되는 영역은 인풋이 되는 box들의 크기보다 작아질 것</strong> 입니다.(shrinking) intersection의 offset은 아래와 같은 수식으로 표현되는데, <code class="language-plaintext highlighter-rouge">min()</code>에서 아웃풋의 박스가 줄어드는 것을 보장하며 Neural Network $f_{off}$에 box들의 offset들을 넣어서 나온 값에다가 sigmoid 함수를 통과하여 나온 0~1 사이의 값을 곱하여 <strong>intersection box의 offset을 결정</strong>하게 됩니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_15.png" alt="Group 15.png"></p>
+<p><img src="https://i.imgur.com/sMQTqJo.png?2" alt="Imgur"></p>
 
 <p>이렇게 intersection operator까지 구하는 법을 배웠으니 앞서 진행한 conjunctive query plan을 embedding space에서의 연산 과정으로 나타내면 다음과 같습니다. 최종적으로 빗금쳐진 intersection이 answer 영역이 됩니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2022.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/CobLHkA.png?1" alt="Imgur"></p>
 
 <h1 id="entity-to-box-distance">
 <a class="anchor" href="#entity-to-box-distance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Entity-to-Box Distance</h1>
@@ -235,13 +262,13 @@ window.onload = wrap_img;
 
 <p>우선 entity는 zero-volume의 점이므로 하나의 위치로 나타낼 수 있습니다. 이와 같은 맥락으로 box는 중심점을 대표 위치로 나타낼 수 있습니다. 하지만 box는 점이 아닌 하나의 <strong>영역</strong>이므로 <strong>박스 안과 밖을 구분</strong>할 수 있고 따라서 이를 구분하여 점-박스 사이의 거리 $d_{box}$를 계산하게 됩니다. <strong>box 안에 있는 경우,</strong> 거리 $d_{in}$에 0~1사이의 값인 weight $\alpha$를 곱해주어 계산합니다. 수식으로 나타내면 아래와 같습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2023.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/DgbmTAo.png?2" alt="Imgur"></p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_16.png" alt="Group 16.png"></p>
+<p><img src="https://i.imgur.com/bUDJyzl.png" alt="Imgur"></p>
 
 <p>이렇게 정의한 점-박스 사이의 거리 $d_{box}$를 기반으로 <strong>score function</strong> $f_q(v)$는 다음과 같이 정의할 수 있습니다. 거리가 멀수록 bad score이어야 하므로 $-$를 붙여 음수로 만들어줍니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2024.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/F9NII8p.png?1" alt="Imgur"></p>
 
 <h1 id="embedding-and-or-queries">
 <a class="anchor" href="#embedding-and-or-queries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embedding AND-OR Queries</h1>
@@ -259,36 +286,36 @@ window.onload = wrap_img;
 
 <hr>
 
-<p>총 3개의 query가 주어져 있고 각 query에 해당하는 answer node들이 있다고 해봅시다.</p>
+<p>총 3개의 query가 주어져 있고 각 query에 해당하는 answer node들 $v_1$, $v_2$, $v_3$이 있다고 해봅시다. answer node들은 서로 중복되지(overlapping) 않습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2025.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/BS30KRL.png?2" alt="Imgur"></p>
 
 <p>그러면 우선 각 query를 box로 나타내어 answer에 맞도록 그려보면 다음과 같을 것입니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_17.png" alt="Group 17.png"></p>
+<p><img src="https://i.imgur.com/jBzDgJT.png?1" alt="Imgur"></p>
 
 <p>다음으로 query의 합집합 연산 v에 대한 query box를 그려보면 다음과 같습니다. 아직까지는 answer(positive)와 answer가 아닌(negative) entity들을 구분하는 영역을 그리는 것이 가능합니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_20.png" alt="Group 20.png"></p>
+<p><img src="https://i.imgur.com/2l9lCG9.png?1" alt="Imgur"></p>
 
 <p>하지만 다음과 같이 entity가 4개인 경우가 된다면 answer와 answer가 아닌 것들을 구분하는 box embedding을 구할 수 없게 됩니다. 이처럼 non-overlapping answer들을 가지고 있는 query들의 갯수가 증가할 수록 이들의 OR 연산자를 다룰 수 있는 공간의 차원도 높아지게 되어 <strong>저차원에서의 AND-OR query를 나타낼 수 없는 것입니다.</strong></p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2026.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/7UV5Zxf.png?1" alt="Imgur"></p>
 
 <p>하지만 저차원의 AND-OR 연산자를 나타낼 수 없다고 해서 이를 아예 해결할 방법이 없는 것은 아닙니다. 여기서 핵심 아이디어는 <strong>맨 마지막 step의 union만 제외하고 다른 union 연산들은 다 풀어서 표현해주면 된다는 것</strong>입니다. 아래의 그림에서 처럼 앞 step에 있던 union을 풀어서 더 여러개의 relation으로 표현해준 다음 맨 마지막 단계에서 union을 넣어주어 동치인 상황을 만들어줍니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2027.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/hZawtQj.png" alt="Imgur"></p>
 
 <h1 id="disjunctive-normal-form">
 <a class="anchor" href="#disjunctive-normal-form" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disjunctive Normal Form</h1>
 
 <p>AND-OR query는 동치인 Disjunctive Normal form, <strong>DNF</strong>로 치환될 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_21.png" alt="Group 21.png"></p>
+<p><img src="https://i.imgur.com/zzg5puZ.png?1" alt="Imgur"></p>
 
 <p>Entity와 DNF $q=q_{1} \vee q_{2} \vee \cdots \vee q_{m}$ 사이의 거리는 다음과 같이 정의 됩니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2028.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/LgYwEVl.png?1" alt="Imgur"></p>
 
 <ul>
   <li>query q의 AND-OR embedding 과정
@@ -345,22 +372,22 @@ window.onload = wrap_img;
   <li>아래와 같이 정의된 loss function $l$을 이용하여 <strong>positive sample의 score는 최대화</strong>, <strong>negative sample의 score는 최소화</strong>하는 방향으로 학습합니다.</li>
 </ol>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2029.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/T36y2ns.png?1" alt="Imgur"></p>
 
 <h1 id="query-generation-from-templates">
 <a class="anchor" href="#query-generation-from-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Query Generation from Templates</h1>
 
 <p>training set에는 다음과 같이 다양한 multiple query template들을 생성해서 넣어줄 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2030.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/b1LsFJu.png?1" alt="Imgur"></p>
 
 <p>answer node에서 시작해서 <strong>backward</strong>하는 방식으로 training sample들을 만들어 낼 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2031.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/0uhJnm2.png?2" alt="Imgur"></p>
 
 <p>위와 같은 KG에서 answer node인 <strong>Fulvestrant</strong>를 하나 선택합니다. 이 노드에서부터 TreatedBy, Assoc relation을 통해 backward를 하게 되면 <code class="language-plaintext highlighter-rouge">[Anchor1, (Relation1, Realtion2)]</code> template인 <strong>[ESR2, (Assoc, TreatedBy)]</strong>의 sample을 하나 얻게 되는 것입니다. 이와 같은 매커니즘으로 CausedBy relation으로 backward하게 되면 <code class="language-plaintext highlighter-rouge">[Anchor1, (Relation1)]</code> template의 sample 하나를 얻게 됩니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2032.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/SJpGCV5.png" alt="Imgur"></p>
 
 <p>이러한 backward를 통해 positive sample인 $\llbracket q \rrbracket_{G}$를 얻게 되고, negative sample은 KG에서 random 하게 샘플링하게 만들어지게 되는데 이때 random하게 만들어진 negative sample이 positive sample과 겹치지 않는지 주의할 필요가 있습니다.</p>
 
@@ -369,7 +396,7 @@ window.onload = wrap_img;
 
 <p>실제로 box embedding이 무엇을 배우는지 확인해보기 위해 t-SNE를 이용하여 시각화 해봅시다. (고차원에서 box embedding이 이루어지고 2차원의 t-sne로 나타내는 것이므로 box 영역으로 나타내어지지 않습니다.)</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2033.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/SiydOmh.png" alt="Imgur"></p>
 
 <h1 id="11강-정리">
 <a class="anchor" href="#11%EA%B0%95-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>11강 정리</h1>
@@ -419,7 +446,7 @@ window.onload = wrap_img;
     })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="u-url" href="/blog/2022/08/17/lecture-1103.html" hidden></a>
+<a class="u-url" href="/blog/reasoning/knowledge%20graph/box%20embedding/projection%20operator/intersection%20operator/distance/query%20generation/score%20function/t-sne/2022/08/17/lecture-1103.html" hidden></a>
 </article>
 
       </div>

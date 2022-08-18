@@ -10,15 +10,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
 <meta property="og:description" content="CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings" />
-<link rel="canonical" href="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1102.html" />
-<meta property="og:url" content="https://cs224w-kor.github.io/blog/2022/08/17/lecture-1102.html" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html" />
 <meta property="og:site_name" content="CS224W-KOR" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-08-17T00:00:00-05:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Lecture 11.2 - Answering Predictive Queries" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings","headline":"Lecture 11.2 - Answering Predictive Queries","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1102.html"},"url":"https://cs224w-kor.github.io/blog/2022/08/17/lecture-1102.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-17T00:00:00-05:00","datePublished":"2022-08-17T00:00:00-05:00","description":"CS224W Lecture 11. Reasoning in Knowledge Graphs using Embeddings","headline":"Lecture 11.2 - Answering Predictive Queries","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html"},"url":"https://cs224w-kor.github.io/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -100,6 +100,28 @@ window.onload = wrap_img;
 </span></p>
 
     
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#reasoning">reasoning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#knowledge graph">knowledge graph</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#traversing">traversing</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#query embedding">query embedding</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#TransE">TransE</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#conjunctive query">conjunctive query</a>
+        
+      
+      </p>
+    
 
     </header>
 
@@ -126,17 +148,17 @@ window.onload = wrap_img;
 
 <p>핵심 아이디어는 <strong>Query를 embedding하는 것</strong>입니다. 이전에 배운 <strong>TransE</strong>를 다시 복습해보면 $\mathbf{h}$에서 $\mathbf{t}$로 가기 위해 $\mathbf{r}$를 경유하여 갈 때의 score function $f_r(h, t)$는 다음과 같이 나타냈었습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%209.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/fYmbV8T.png?2" alt="Imgur"></p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2010.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/X8DJUHI.png" alt="Imgur"></p>
 
 <p>이것을 Query Embedding 관점으로 다시 생각해보면, query embedding $\mathbf{q} = \mathbf{h} + \mathbf{r}$로 볼 수 있고 이때의 목표는 <strong>query embedding $\mathbf{q}$를 answer embeding인 $\mathbf{t}$와 가깝게 만드는 것</strong>입니다. 따라서 query를 임베딩 한다는 것은 TransE를 multi-hop reasoning으로 일반화 시키는 것과 같습니다. Query의 relation들이 여러개 적용되는 과정은 embedding space에서 vector addition 과정이며 이는 Knowledge Graph에서의 <strong>entity마다 독립적으로</strong> 일어나는 과정입니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/MUsxK7G.png?1" alt="Imgur"></p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/a6L10yl.png" alt="Imgur"></p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/wGPmXw1.png" alt="Imgur"></p>
 
 <aside>
 💡 - ***TransE***는 **composition relation을 다룰 수 있었기 때문에** path query의 multi-hop를 **latent space에서의 relation addition으로** 표현할 수 있도록 했습니다.
@@ -147,15 +169,15 @@ window.onload = wrap_img;
 <h1 id="conjunctive-queries">
 <a class="anchor" href="#conjunctive-queries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conjunctive Queries</h1>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_12.png" alt="Group 12.png"></p>
+<p><img src="https://i.imgur.com/FcAlKnK.png?1" alt="Imgur"></p>
 
 <p>지금까지 One-hop query와 이를 multi-hop으로 확장한 Path Query까지 알아보았습니다. 그렇다면 마지막으로 남은 더 복잡한 <strong>query들 간의 결합(conjunction) 연산</strong>도 가능할까요? 각 query의 anchor node에서 출발하여 traversing을 하고 난 뒤, 각 traversing의 결과인 node의 교집합(intersection)을 구하면 정답을 구할 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_11.png" alt="Group 11.png"></p>
+<p><img src="https://i.imgur.com/J49hf5p.png?2" alt="Imgur"></p>
 
 <p>하지만 여기서도 missing connection이 있다면 해당 connection과 관련된 정답을 놓칠 수 있습니다. 이런 경우 implicit하게 connection을 추론해볼 수 있습니다. 만약 <code class="language-plaintext highlighter-rouge">(ESR2, Assoc, Breast Cancer)</code>이 missing되었다면 (1) ESR2가 BRCA1과 ESR1 모두와 interaction 관계를 가지고 있고 (2)BRCA1과 ESR1 각각은 Breast cancer과 association 관계를 가지고 있기 때문에 <strong>(ESR2, Assoc, Breast Cancer)을 가질 수 있음을 추론</strong>해볼 수 있습니다.</p>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Untitled%2014.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/UP2MWnJ.png" alt="Imgur"></p>
 
 <h1 id="traversing-kg-in-vector-space-1">
 <a class="anchor" href="#traversing-kg-in-vector-space-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Traversing KG in Vector Space</h1>
@@ -167,7 +189,7 @@ window.onload = wrap_img;
   <li>latent space에서의 <strong>Intersection</strong>을 어떻게 정의하고 어떤 연산과정으로 나타낼 것인지</li>
 </ol>
 
-<p><img src="Lecture%2011%201ae7315915874c8ebfdc2f5faa435a12/Group_13.png" alt="Group 13.png"></p>
+<p><img src="https://i.imgur.com/TH3SoCg.png?1" alt="Imgur"></p>
 
 <hr>
 
@@ -204,7 +226,7 @@ window.onload = wrap_img;
     })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="u-url" href="/blog/2022/08/17/lecture-1102.html" hidden></a>
+<a class="u-url" href="/blog/reasoning/knowledge%20graph/traversing/query%20embedding/transe/conjunctive%20query/2022/08/17/lecture-1102.html" hidden></a>
 </article>
 
       </div>
