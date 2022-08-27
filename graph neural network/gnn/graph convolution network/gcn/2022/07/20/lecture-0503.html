@@ -146,11 +146,10 @@ window.onload = wrap_img;
 </ul><hr>
 <blockquote>
   <p><strong>Lecture 5</strong></p>
-
   <ul>
-    <li><a href="">Lecture 5.1 - Message passing and Node Classification</a></li>
-    <li><a href="">Lecture 5.2 - Relational and Iterative Classification</a></li>
-    <li><a href="">Lecture 5.3 - Collective Classification : Belief Propagation</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html">Lecture 5.1 - Message passing and Node Classification</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html">Lecture 5.2 - Relational and Iterative Classification</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0503.html">Lecture 5.3 - Collective Classification : Belief Propagation</a></li>
   </ul>
 
 </blockquote>
@@ -182,8 +181,6 @@ window.onload = wrap_img;
 
 <aside>
 
----
-
 💬 먼저 지금까지 배운 내용으로는 각 노드는 이웃 노드의 확률의 가중평균을 자신의 새로운 확률로 삼고 있다.
 혹은 각 노드는 이웃 노드의 레이블을 활용해 자신의 새로운 확률을 계산하게 된다. 
 즉, 이웃노드의 정보가 각각의 노드에서 사용되고 있는 것이다.
@@ -194,6 +191,7 @@ window.onload = wrap_img;
 좀 더 먼 노드의 belief도 중요하게 작동하지 않을까? 
 왜냐하면 결국 이터레이션을 반복하여 이웃노드의 belief를 받게 된다면, 해당 belief는 이웃노드의 이웃노드의 belief가 섞여있는 상태기 때문에, 이터레이션을 반복한다는 것은 자신의 이웃노드의 이웃노드의 이웃노드의 .... belief를 받고 있는 것이기 때문이다. 
 이를 역으로 생각하여 belief가 그래프에 직접 흐르도록 알고리즘을 구성한 것이 loopy belief propagation이 된다.
+
 </aside>
 
 <h3 id="loopy-belief-propagation">
@@ -205,7 +203,7 @@ window.onload = wrap_img;
     <p>Iterative process in which neighbor nodes “talk” to each other, passing messages</p>
 
     <aside>
-    
+
   📌 "I (node v) believe you (node u) belong to class 1 with likelihood ..."
   </aside>
   </li>
