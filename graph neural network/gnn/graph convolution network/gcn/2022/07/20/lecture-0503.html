@@ -4,9 +4,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Lecture 5.1 - Collective Classification - Belief Propagation | CS224W-KOR</title>
+<title>Lecture 5.3 - Collective Classification - Belief Propagation | CS224W-KOR</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Lecture 5.1 - Collective Classification - Belief Propagation" />
+<meta property="og:title" content="Lecture 5.3 - Collective Classification - Belief Propagation" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="CS224W Lecture 5." />
 <meta property="og:description" content="CS224W Lecture 5." />
@@ -16,9 +16,9 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-07-20T00:00:00-05:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Lecture 5.1 - Collective Classification - Belief Propagation" />
+<meta property="twitter:title" content="Lecture 5.3 - Collective Classification - Belief Propagation" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-20T00:00:00-05:00","datePublished":"2022-07-20T00:00:00-05:00","description":"CS224W Lecture 5.","headline":"Lecture 5.1 - Collective Classification - Belief Propagation","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0503.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0503.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-20T00:00:00-05:00","datePublished":"2022-07-20T00:00:00-05:00","description":"CS224W Lecture 5.","headline":"Lecture 5.3 - Collective Classification - Belief Propagation","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0503.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0503.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -89,7 +89,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Lecture 5.1 - Collective Classification - Belief Propagation</h1><p class="page-description">CS224W Lecture 5.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-20T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 5.3 - Collective Classification - Belief Propagation</h1><p class="page-description">CS224W Lecture 5.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-20T00:00:00-05:00" itemprop="datePublished">
         Jul 20, 2022
       </time>
        • <span class="read-time" title="Estimated read time">
@@ -169,35 +169,31 @@ window.onload = wrap_img;
 <ul>
   <li>Relational classifiers</li>
   <li>Iterative classification</li>
-  <li>
-    <p>Loopy belief propagation</p>
-  </li>
+  <li>Loopy belief propagation</li>
+</ul>
+
+<hr>
+
+<ul>
   <li>관계 분류자</li>
   <li>반복구분</li>
   <li>루피 신앙 전파</li>
 </ul>
 
 <aside>
+
+---
+
 💬 먼저 지금까지 배운 내용으로는 각 노드는 이웃 노드의 확률의 가중평균을 자신의 새로운 확률로 삼고 있다.
-
 혹은 각 노드는 이웃 노드의 레이블을 활용해 자신의 새로운 확률을 계산하게 된다. 
-
 즉, 이웃노드의 정보가 각각의 노드에서 사용되고 있는 것이다.
-
 이것을 각 노드는 이웃노드에게 Belief를 전달받는다고 할 수 있다. 
-
 즉 이웃 노드의 belief를 받아 자신의 belief를 생성한다. 
-
 다르게 말하면, 모델은 각 노드에 대해 데이터마다 belief를 가지고 있고, 이웃 노드의 belief를 이용해 각 노드의 belief를 업데이트하고 있다.
-
 그렇다면 왜 굳이 바로 이웃노드에서만 belief를 받아야 할까. 
-
 좀 더 먼 노드의 belief도 중요하게 작동하지 않을까? 
-
 왜냐하면 결국 이터레이션을 반복하여 이웃노드의 belief를 받게 된다면, 해당 belief는 이웃노드의 이웃노드의 belief가 섞여있는 상태기 때문에, 이터레이션을 반복한다는 것은 자신의 이웃노드의 이웃노드의 이웃노드의 .... belief를 받고 있는 것이기 때문이다. 
-
 이를 역으로 생각하여 belief가 그래프에 직접 흐르도록 알고리즘을 구성한 것이 loopy belief propagation이 된다.
-
 </aside>
 
 <h3 id="loopy-belief-propagation">
@@ -209,18 +205,22 @@ window.onload = wrap_img;
     <p>Iterative process in which neighbor nodes “talk” to each other, passing messages</p>
 
     <aside>
-  📌 "I (node v) believe you (node u) belong to class 1 with likelihood ..."
     
+  📌 "I (node v) believe you (node u) belong to class 1 with likelihood ..."
   </aside>
   </li>
-  <li>
-    <p>When consensus is reached, calculate final belief</p>
-  </li>
+  <li>When consensus is reached, calculate final belief</li>
+</ul>
+
+<hr>
+
+<ul>
   <li>믿음 전파는 그래프에서 확률 쿼리에 응답하는 동적 프로그래밍 접근법이다(예: 클래스 1에 속하는 노드 $v$의 확률).</li>
   <li>
     <p>인접 노드가 메시지를 전달하면서 서로 “대화”하는 반복 프로세스</p>
 
     <aside>
+
   📌 "나(노드 v)는 (노드 u)가 클래스 1에 속한다고 믿고 있습니다.”
     
   </aside>
@@ -228,15 +228,14 @@ window.onload = wrap_img;
   <li>합의가 이루어지면 최종 믿음을 계산합니다.</li>
 </ul>
 
+<hr>
+
 <aside>
+
 💬 Belief Propagation 확률 쿼리에 응답하기 위한 동적 프로그래밍 접근법이다.
-
 또한 반복적으로 이웃노드와 'talk'하면서 메시지를 전달하는 방법이다. 
-
 따라서 주된 아이디어는 각 노드는 메시지를 이웃으로부터 얻는다. 
-
 그리고 업데이트하고 앞으로 전달한다.
-
 </aside>
 
 <h3 id="message-passing-basics">
@@ -245,9 +244,12 @@ window.onload = wrap_img;
 <ul>
   <li>Task: Count the number of nodes in a graph*</li>
   <li>Condition: Each node can only interact (pass message) with its neighbors</li>
-  <li>
-    <p>Example: path graph</p>
-  </li>
+  <li>Example: path graph</li>
+</ul>
+
+<hr>
+
+<ul>
   <li>과제: 그래프의 노드 수 계산*</li>
   <li>조건: 각 노드는 인접 노드와만 상호 작용(메시지 전달)할 수 있습니다.</li>
   <li>예: 경로 그래프</li>
@@ -259,15 +261,17 @@ window.onload = wrap_img;
 
 <p>We’ll get back to it later!</p>
 
-<p>그래프에 주기가 포함되어 있을 때 발생할 수 있는 문제.</p>
+<hr>
 
-<p>나중에 다시 얘기하자!</p>
+<p>그래프에 주기가 포함되어 있을 때 발생할 수 있는 문제.
+나중에 다시 얘기하자!</p>
+
+<hr>
 
 <aside>
+
 💬 위와 같이 가장 단순한 그래프의 형태를 생각해보자.
-
 우리가 원하는 것은 그래프의 노드 수를 계산하고자 한다. 
-
 이때 belief는 각 이터레이션마다 이웃 노드로만 전달될 수 있다.
 
 </aside>
@@ -293,6 +297,11 @@ window.onload = wrap_img;
       </li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>과제: 그래프의 노드 수 계산</li>
   <li>알고리즘:
     <ul>
@@ -314,41 +323,42 @@ window.onload = wrap_img;
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled.png" alt="Untitled"></p>
 
+<hr>
+
 <aside>
+
 💬 알고리즘은 다음과 같을 것이다.
 
 1. 노드의 순서를 정한다.
 2. 1에서 정한 순서에 따라 엣지의 방향을 정한다.
 3. $i$번째 노드에 대해 다음을 시행한다.
-    
     $i-1$ 노드에서 belief(이전까지 지나온 노드의 수)를 받는다.
-    
     belief에 $1$(자신에 대한 count)을 더한다.
-    
     $i+1$ 노드로 belief를 전달한다.
     
 </aside>
 
+<hr>
 <h3 id="message-passing-basics-1">
 <a class="anchor" href="#message-passing-basics-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Message Passing: Basics</h3>
 
-<p>Task: Count the number of nodes in a graph Condition: Each node can only interact (pass message) with its neighbors</p>
+<p>Task: Count the number of nodes in a graph Condition: Each node can only interact (pass message) with its neighbors
+Solution: Each node listens to the message from its neighbor, updates it, and passes it forward
+$m$ : the message</p>
 
-<p>Solution: Each node listens to the message from its neighbor, updates it, and passes it forward</p>
+<hr>
 
-<p>$m$ : the message</p>
-
-<p>작업: 그래프의 노드 수 계산 조건: 각 노드는 인접 노드와만 상호 작용(메시지 전달)할 수 있습니다.</p>
-
-<p>솔루션: 각 노드는 인접 노드로부터 메시지를 수신하고 업데이트한 후 전달</p>
-
-<p>$m$ : 메시지</p>
+<p>작업: 그래프의 노드 수 계산 조건: 각 노드는 인접 노드와만 상호 작용(메시지 전달)할 수 있습니다.
+솔루션: 각 노드는 인접 노드로부터 메시지를 수신하고 업데이트한 후 전달
+$m$ : 메시지</p>
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%201.png" alt="Untitled"></p>
 
-<aside>
-💬 그래프의 노드의 수를 세는 방법을 구하기 위해서 위에서 본 알고리즘을 따라 먼저 노드의 순서와 그에 따른 방향을 정해준다.
+<hr>
 
+<aside>
+
+💬 그래프의 노드의 수를 세는 방법을 구하기 위해서 위에서 본 알고리즘을 따라 먼저 노드의 순서와 그에 따른 방향을 정해준다.
 그리고 난뒤로 이전 노드로 부터 message를 전달받고(listen) 현재노드에서 메시지를 업데이트하고 앞의 노드로 전달해준다.
 
 </aside>
@@ -358,18 +368,23 @@ window.onload = wrap_img;
 
 <ul>
   <li>We can perform message passing not only on a path graph, but also on a tree-structured graph</li>
-  <li>
-    <p>Define order of message passing from leaves to root</p>
-  </li>
+  <li>Define order of message passing from leaves to root</li>
+</ul>
+
+<hr>
+
+<ul>
   <li>경로 그래프뿐만 아니라 트리 구조 그래프에서도 메시지 전달을 수행할 수 있습니다.</li>
   <li>리프에서 루트로 전달되는 메시지 순서 정의</li>
 </ul>
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%202.png" alt="Untitled.png"></p>
 
-<aside>
-💬 같은 알고리즘을 위와 같은 트리 구조에 적용한다.
+<hr>
 
+<aside>
+
+💬 같은 알고리즘을 위와 같은 트리 구조에 적용한다.
 트리는 parent와 child로 구성되어 있기 때문에, 전체 노드의 수를 세기 위해서 child에서 parent 방향으로 belief가 흐르면 될 것이다.
 
 </aside>
@@ -385,13 +400,13 @@ window.onload = wrap_img;
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%204.png" alt="Untitled"></p>
 
+<hr>
+
 <aside>
+
 💬 이때 왼쪽 그림과 같이 parent 노드는 자신의 child 노드의 belief를 받아 종합하는 일종의 계산을 수행한 수 자신의 parent 노드로 belief를 넘겨주게 된다.
-
 이를 통해 최종적으로 root 노드에서 전체 노드의 수를 구할 수 있을 것이다.
-
 하지만 실제로 count를 belief로 간주하고 이웃 노드에 전달하지 않을 것이다. 
-
 실제로 알고리즘이 어떻게 되어 있는지 살펴보자.
 
 </aside>
@@ -400,25 +415,29 @@ window.onload = wrap_img;
 <a class="anchor" href="#loopy-bp-algorithm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Loopy BP Algorithm</h3>
 
 <p>What message will $i$ send to $j$ ?</p>
-
 <ul>
   <li>It depends on what $i$ hears from its neighbors</li>
   <li>Each neighbor passes a message to $i$ its beliefs of the state of $i$</li>
 </ul>
 
-<p>$i$가 $j$에 보낼 메시지는 무엇입니까?</p>
+<hr>
 
+<p>$i$가 $j$에 보낼 메시지는 무엇입니까?</p>
 <ul>
   <li>$i$가 이웃으로부터 무엇을 듣느냐에 따라 달라진다.</li>
   <li>각 이웃은 $i$ 상태에 대한 믿음을 $i$에 전달한다.</li>
 </ul>
 
+<hr>
+
 <aside>
+
 📌 I (node $i$ ) believe that you (node $j$ ) belong to class $Y_{j}$ with probability $\cdots$
 
 </aside>
 
 <aside>
+
 📌 I(노드 $i$)는 당신(노드 $j$)이 확률로 클래스 $Y_{j}$에 속한다고 믿는다$\cdots$
 
 </aside>
@@ -426,6 +445,7 @@ window.onload = wrap_img;
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%205.png" alt="Untitled"></p>
 
 <aside>
+
 💬 일반적으로는 여러 노드의 정보를 $i$노드로 전달하고(hear) $i$노드에서 $j$노드로 전달한다.
 
 </aside>
@@ -434,27 +454,27 @@ window.onload = wrap_img;
 <a class="anchor" href="#notation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notation</h3>
 
 <ul>
-  <li>
-    <p>Label-label potential matrix $\psi$ : Dependency between a node and its neighbor.</p>
-
-    <p>$\boldsymbol{\psi}\left(Y_{i}, Y_{j}\right)$ is proportional to the probability of a node $j$ being in class $Y_{j}$ given that it has neighbor $i$ in class $Y_{i}$.</p>
-  </li>
+  <li>Label-label potential matrix $\psi$ : Dependency between a node and its neighbor.
+  $\boldsymbol{\psi}\left(Y_{i}, Y_{j}\right)$ is proportional to the probability of a node $j$ being in class $Y_{j}$ given that it has neighbor $i$ in class $Y_{i}$.</li>
   <li>Prior belief $\phi: \phi\left(Y_{i}\right)$ is proportional to the probability of node $i$ being in class $Y_{i}$.</li>
   <li>$m_{i \rightarrow j}\left(Y_{j}\right)$ is $i^{\prime}$ s message / estimate of $j$ being in class $Y_{j}$.</li>
-  <li>
-    <p>$\mathcal{L}$ is the set of all classes/labels</p>
-  </li>
-  <li>
-    <p>레이블 레이블 잠재적 매트릭스 $\psi$ : 노드와 인접 노드 간의 종속성.</p>
+  <li>$\mathcal{L}$ is the set of all classes/labels</li>
+</ul>
 
-    <p>$\boldsymbol{\psi}\left(Y_{i}, Y_{j}\right)$는 노드 $j$가 클래스 $Y_{j}$에 있을 확률에 비례한다.</p>
-  </li>
+<hr>
+
+<ul>
+  <li>레이블 레이블 잠재적 매트릭스 $\psi$ : 노드와 인접 노드 간의 종속성.
+  $\boldsymbol{\psi}\left(Y_{i}, Y_{j}\right)$는 노드 $j$가 클래스 $Y_{j}$에 있을 확률에 비례한다.</li>
   <li>$\phi: \phi\left(Y_{i}\right)$는 노드 $i$가 클래스 $Y_{i}$에 포함될 확률에 비례한다.</li>
   <li>$m_{i \rightarrow j}\left(Y_{j}\right)$는 클래스 $Y_{j}$에 속하는 $j$의 $i^{\prime}$ 메시지/추정이다.</li>
   <li>$\mathcal{L}$ 는 모든 클래스/라벨의 집합입니다.</li>
 </ul>
 
+<hr>
+
 <aside>
+
 💬 **Notation**
 
 - $\psi$ (Label-Label Potential Matrix) : $\psi$ 는 각 노드가 이웃노드의 클래스에 대한 영향력(비례)을 행렬로 표현한 것이다.
@@ -466,6 +486,7 @@ window.onload = wrap_img;
     - $j$의 노드를 예측할 수 있도록 $i$에서 $j$로 전달하는 메시지이다.
 - $L:$ 모든 레이블(클래스)을 포함하는 집합
 - $b_{i}\left(Y_{i}\right)$ : 노드 i의 클래스가 $Y_{i}$ 일 belief
+
 </aside>
 
 <h3 id="loopy-bp-algorithm-1">
@@ -473,9 +494,12 @@ window.onload = wrap_img;
 
 <ol>
   <li>Initialize all messages to 1</li>
-  <li>
-    <p>Repeat for each node:</p>
-  </li>
+  <li>Repeat for each node:</li>
+</ol>
+
+<hr>
+
+<ol>
   <li>모든 메시지를 1로 초기화</li>
   <li>각 노드에 대해 반복합니다.</li>
 </ol>
@@ -490,25 +514,24 @@ window.onload = wrap_img;
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%208.png" alt="Untitled.png"></p>
 
-<aside>
-💬 1. 가장 처음에는 모든 노드의 메세지를 1로 초기화한다.
+<hr>
 
+<aside> 
+
+1. 가장 처음에는 모든 노드의 메세지를 1로 초기화한다.
 2. 이후 가운데 이미지와 같이 모든 노드에 대해 다음 노드로 메세지를 전달하는 과정을 반복한다.
 
 이때 가운데 이미지의 수식을 설명해보자면, 가장 앞의 분홍색 부분은 현재 노드 $i$의 모든 레이블의 가능성에 대해 반복하여 더한다는 의미이다.
-
 녹색 부분은 label-label potential로서, $i$노드의 각 레이블마다 $j$노드가 $Y_{j}$ 레이블을 가질 확률을 계산하게 된다. 
-
 적색 부분은 Prior로서 $i$노드가 $Y_{i}$ 레이블을 가질 확률을 계산하게 된다. 
-
 청색 부분은 $i$ 노드가 메세지를 넘겨받는 이웃 노드에서 $i$ 노드가 $Y_{i}$ 레이블일 belief를 넘겨 받는 부분이다.
-
 만약 위의 과정이 충분히 반복되어 수렴한다면 세번째 이미지에 해당하는 실제 확률 $[b_{i}\left(Y_{i}\right)]$이 계산되게 된다.
-
 1. 즉, Prior 확률에 belief를 모두 곱하여 최종적인 belief ($[b_{i}\left(Y_{i}\right)]$) 를 결정한다.
+
 </aside>
 
 <aside>
+
 💡 Q: 수렴 하는 것이 무엇인지? 무엇이 수렴하는 것인지 상황에 대한 질문
 
 </aside>
@@ -533,6 +556,8 @@ window.onload = wrap_img;
 
 <p>But we can still run BP, but it will pass messages in loops.</p>
 
+<hr>
+
 <ul>
   <li>이제 주기가 있는 그래프를 살펴봅시다.</li>
   <li>더 이상 노드 순서가 없습니다.</li>
@@ -552,23 +577,18 @@ window.onload = wrap_img;
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%209.png" alt="Untitled"></p>
 
+<hr>
+
 <aside>
+
 💬 지금까지 이야기한 그래프들은 순환하는 구조를 가지고 있지 않아 메세지를 전달할 순서를 정하는데 문제가 없었다.
-
-하지만 순환하는 구조를 가지는 그래프의 경우에는 단순하게 노드의 순서를 정해서 메세지를 전달하도록 만들 수 없다. 
-
+하지만 순환하는 구조를 가지는 그래프의 경우에는 단순하게 노드의 순서를 정해서 메세지를 전달하도록 만들 수 없다 
 그에 대해 자세히 살펴보자.
-
 만약 위와 같은 그래프가 있고, 위와 같은 순서로 메세지를 주고 받는다고 생각해보자. 
-
 $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는 자기 자신의 메세지마저 받고 있는 상황이다. 
-
 즉, 더 이상 모든 노드가 독립적이지 않고, 의존성이 생긴다. 
-
 순서가 반대로 트리와 같이 $j$가 $i, k$로 메세지를 전달하고, $i, k$가 $u$로 메세지를 전달한다면, $j$의 메세지는 $u$에게 중복되어 두 번 전달되는 문제가 생긴다.
-
 이렇게 되면 알고리즘이 크게 문제가 생기는 것 같지만, 실제 적용해보니 그렇지 않다고 한다. 
-
 실제 그래프들은 무척 크고, 거기에 순환하는 cycle 구조는 그렇게 큰 부분을 차지하지 않는데 반면, 전체 구조는 매우 복잡하기 때문에 Loopy BP 알고리즘이 잘 작동한다고 한다.
 
 </aside>
@@ -585,9 +605,12 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>i</mi><mo>→</mo><mi>j</mi><mo>→</mo><mi>k</mi><mo>→</mo><mi>u</mi><mo>→</mo><mi>i</mi></mrow><annotation encoding="application/x-tex">i \rightarrow j \rightarrow k \rightarrow u \rightarrow i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span></span>
 
 <ul>
-  <li>
-    <p>However, in practice, Loopy BP is still a good heuristic for complex graphs which contain many branches.</p>
-  </li>
+  <li>However, in practice, Loopy BP is still a good heuristic for complex graphs which contain many branches.</li>
+</ul>
+
+<hr>
+
+<ul>
   <li>신념이 수렴되지 않을 수 있다.</li>
   <li>메시지 $m_{u \rightarrow i}\left(Y_{i}\right)$는 $i$에 대한 별도의 증거가 아니라 $i$의 초기 믿음에 기초한다.</li>
   <li>(잘못될 수 있음) $i$의 초기 신념은 주기에 의해 강화된다.</li>
@@ -601,6 +624,8 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%209.png" alt="Untitled"></p>
 
+<hr>
+
 <ul>
   <li>Messages loop around and around: $2,4,8,16,32, \ldots$ More and more convinced that these variables are $T$ !</li>
   <li>BP incorrectly treats this message as separate evidence that the variable is $\mathrm{T}$!.</li>
@@ -610,6 +635,11 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
       <li>One influenced the other (via a cycle).</li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>메시지는 돌고 돈다: $2,4,8,16,32,\ldots$ 이러한 변수가 $T$임을 점점 더 확신하게 된다!</li>
   <li>BP는 이 메시지를 변수가 $\mathrm{T}$라는 별도의 증거로 잘못 취급한다.</li>
   <li>이 두 메시지를 독립한 것처럼 곱합니다.
@@ -622,22 +652,15 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
 
 <p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%2010.png" alt="Untitled"></p>
 
-<p>This is an extreme example.</p>
+<p>This is an extreme example. 
+Often in practice, the cyclic influences are weak. 
+(As cycles are long or include at least one weak correlation.)</p>
 
-<p>Often in practice, the cyclic influences are weak.</p>
+<hr>
 
-<p>(As cycles are long or include at least one weak correlation.)</p>
-
-<p>이것은 극단적인 예입니다.</p>
-
-<p>실제로, 주기적인 영향은 약하다.</p>
-
-<p>(주기가 길거나 하나 이상의 약한 상관 관계를 포함하기 때문에)</p>
-
-<aside>
-💬
-
-</aside>
+<p>이것은 극단적인 예입니다.
+실제로, 주기적인 영향은 약하다. 
+(주기가 길거나 하나 이상의 약한 상관 관계를 포함하기 때문에)</p>
 
 <h3 id="advantages-of-belief-propagation">
 <a class="anchor" href="#advantages-of-belief-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advantages of Belief Propagation</h3>
@@ -663,6 +686,11 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
       <li>Require training to estimate</li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>장점:
     <ul>
       <li>프로그래밍 및 병렬화가 용이함</li>
@@ -685,7 +713,10 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
   </li>
 </ul>
 
+<hr>
+
 <aside>
+
 💬 **Advantages:**
 
 1. 코딩이 쉽고, 병렬화가 가능하다.
@@ -695,6 +726,7 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
 
 1. 수렴이 보장되지 않아 언제 멈춰야 할지 알 수 없으며, 특히 순환구조일 경우 수렴이 보장되지 않아 반복횟수를 지정해주어야 한다.
 2. cycle 구조로 인해 종종 적은 이터만 돌리기도 한다.
+
 </aside>
 
 <h3 id="summary">
@@ -709,6 +741,11 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
       <li>Loopy belief propagation</li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>우리는 그래프의 상관 관계를 활용하여 노드에 대한 예측을 하는 방법을 배웠다.</li>
   <li>주요 기술:
     <ul>
@@ -719,14 +756,7 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
   </li>
 </ul>
 
-<aside>
-💬
-
-</aside>
-
 <hr>
-
-<p><a href="../Lecture%205%200439f07c33674421b9e4ad4977ff3af5.md">Lecture 5</a></p>
 
 <table>
   <tbody>

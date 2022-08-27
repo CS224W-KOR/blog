@@ -148,7 +148,6 @@ window.onload = wrap_img;
 </li>
 </ul>
 </li>
-<li class="toc-entry toc-h1"><a href="#reference">Reference</a></li>
 </ul><hr>
 <blockquote>
   <p><strong>Lecture 5</strong></p>
@@ -172,27 +171,22 @@ window.onload = wrap_img;
 <h3 id="todays-lecture-outline">
 <a class="anchor" href="#todays-lecture-outline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Today’s Lecture: outline</h3>
 
-<p>Main question today: Given a network with labels on some nodes, how do we assign labels to all other nodes in the network?</p>
-
-<p>Example: In a network, some nodes are fraudsters, and some other nodes are fully trusted.</p>
-
-<p>How do you find the other fraudsters and trustworthy nodes?</p>
-
-<p>We already discussed node embeddings as a method to solve this in Lecture 3</p>
+<p>Main question today: Given a network with labels on some nodes, how do we assign labels to all other nodes in the network?
+Example: In a network, some nodes are fraudsters, and some other nodes are fully trusted.
+How do you find the other fraudsters and trustworthy nodes?
+We already discussed node embeddings as a method to solve this in Lecture 3</p>
 
 <hr>
 
-<p>오늘 주요 질문: 일부 노드에 레이블이 있는 네트워크에서 네트워크의 다른 모든 노드에 레이블을 할당하려면 어떻게 해야 합니까?</p>
-
-<p>예: 네트워크에서 일부 노드는 사기꾼이고 다른 일부 노드는 완전히 신뢰됩니다.</p>
-
-<p>다른 사기꾼과 신뢰할 수 있는 노드를 어떻게 생각하십니까?</p>
-
-<p>우리는 이것을 해결하기 위한 방법으로 노드 임베딩을 이미 강의 3에서 논의하였습니다</p>
+<p>오늘 주요 질문: 일부 노드에 레이블이 있는 네트워크에서 네트워크의 다른 모든 노드에 레이블을 할당하려면 어떻게 해야 합니까?
+예: 네트워크에서 일부 노드는 사기꾼이고 다른 일부 노드는 완전히 신뢰됩니다.
+다른 사기꾼과 신뢰할 수 있는 노드를 어떻게 생각하십니까?
+우리는 이것을 해결하기 위한 방법으로 노드 임베딩을 이미 강의 3에서 논의하였습니다</p>
 
 <hr>
 
 <aside>
+
 💬 이번 수업에서 다룬 내용은 한 그래프에서 특정 노드들에 레이블에 매겨져 있을 때, 다른 노드들에 레이블을 매기는 방법에 대해 다루게 된다.
 
 </aside>
@@ -202,23 +196,20 @@ window.onload = wrap_img;
 
 <p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled.png" alt="Untitled"></p>
 
-<p>Given labels of some nodes</p>
-
-<p>Let’s predict labels of unlabeled nodes</p>
-
-<p>This is called semi-supervised node classification</p>
+<p>Given labels of some nodes
+Let’s predict labels of unlabeled nodes
+This is called semi-supervised node classification</p>
 
 <hr>
 
-<p>일부 노드의 지정된 레이블</p>
-
-<p>레이블이 없는 노드의 레이블을 예측해 봅시다.</p>
-
-<p>이를 준지도 노드 분류라고 합니다.</p>
+<p>일부 노드의 지정된 레이블
+레이블이 없는 노드의 레이블을 예측해 봅시다.
+이를 준지도 노드 분류라고 합니다.</p>
 
 <hr>
 
 <aside>
+
 💬 위 그림과 같이 그래프 전체에서 일부 노드에 레이블이 있고, 나머지 노드에는 레이블이 없을 때, 이를 예측하는 방법론을 다룬다.
 
 </aside>
@@ -267,6 +258,7 @@ window.onload = wrap_img;
 <hr>
 
 <aside>
+
 💬 이를 Semi-supervised node classification이라 한다고 한다.
 
 이미 레이블이 있는 정보와, 없는 구조를 학습하여 새로이 레이블을 예측하기 때문으로 보인다.
@@ -312,14 +304,11 @@ window.onload = wrap_img;
 <hr>
 
 <aside>
+
 💬 위의 그래프에서, 비슷한 노드(같은 레이블을 가지고 있는 노드, 초록색, 빨간색과 같이)는 근처에 위치하는 것을 알 수 있다.
-
 이와 같이, 노드 간의 관계를 파악하여, 서로 근접한 노드를 찾을 수 있다면, 거기에 비슷한 레이블을 매길 수 있을 것이다. 
-
 여기서 이제 어떻게 노드 간의 상관관계를 이끌어 낼 수 있을지 살펴보자.
-
 노드 간의 상관관계는 Homophily, Influence 두 개념에 의해 정의되어진다. 
-
 두 개념 모두 사회과학 분야에서 social network를 분석하면서 쓰인 개념으로 보이는데, 하나씩 자세히 살펴보도록 하자.
 
 </aside>
@@ -381,20 +370,14 @@ window.onload = wrap_img;
 <hr>
 
 <aside>
+
 💬 개인의 특징은 나이, 성별, 직업, 취미, 거주지 등 다양한 요소가 있을 것이다.
-
 Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연결되고, 함께 행동하려고 한다는 개념이다. 
-
 예를 들어, 머신러닝 연구자들은 비슷한 학회를 동시에 참여하고, 비슷한 커뮤니티를 읽고 토론하게 되면서 자연스레 친분을 쌓게 된다. 
-
 또한, 가수들은 서로 같이 공연하고, 서로의 앨범을 들으면서 서로 사회적으로 연결되게 된다.
-
 위의 그래프는 한 학교의 학생들을 나타낸 그래프인데, 학생 개인이 노드, 친분이 엣지로 표현되어 있다. 
-
 이때 노드의 레이블인 색은 각 학생의 관심사로 운동, 예술 등이 있다. 
-
 직관적으로 살펴보아도 알 수 있지만 총 4개의 작은 그룹으로 나누어질 수 있으며, 각 그룹은 비슷한 관심사를 가지는 학생들이 모여있는 것을 알 수 있다. 
-
 이를 Homophily라고 할 수 있을 것이다.
 
 </aside>
@@ -418,8 +401,8 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 <p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%205.png" alt="Untitled"></p>
 
 <aside>
-💬 Influence는 사회적으로 연결된 개인 간에는 서로 영향을 주고 받으면서 비슷한 특징을 가지게 된다는 것을 의미한다.
 
+💬 Influence는 사회적으로 연결된 개인 간에는 서로 영향을 주고 받으면서 비슷한 특징을 가지게 된다는 것을 의미한다.
 예를 들어, 내가 1, 2학년 때는 경상계열 친구들과 친하게 지내면서, 경제, 사회, 제도 등에 관심을 가지고 해당 직군을 희망했다면, 3, 4학년이 되면서 통계나 수학, 컴퓨터 공학 친구들과 친하게 지내면서 ML, DL, 코딩 등에 관심을 가지고 해당 직군을 희망하게 된 것이 Influence 때문이라고 할 수 있을 것이다.
 
 </aside>
@@ -483,17 +466,15 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 </ul>
 
 <aside>
+
 💬 한 그래프 내에서 비슷한 노드는 가까이 위치하거나 직접 연결되어 있을 것이다.
-
 이를 Guilt-by-association이라고 하는데, 노드 b가 아직 레이블이 없는 상태에서, 이웃노드 x가 1로 레이블 되어 있다면, 이웃노드 x와 가깝기 때문에 노드 b 역시 1로 레이블 될 가능성이 높다는 개념이다.
-
 구체적인 예시로는 스팸 사이트들이 안전한 사이트와의 연결고리는 생성할 수 없기 때문에, 노출도와 신뢰도를 높이기 위해 서로 링크를 연결하는 경향이 있는데, 이를 이용해서 스팸 사이트 하나를 잡을 수 있다면, 서로 연결된 다른 스팸 사이트도 색출 할 수 있다고 한다.
-
 이때, 노드 v의 분류에 이용하는 정보들은 다음과 같다.
-
 1. 노드 v의 변수들
 2. 노드 v의 이웃 노드들의 레이블
 3. 노드 v의 이웃 노드들의 변수들
+
 </aside>
 
 <h3 id="semi-supervised-learning">
@@ -511,6 +492,8 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 <p>Find: Class (red/green) of remaining nodes</p>
 
 <p>Main assumption: There is homophily in the network</p>
+
+<hr>
 
 <p><strong>공식 설정:</strong></p>
 
@@ -541,6 +524,8 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
   <li>Goal: Predict which unlabeled nodes are likely Class 1, and which are likely Class 0</li>
 </ul>
 
+<hr>
+
 <p><strong>작업 예</strong>:</p>
 
 <ul>
@@ -555,11 +540,12 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
   <li>목표: 레이블이 없는 노드가 클래스 1일 가능성이 높고 클래스 0일 가능성이 높은 노드를 예측합니다.</li>
 </ul>
 
+<hr>
+
 <aside>
+
 💬 실제로 이용하게 되는 입력값은
-
 인접행렬: $A_{n*n}$, 레이블 벡터 $Y=[0,1]^n$, $Y_v$ **= 1이 클래스 1**에 속함, $Y_v$ **= 0이 클래스 0**에 속함이 있으며, 
-
 아직 레이블이 없는 노드에 대해 레이블이 0 혹은 1일 확률을 계산하는 것이 목표이다.
 
 </aside>
@@ -567,30 +553,18 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 <h3 id="problem-setting">
 <a class="anchor" href="#problem-setting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problem Setting</h3>
 
-<p>How to predict the labels $Y_v$ for the unlabeled nodes $v$  (in grey color)?</p>
-
-<p>Each node $v$ has a feature vector $f_v$</p>
-
-<p>Labels for some nodes are given (1 for green, 0 for red)</p>
-
-<p>Task: Find $P(Y_v)$ given all features and the network</p>
-
-<p>라벨이 없는 노드 $v$(회색)에 대한 레이블 $Y_v$를 예측하는 방법</p>
-
-<p>각 노드 $v$에는 특징 벡터 $f_v$가 있습니다.</p>
-
-<p>일부 노드의 라벨이 제공됩니다(녹색은 1, 빨간색은 0).</p>
-
-<p>작업: 모든 기능 및 네트워크가 주어진 $P(Y_v)$ 찾기</p>
+<p>How to predict the labels $Y_v$ for the unlabeled nodes $v$  (in grey color)?
+Each node $v$ has a feature vector $f_v$
+Labels for some nodes are given (1 for green, 0 for red)
+Task: Find $P(Y_v)$ given all features and the network
+라벨이 없는 노드 $v$(회색)에 대한 레이블 $Y_v$를 예측하는 방법
+각 노드 $v$에는 특징 벡터 $f_v$가 있습니다.
+일부 노드의 라벨이 제공됩니다(녹색은 1, 빨간색은 0).
+작업: 모든 기능 및 네트워크가 주어진 $P(Y_v)$ 찾기</p>
 
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">?</mo></mrow><annotation encoding="application/x-tex">P(Y_v)=?</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mclose">?</span></span></span></span></span>
 
 <p><img src="5%201%20-%20Message%20passing%20and%20Node%20Classification%205607fcf8b2ff4cad8de03de35d691bdf/Untitled%208.png" alt="Untitled"></p>
-
-<aside>
-💬
-
-</aside>
 
 <h3 id="example-applications">
 <a class="anchor" href="#example-applications" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example applications:</h3>
@@ -607,6 +581,11 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
       <li>Spam and fraud detection</li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>이 설정 아래의 많은 응용 프로그램:
     <ul>
       <li>문서구분</li>
@@ -620,7 +599,10 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
   </li>
 </ul>
 
+<hr>
+
 <aside>
+
 💬 이러한 방법론은 위와 같은 다양한 분야에 적용이 가능하다.
 
 </aside>
@@ -631,17 +613,15 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 <p>collective classification을 전반적으로 살펴보면 다음과 같다.</p>
 
 <aside>
+
 📌 Intuition(직관) : 노드 간 상관관계를 이용해 서로 연결된 노드들을 동시에 분류하기
 
 </aside>
 
-<p>이때 1차 마르코프 연쇄를 사용한다.</p>
-
-<p>즉, 노드 $\mathrm{v}$ 의 레이블 $Y_{v}$ 를 예측하기 위해서는 이웃노드 $N_{v}$ 만 필요하다는 것이다.</p>
-
-<p>2차 마르코프 연쇄를 사용할 경우 $N_{v}$ 의 이웃노드 역시 사용할 것이다.</p>
-
-<p>1차 마르포크 연쇄를 사용할 경우 식은 다음과 같아질 것이다.</p>
+<p>이때 1차 마르코프 연쇄를 사용한다. 
+즉, 노드 $\mathrm{v}$ 의 레이블 $Y_{v}$ 를 예측하기 위해서는 이웃노드 $N_{v}$ 만 필요하다는 것이다. 
+2차 마르코프 연쇄를 사용할 경우 $N_{v}$ 의 이웃노드 역시 사용할 것이다. 
+1차 마르포크 연쇄를 사용할 경우 식은 다음과 같아질 것이다.</p>
 
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo fence="true">)</mo></mrow><mo>=</mo><mi>P</mi><mrow><mo fence="true">(</mo><msub><mi>Y</mi><mi>v</mi></msub><mo>∣</mo><msub><mi>N</mi><mi>v</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">P\left(Y_{v}\right)=P\left(Y_{v} \mid N_{v}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;">)</span></span></span></span></span></span>
 
@@ -652,31 +632,23 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 
 <p><strong>Local Classifier</strong></p>
 
-<p>최초로 레이블을 할당하기 위해 사용되는 분류기이다.</p>
-
-<p>즉, 그래프에서 레이블이 없는 노드들에 대해 우선 노드를 생성해야 하기 때문에, 기존의 분류문제와 동일하게 구성된다.</p>
-
-<p>이때 예측 과정은 각 노드의 변수만 사용하여 이미 레이블이 있는 노드로 학습하고, 레이블이 없는 노드로 예측하게 된다.</p>
-
-<p>그래프의 구조적 정보가 사용되지 않는다는 점에 유의하자.</p>
+<p>최초로 레이블을 할당하기 위해 사용되는 분류기이다. 
+즉, 그래프에서 레이블이 없는 노드들에 대해 우선 노드를 생성해야 하기 때문에, 기존의 분류문제와 동일하게 구성된다. 
+이때 예측 과정은 각 노드의 변수만 사용하여 이미 레이블이 있는 노드로 학습하고, 레이블이 없는 노드로 예측하게 된다. 
+그래프의 구조적 정보가 사용되지 않는다는 점에 유의하자.</p>
 
 <p><strong>Relational Classifier</strong></p>
 
-<p>노드 간 상관관계를 파악하기 위해 이웃 노드의 레이블과 변수를 사용하는 분류기이다.</p>
-
-<p>이를 통해 이웃 노드의 레이블과 변수와 현재 노드의 변수를 이용해 현재 노드의 레이블을 예측할 수 있다.</p>
-
-<p>이때, 이웃노드의 정보가 사용되기 때문에, 그래프의 구조적 정보가 사용된다.</p>
+<p>노드 간 상관관계를 파악하기 위해 이웃 노드의 레이블과 변수를 사용하는 분류기이다. 
+이를 통해 이웃 노드의 레이블과 변수와 현재 노드의 변수를 이용해 현재 노드의 레이블을 예측할 수 있다. 
+이때, 이웃노드의 정보가 사용되기 때문에, 그래프의 구조적 정보가 사용된다.</p>
 
 <p><strong>Collective Inference</strong></p>
 
-<p>Collective Classification은 한번의 예측으로 종료되지 않는 것이 핵심이다.</p>
-
-<p>특정 조건을 만족할 때까지 각 노드에 대해 분류하고 레이블을 업데이트한다.</p>
-
-<p>이때의 조건이란 더이상 레이블이 변하지 않거나, 정해진 횟수를 의미한다.</p>
-
-<p>이때 동일한 변수를 가진 노드라 하더라도 그래프의 구조에 따라 최종 예측이 달라질 수 있다는 점을 유념하자.</p>
+<p>Collective Classification은 한번의 예측으로 종료되지 않는 것이 핵심이다. 
+특정 조건을 만족할 때까지 각 노드에 대해 분류하고 레이블을 업데이트한다. 
+이때의 조건이란 더이상 레이블이 변하지 않거나, 정해진 횟수를 의미한다. 
+이때 동일한 변수를 가진 노드라 하더라도 그래프의 구조에 따라 최종 예측이 달라질 수 있다는 점을 유념하자.</p>
 
 <h3 id="overview-of-what-is-coming">
 <a class="anchor" href="#overview-of-what-is-coming" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview of What is Coming</h3>
@@ -690,6 +662,11 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
       <li>Correct &amp; Smooth</li>
     </ul>
   </li>
+</ul>
+
+<hr>
+
+<ul>
   <li>우리는 준지도 이진 노드 분류에 초점을 맞춘다.</li>
   <li>다음 세 가지 접근 방식을 소개합니다.
     <ul>
@@ -701,9 +678,6 @@ Homophily는 개인들이 비슷한 특징을 가지는 타인들과 서로 연�
 </ul>
 
 <hr>
-
-<h1 id="reference">
-<a class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h1>
 
 <p><a href="https://www.youtube.com/watch?v=6g9vtxUmfwM&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=14">CS224W: Machine Learning with Graphs 2021 Lecture 5.1 - Message passing and Node Classification</a></p>
 
