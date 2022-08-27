@@ -146,6 +146,7 @@ window.onload = wrap_img;
 </ul><hr>
 <blockquote>
   <p><strong>Lecture 5</strong></p>
+
   <ul>
     <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html">Lecture 5.1 - Message passing and Node Classification</a></li>
     <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html">Lecture 5.2 - Relational and Iterative Classification</a></li>
@@ -179,6 +180,8 @@ window.onload = wrap_img;
   <li>루피 신앙 전파</li>
 </ul>
 
+<hr>
+
 <aside>
 
 💬 먼저 지금까지 배운 내용으로는 각 노드는 이웃 노드의 확률의 가중평균을 자신의 새로운 확률로 삼고 있다.
@@ -205,6 +208,7 @@ window.onload = wrap_img;
     <aside>
 
   📌 "I (node v) believe you (node u) belong to class 1 with likelihood ..."
+
   </aside>
   </li>
   <li>When consensus is reached, calculate final belief</li>
@@ -234,6 +238,7 @@ window.onload = wrap_img;
 또한 반복적으로 이웃노드와 'talk'하면서 메시지를 전달하는 방법이다. 
 따라서 주된 아이디어는 각 노드는 메시지를 이웃으로부터 얻는다. 
 그리고 업데이트하고 앞으로 전달한다.
+
 </aside>
 
 <h3 id="message-passing-basics">
@@ -253,7 +258,9 @@ window.onload = wrap_img;
   <li>예: 경로 그래프</li>
 </ul>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/XHrIBtI"><img src="https://i.imgur.com/XHrIBtI.png" title="source: imgur.com"></a>
+</p>
 
 <p>Potential issues when the graph contains cycles.</p>
 
@@ -319,7 +326,9 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/XHrIBtI"><img src="https://i.imgur.com/XHrIBtI.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -350,7 +359,9 @@ $m$ : the message</p>
 솔루션: 각 노드는 인접 노드로부터 메시지를 수신하고 업데이트한 후 전달
 $m$ : 메시지</p>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%201.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/YdRCNzd"><img src="https://i.imgur.com/YdRCNzd.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -376,7 +387,9 @@ $m$ : 메시지</p>
   <li>리프에서 루트로 전달되는 메시지 순서 정의</li>
 </ul>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%202.png" alt="Untitled.png"></p>
+<p align="center">
+    <a href="https://imgur.com/hT3fUTi"><img src="https://i.imgur.com/hT3fUTi.png" title="source: imgur.com" width="300px"></a>
+</p>
 
 <hr>
 
@@ -394,9 +407,10 @@ $m$ : 메시지</p>
 
 <p>트리 구조의 신뢰 업데이트</p>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%203.png" alt="Untitled"></p>
-
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%204.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/d5PUBIT"><img src="https://i.imgur.com/d5PUBIT.png" title="source: imgur.com" width="500px"></a>
+    <a href="https://imgur.com/Bw3I4Ch"><img src="https://i.imgur.com/Bw3I4Ch.png" title="source: imgur.com" width="450px"></a>
+</p>
 
 <hr>
 
@@ -440,7 +454,9 @@ $m$ : 메시지</p>
 
 </aside>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%205.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/qPnz3bc"><img src="https://i.imgur.com/qPnz3bc.png" title="source: imgur.com" width="300px"></a>
+</p>
 
 <aside>
 
@@ -502,15 +518,21 @@ $m$ : 메시지</p>
   <li>각 노드에 대해 반복합니다.</li>
 </ol>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%206.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/qLrdN7Z"><img src="https://i.imgur.com/qLrdN7Z.png" title="source: imgur.com" width="250px"></a>
+</p>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%207.png" alt="Untitled.png"></p>
+<p align="center">
+    <a href="https://imgur.com/6GBZZk4"><img src="https://i.imgur.com/6GBZZk4.png" title="source: imgur.com" width="450px"></a>
+</p>
 
 <p>After convergence: $b_{i}\left(Y_{i}\right)=$ node $i$ ‘s belief of being in class $Y_{i}$</p>
 
 <p>수렴 후: $b_{i}\left(Y_{i}\right)=$ 노드 $i$의 클래스 $Y_{i}$에 대한 믿음</p>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%208.png" alt="Untitled.png"></p>
+<p align="center">
+    <a href="https://imgur.com/OQmM6Aa"><img src="https://i.imgur.com/OQmM6Aa.png" title="source: imgur.com" width="450px"></a>
+</p>
 
 <hr>
 
@@ -525,11 +547,6 @@ $m$ : 메시지</p>
 청색 부분은 $i$ 노드가 메세지를 넘겨받는 이웃 노드에서 $i$ 노드가 $Y_{i}$ 레이블일 belief를 넘겨 받는 부분이다.
 만약 위의 과정이 충분히 반복되어 수렴한다면 세번째 이미지에 해당하는 실제 확률 $[b_{i}\left(Y_{i}\right)]$이 계산되게 된다.
 1. 즉, Prior 확률에 belief를 모두 곱하여 최종적인 belief ($[b_{i}\left(Y_{i}\right)]$) 를 결정한다.
-
-</aside>
-
-<aside>
-
 💡 Q: 수렴 하는 것이 무엇인지? 무엇이 수렴하는 것인지 상황에 대한 질문
 
 </aside>
@@ -548,11 +565,9 @@ $m$ : 메시지</p>
   </li>
 </ul>
 
-<p>What if our graph has cycles?</p>
-
-<p>Messages from different subgraphs are no longer independent!</p>
-
-<p>But we can still run BP, but it will pass messages in loops.</p>
+<p>What if our graph has cycles?
+Messages from different subgraphs are no longer independent!
+But we can still run BP, but it will pass messages in loops.</p>
 
 <hr>
 
@@ -567,13 +582,13 @@ $m$ : 메시지</p>
   </li>
 </ul>
 
-<p>만약 우리 그래프에 주기가 있다면?</p>
+<p>만약 우리 그래프에 주기가 있다면?
+다른 하위 그래프의 메시지는 더 이상 독립적이지 않습니다!
+하지만 BP는 여전히 실행할 수 있지만 메시지를 루프 형태로 전달합니다.</p>
 
-<p>다른 하위 그래프의 메시지는 더 이상 독립적이지 않습니다!</p>
-
-<p>하지만 BP는 여전히 실행할 수 있지만 메시지를 루프 형태로 전달합니다.</p>
-
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%209.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/kZh0Yei"><img src="https://i.imgur.com/kZh0Yei.png" title="source: imgur.com" width="300px"></a>
+</p>
 
 <hr>
 
@@ -620,7 +635,9 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
   <li>그러나 실제로 Loopy BP는 많은 분기를 포함하는 복잡한 그래프에 여전히 좋은 휴리스틱이다.</li>
 </ul>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%209.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/kZh0Yei"><img src="https://i.imgur.com/kZh0Yei.png" title="source: imgur.com" width="300px"></a>
+</p>
 
 <hr>
 
@@ -648,7 +665,9 @@ $u$ 노드는 $k$에게 메세지를 받는 것처럼 보이지만, 실제로는
   </li>
 </ul>
 
-<p><img src="5%203%20-%20Collective%20Classification%20Belief%20Propagation%201798fd49b34d470bb364e98b6c68514a/Untitled%2010.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/YjQVLbj"><img src="https://i.imgur.com/YjQVLbj.png" title="source: imgur.com" width="300px"></a>
+</p>
 
 <p>This is an extreme example. 
 Often in practice, the cyclic influences are weak. 
@@ -756,15 +775,7 @@ Often in practice, the cyclic influences are weak.
 
 <hr>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 5.3 - Collective Classification](https://www.youtube.com/watch?v=kh3I_UTtUOo&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=16)</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://www.youtube.com/watch?v=kh3I_UTtUOo&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=16">CS224W: Machine Learning with Graphs 2021 Lecture 5.3 - Collective Classification</a></p>
 
   </div><!-- from https://github.com/utterance/utterances
 <script src="https://utteranc.es/client.js"

@@ -157,6 +157,7 @@ window.onload = wrap_img;
 </ul><hr>
 <blockquote>
   <p><strong>Lecture 5</strong></p>
+
   <ul>
     <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0501.html">Lecture 5.1 - Message passing and Node Classification</a></li>
     <li><a href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/07/20/lecture-0502.html">Lecture 5.2 - Relational and Iterative Classification</a></li>
@@ -236,7 +237,7 @@ window.onload = wrap_img;
 
 <aside>
 
-💬 기본 아이디어 : `노드 $v$의 레이블 확률 $Y_v$는 노드 $v$의 주변노드의 레이블 확률의 가중평균과 같다.`
+💬 기본 아이디어 : 노드 $v$의 레이블 확률 $Y_v$는 노드 $v$의 주변노드의 레이블 확률의 가중평균과 같다.
 즉, 레이블이 없는 노드에 대해 이웃 노드들의 레이블 확률을 가중평균하여 예측하게 된다. 
 이진 분류문제라 가정하고, 모든 노드에 레이블 확률이 존재해야 하기 때문에, 레이블이 없는 노드는 0.5의 확률로 초기화하여 시작하게 된다.
 업데이트는 반복적으로 진행되며, 모든 노드에 대해 수렴하거나 반복횟수에 도달할 경우 멈추게 된다.
@@ -271,7 +272,9 @@ window.onload = wrap_img;
 (확률 0.5의 클래스 1에 속함)</li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/vPvX8Qh"><img src="https://i.imgur.com/vPvX8Qh.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -301,7 +304,9 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%201.png" alt="Untitled.png"></p>
+<p align="center">
+    <a href="https://imgur.com/DaLEfgG"><img src="https://i.imgur.com/DaLEfgG.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -331,7 +336,9 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%202.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/CAZ4Hi2"><img src="https://i.imgur.com/CAZ4Hi2.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -361,7 +368,9 @@ window.onload = wrap_img;
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%203.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/KfbtRpU"><img src="https://i.imgur.com/KfbtRpU.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -376,7 +385,9 @@ window.onload = wrap_img;
 <p>After Iteration 1 (a round of updates for all unlabeled nodes)
 반복 후 1 (라벨이 지정되지 않은 모든 노드에 대한 업데이트 라운딩)</p>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%204.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/Fguf7ms"><img src="https://i.imgur.com/Fguf7ms.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -391,21 +402,27 @@ window.onload = wrap_img;
 
 <p>After Iteration 2 (반복 후 2)</p>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%205.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/TFAiAXZ"><img src="https://i.imgur.com/TFAiAXZ.png" title="source: imgur.com"></a>
+</p>
 
 <h3 id="example-after-3rd-iteration">
 <a class="anchor" href="#example-after-3rd-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $3^{rd}$ Iteration</h3>
 
 <p>After Iteration 3 (반복 후 3)</p>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%206.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/PNeoIVy"><img src="https://i.imgur.com/PNeoIVy.png" title="source: imgur.com"></a>
+</p>
 
 <h3 id="example-after-4th-iteration">
 <a class="anchor" href="#example-after-4th-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example: After $4^{th}$ Iteration</h3>
 
 <p>After Iteration 4 (반복 후 4)</p>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%207.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/aY3Haqg"><img src="https://i.imgur.com/aY3Haqg.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -446,7 +463,9 @@ class 1 : 4, 5, 6, 7, 8, 9
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%208.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/j8AFk3S"><img src="https://i.imgur.com/j8AFk3S.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -561,7 +580,9 @@ $z_u$: 이웃 노드의 라벨을 표현하는 벡터 (라벨의 비율, 개수 
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%209.png" alt="Untitled.png"></p>
+<p align="center">
+    <a href="https://imgur.com/te9M6sa"><img src="https://i.imgur.com/te9M6sa.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -694,7 +715,9 @@ Phase 2 : **Inference**
   <li>기준: 노드 속성을 기준으로 페이지를 분류하도록 분류기(예: 선형 분류기)를 훈련합니다.</li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2010.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/7GfsTWy"><img src="https://i.imgur.com/7GfsTWy.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -748,7 +771,9 @@ Phase 2 : **Inference**
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2011.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/VdovUfU"><img src="https://i.imgur.com/VdovUfU.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -802,7 +827,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   <li>레이블 업데이트 $Y_v$</li>
 </ol>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2012.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/zdTcimV"><img src="https://i.imgur.com/zdTcimV.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -850,7 +877,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   <li>레이블 업데이트 $Y_v$</li>
 </ol>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2013.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/6i8y2uj"><img src="https://i.imgur.com/6i8y2uj.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -887,7 +916,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   <li>레이블 업데이트 $Y_v$</li>
 </ol>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2014.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/KQtZ5sC"><img src="https://i.imgur.com/KQtZ5sC.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -926,7 +957,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   <li>레이블 업데이트 $Y_v$</li>
 </ol>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2015.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/a4nOxOz"><img src="https://i.imgur.com/a4nOxOz.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -975,7 +1008,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   <li>레이블 업데이트 $Y_v$</li>
 </ol>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2016.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/xSzFLfb"><img src="https://i.imgur.com/xSzFLfb.png" title="source: imgur.com"></a>
+</p>
 
 <aside>
 
@@ -1004,7 +1039,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   </li>
 </ul>
 
-<p><img src="5%202%20-%20Relational%20and%20Iterative%20Classification%203b38e3839ca84920a473d935dc38054f/Untitled%2017.png" alt="Untitled"></p>
+<p align="center">
+    <a href="https://imgur.com/mmLmucZ"><img src="https://i.imgur.com/mmLmucZ.png" title="source: imgur.com"></a>
+</p>
 
 <hr>
 
@@ -1049,15 +1086,9 @@ $*z_v*$를 여러 방법들중 들어오고 나오는 엣지들의 라벨개수�
   </li>
 </ul>
 
-<table>
-  <tbody>
-    <tr>
-      <td>[CS224W: Machine Learning with Graphs</td>
-      <td>2021</td>
-      <td>Lecture 5.2 - Relational and Iterative Classification](https://www.youtube.com/watch?v=QUO-HQ44EDc&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=15)</td>
-    </tr>
-  </tbody>
-</table>
+<hr>
+
+<p><a href="https://www.youtube.com/watch?v=QUO-HQ44EDc&amp;list=PLoROMvodv4rPLKxIpqhjhPgdQy7imNkDn&amp;index=15">CS224W: Machine Learning with Graphs 2021 Lecture 5.2 - Relational and Iterative Classification</a></p>
 
   </div><!-- from https://github.com/utterance/utterances
 <script src="https://utteranc.es/client.js"
