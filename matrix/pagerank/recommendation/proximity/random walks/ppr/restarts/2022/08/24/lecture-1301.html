@@ -158,14 +158,14 @@ window.onload = wrap_img;
 
 <p>우리는 직관적으로 네트워크를 아래 그림과 같은 형태로 생각하곤 합니다. 가장 단적인 예로, 자신의 인간관계 그래프를 떠올려 보십시오. 나의 가족과 친구로 구성된 최측근 집단이 있는 반면, 직장 혹은 학교에서 이름과 얼굴 정도만 아는 좀 더 먼 관계들도 있을 수 있습니다.</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/3rRHnzY.png?1" alt="Imgur"></p>
 
 <h1 id="flow-of-job-information">
 <a class="anchor" href="#flow-of-job-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flow of Job Information</h1>
 
 <p>1960년도에 Granovetter은 이런 소셜 네트워크 상 사람들이 어떤 경로로 직업을 소개 및 추천 받는지에 대한 분석을 수행하였습니다. 분석 결과, 사람들은 주로 주변 사람들로부터 직업을 소개 받지만, 놀랍게도 <strong>가까운 지인(close-friend)보다 가벼운 친분이 있는 사람들(acquaintance)로 부터 소개 받는 경우가 더 많았습니다</strong>. 왜 이런 결과가 도출되었을까요?</p>
 
-<p><img src="https://imgur.com/ou14xQL" alt="Imgur"></p>
+<p><img src="https://i.imgur.com/dau1o9c.png" alt="Imgur"></p>
 
 <h1 id="granovetters-explanation">
 <a class="anchor" href="#granovetters-explanation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Granovetter’s Explanation</h1>
@@ -183,7 +183,7 @@ window.onload = wrap_img;
 
 <p>이를 정보 흐름의 관점에서 재해석하면 왜 사람들이 사회적으로 친분이 덜한 사람들에게서 직업 소개를 더 많이 받는지 알 수 있습니다 🙂</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%202.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/LziI6l0.png" alt="Imgur"></p>
 
 <ul>
   <li>위 그래프 상 Weak/ W로 표시된 <strong>long-range 엣지를 통해 네트워크의 다른 부분들에서 유의미한 정보가 흘러 들어올 수 있습니다</strong>.</li>
@@ -197,20 +197,20 @@ window.onload = wrap_img;
 
 <p>그렇다면 네트워크에 존재하는 밀도 높은 군집들은 어떻게 해서 생겨나는 것일까요?</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%203.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/yhaMUHg.png" alt="Imgur"></p>
 
 <p>그 이유를 알아보기에 앞서서 위와 같은 그래프에서 노드 a와 b가 엣지로 연결될 확률이 더 높을까요 혹은 노드 a와 c가 연결될 확률이 더 높을까요? 아마 공통된 이웃 노드를 갖고 있는 a와 b가 연결될 확률이 더 높을 것입니다. 이렇게 서로 완전 연결된 삼각형 구조를 <strong>triadic(3인조의) closure</strong>이라고 합니다. 네트워크 상 triadic closure이 많다는 것은 곧 우리가 2강에서 다뤘던 clustering coefficient가 높다는 것과 동일한 의미를 가집니다.</p>
 
 <blockquote>
   <p>💡 <strong>Clustering Coefficient</strong> (2강 참조)<br>
-<img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%204.png" alt="Untitled"></p>
+<img src="https://i.imgur.com/TU8Wr1c.png" alt="Imgur"></p>
 </blockquote>
 
 <p>네트워크에서 triadic closure이 생겨서 결국 밀도 높은 군집들이 형성되는 이유는 다음과 같습니다.</p>
 
 <p>만약 B와 C라는 사람이 A라는 공통인 친구가 있다고 가정한다면,</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%205.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/vcvgaAG.png" alt="Imgur"></p>
 
 <ol>
   <li>B와 C는 둘 다 A와 시간을 보낼 것이기 때문에 서로 만날 확률이 높습니다.</li>
@@ -232,7 +232,7 @@ window.onload = wrap_img;
     <p><strong>구조적인 노드 밀집도 (Tightly-connected edges)</strong>
 이어진 두 노드가 구조적으로 얼마나 밀도 높게 모여 있는지 확인하기 위해 <strong>Edge overlap</strong>이라는 개념을 새로 도입하겠습니다. Edge overlap은 아래의 식으로 구할 수 있으며, 0과 1 사이의 값으로 도출됩니다. Edge overlap이 1에 가까워질수록 두 노드는 한 커뮤니티에 속하는 노드일 가능성이 높으며, 0에 가까워질수록 두 노드를 잇는 엣지는 커뮤니티와 커뮤니티를 잇는 local bridge에 가까워집니다.</p>
 
-    <p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%206.png" alt="Untitled"></p>
+    <p><img src="https://i.imgur.com/THgmjPU.png" alt="Imgur"></p>
   </li>
   <li>
     <p><strong>사회적인 밀접도 (Socially strong)</strong>
@@ -252,15 +252,13 @@ window.onload = wrap_img;
     <p><strong>Edge Overlap vs. Strength</strong>
 각 엣지에 대한 edge overlap 값과 edge strength를 나타낸 그래프는 아래와 같습니다. 파란색으로 표현된 우리 데이터에 대해서 예상 그대로 <strong>edge overlap과 edge strength가 정비례하는 관계</strong>를 보입니다. 빨간색으로 표현된 선은 실험의 베이스라인으로써, 우리 데이터의 네트워크 구조는 그대로 유지하되 edge strength 값만 랜덤하게 재배치한 그래프에 대한 결과입니다.</p>
 
-    <p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%207.png" alt="Untitled"></p>
+    <p><img src="https://i.imgur.com/S2HhQbk.png" alt="Imgur"></p>
   </li>
 </ol>
 
 <p>데이터를 직접 시각화 해보면 이러한 경향이 더 확연하게 보입니다. 아래의 왼쪽 그래프가 우리의 실제 통화량 그래프이며, 여기서 엣지의 색깔이 edge weight를 나타냅니다. 보다시피 밀집되어있는 노드들 사이가 붉은색 엣지로 연결되어 상호 통화량이 많다는 사실을 확인할 수 있습니다. 반면, 오른쪽에 제시된 랜덤 edge weight의 베이스라인 네트워크에선 구조적인 밀집도와 관계 없이 붉은색 엣지가 산재되어 있는 것을 볼 수 있습니다.</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%208.png" alt="Untitled"></p>
-
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%209.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/6NmiN9n.png" alt="Imgur"> <img src="https://i.imgur.com/vIThpsh.png" alt="Imgur"></p>
 
 <ol>
   <li>
@@ -270,14 +268,12 @@ window.onload = wrap_img;
 
 <p>아래 결과 그래프에서 볼 수 있다시피, <strong>두 경우에서 모두 edge strength와 edge overlap의 값이 작은 엣지부터 삭제했을 때 가장 큰 subgraph의 크기가 더 작아진다</strong>는 것을 확인할 수 있습니다. 이는 edge strength와 edge overlap값이 작은 엣지는 커뮤니티 간 local bridge일 확률이 높기 때문에 비교적 더 빠르게 전체 네트워크를 subgraph로 나눌 수 있기 때문입니다.</p>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2010.png" alt="Untitled"></p>
-
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/BX0qrml.png" alt="Imgur"> <img src="https://i.imgur.com/Q4sOoSU.png" alt="Imgur"></p>
 
 <h1 id="conceptual-picture-of-networks">
 <a class="anchor" href="#conceptual-picture-of-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conceptual Picture of Networks</h1>
 
-<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="https://i.imgur.com/wYYMOcB.png" alt="Imgur"></p>
 
 <p>지금까지 Granovetter의 이론의 검증을 마쳤습니다. 그의 이론에 따르면 결론적으로 그래프는 <strong>1) 국소적으로 밀집되어 strong 엣지로 연결된 노드 커뮤니티</strong>와, <strong>2) 서로 다른 커뮤니티를 잇는 weak 엣지</strong>들로 구성됩니다.</p>
 
