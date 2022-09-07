@@ -1,0 +1,106 @@
+<h1 id="lecture-172">Lecture 17.2</h1>
+
+<h2 id="lecture-172---graphsage-neighbor-sampling"><strong>**Lecture 17.2 - GraphSAGE Neighbor Sampling</strong>**</h2>
+
+<p><strong>Recall: Computational Graph</strong></p>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled.png" alt="Untitled" /></p>
+
+<p>GNN이 노드 임베딩을 어떻게 만드는지 다시 떠올려 볼까요? 타겟 노드가 0번 노드라고 가정하면, 0번 노드를 기점으로 하여 computation graph가 생성됩니다. 오른쪽 그림은 타겟 노드로부터 2-hop 떨어진 이웃 노드까지 aggregate하여 타겟 노드의 임베딩을 생성하는데요, 이는 2개의 GNN layer로 표현됩니다. 이를 일반화하면, $K$<strong>-layer의 GNN은 결국 $K$-hop만큼 떨어진 이웃 노드까지 본다</strong>는 얘기가 되겠죠. 다시 말해, <strong>타겟 노드의 임베딩을 업데이트 하기 위해 $K$-hop까지 떨어진 이웃 노드를 제외한 나머지 모든 노드들은 신경 쓰지 않아도 된다는 말입니다.</strong></p>
+
+<p><strong>Computing Node Embeddings</strong></p>
+
+<p>위에서 얻은 인사이트를 바탕으로 생각해보면, 결국 아래 왼쪽 그림처럼 mini-batch를 <strong>노드 단위</strong>로 구성해서 이웃 노드 정보가 다 끊기도록 만들기 보다, 오른쪽 그림과 같이 mini-batch를 <strong>computation graph 단위</strong>로 구성한다면 노드 간 연결된 모양새를 유지하며 성공적으로 SGD를 수행할 수 있으리라 기대할 수 있습니다. <strong>다시 말해, $M$개의 랜덤 샘플링된 노드 자체 대신, 그 노드들로부터 뻗어나가는 $M$개의 computation graph로 mini-batch를 구성한다는 것입니다.</strong> 물론 전체 그래프 말고 mini-batch를 사용하기 때문에 GPU에 한꺼번에 올려 계산하는 것이 가능한 선에서 $M$을 설정해야겠죠! Mini-batch를 적당하게 만들었다면, 이후에 진행될 SGD 학습은 동일한 방식으로 일어납니다.ㅇ</p>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%201.png" alt="Untitled" /></p>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%202.png" alt="Untitled" /></p>
+
+<aside>
+💡 **Computation graph로 mini-batch를 구성하자!**
+
+</aside>
+
+<p><strong>Issue with Stochastic Training</strong></p>
+
+<p>하지만 computation graph로 mini-batch를 만드는 데는 여러 문제가 있습니다.</p>
+
+<ol>
+  <li><strong>Computation graph의 크기는 GNN layer 수 $K$에 대해 지수적으로 증가함</strong></li>
+</ol>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%203.png" alt="Untitled" /></p>
+
+<ol>
+  <li><strong>Hub 노드가 존재하면 computation graph의 크기가 폭증함</strong></li>
+</ol>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%204.png" alt="Untitled" /></p>
+
+<p>여기서 Hub 노드란 SNS 그래프의 연예인 노드와 같이 차수가 높은 노드를 일컫습니다. 만약 이웃 중 하나라도 이런 hub 노드가 포함된다면 이에 연결된 엄청 많은 이웃 노드들까지 고려해야 하기 때문에 computation graph의 사이즈가 폭증합니다.</p>
+
+<p>따라서 단순하게 computation graph를 그대로 갖다 mini-batch에 넣어버리기 보다, <strong>computation graph 자체를 더욱더 작게 만들어줄 필요가 생겼습니다!</strong></p>
+
+<p><strong>Neighbor Sampling</strong></p>
+
+<p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%205.png" alt="Untitled" /></p>
+
+<p><strong>따라서 우리는 하나의 뻗어나간 가지에서 최대로 랜덤하게 $H$개의 이웃 노드만을 내버려 두고, 나머지 노드들은 버리는 방법을 취합니다.</strong> 만약 $H=2$로 둔다면, 위 그림처럼 한 노드의 이웃 노드를 갖고 computation graph를 그릴때, 딱 2개의 이웃 노드들만 사용하는 것이죠. 이렇게 가지치기된 (pruned) computation graph는 감당 가능한 사이즈로 유지되기 때문에, 이를 활용해서 mini-batch를 구성한다면 더욱 효율적으로 큰 그래프를 SGD로 학습할 수 있습니다.</p>
+
+<aside>
+💡 **최대 $H$개의 랜덤한 이웃 노드만 사용하여 computation graph를 생성하자!**
+
+</aside>
+
+<p>따라서 결국에 $K$ layer의 GNN은 매 hop마다 $H$개의 이웃 노드로 뻗어나가는 computation graph를 생성할 것이기 때문에 computation graph 내에 총 $\prod_{k=1}^K H_k$ 개의 leaf 노드를 가지게 될 것입니다. 즉, 여전히 $K$에 대해 지수적으로 computation graph의 크기가 증가하긴 하지만, fanout에 상한계 (upper bound)가 생김으로써 너무 커지지 않게 조절할 수 있게 된다는 말입니다.</p>
+
+<p><strong>Remarks on Neighbor Sampling</strong></p>
+
+<p><strong>논점 1 .   $H$와 학습 안정성의 trade-off 관계</strong></p>
+
+<ul>
+  <li>작은 $H$는 computation graph의 크기를 작게 만들어 효율적이고 빠른 학습이 가능하게 합니다 ↔ 하지만 한 노드를 업데이트 하기 위해 너무 일부의 이웃 노드만 활용하기 때문에 aggregation 단계의 variance를 크게 하고, 결국 불안정한 학습을 야기합니다.</li>
+</ul>
+
+<p><strong>논점 2 .  학습 과정의 시간 복잡도</strong></p>
+
+<ul>
+  <li>앞에서 언급했듯이 Neighbor Sampling을 하더라도 computation graph의 크기는 여전히 $K$에 대해 지수적으로 증가합니다.</li>
+</ul>
+
+<p><strong>논점 3 .  어떤 이웃 노드들을 샘플링 할 것인지?</strong></p>
+
+<ul>
+  <li>랜덤하게 $H$개의 이웃 노드를 샘플링하는 방식은 매우 빠르지만, 대다수의 중요치 않은 (차수가 낮은) 노드들이 선택될 가능성이 높기 때문에 최적의 방식은 아닙니다.</li>
+  <li>
+    <p><strong>Random Walk with Restarts 방식을 활용하여 중요한 노드들을 위주로 샘플링 해봅시다.</strong></p>
+
+    <p><img src="Lecture%2017%202%20fc292022b8b3449eaff0b6674c2c21e8/Untitled%206.png" alt="Untitled" /></p>
+
+    <ul>
+      <li>초록색 노드가 타겟 노드라고 할 때, 초록색 노드의 이웃 노드들 중 $H=3$개의 노드만 샘플링 해봅시다 (이해의 편의를 위해 1-hop만 고려하겠습니다~)</li>
+      <li>먼저 초록색 노드로부터 시작하는 Random Walk를 수행한 후, 각 이웃 노드들이 random walk상 방문될 score $R_i$를 계산합니다.</li>
+      <li>총 9개의 이웃 노드 중, 가장 큰 $R_i$를 갖는 3개의 파란색 노드만 샘플링하여 computation graph를 구성합니다.</li>
+      <li>보통 차수가 높은 중요한 노드들이 random walk상 등장할 가능성이 더 높기 때문에 이 방법으로 더 중요한 이웃 노드들을 성공적으로 샘플링 할 수 있습니다!</li>
+    </ul>
+  </li>
+  <li>이웃 노드들을 샘플링하는 방식들은 여전히 연구가 진행되고 있는 주제라고 하네요~</li>
+</ul>
+
+<p><strong>Summary: Neighbor Sampling</strong></p>
+
+<aside>
+💡 **1.  GNN 구조 : 그대로 사용
+2.  Mini-batch 구성 방식: $M$개의 Computation graph로 구성
+3.  학습 방식: SGD training**
+
+</aside>
+
+<ul>
+  <li>$M$개의 노드에 대해 computation graph를 생성하여 mini-batch에 넣음</li>
+  <li>Neighbor Sampling 단계에서 computation graph가 가지치기되어 계산상의 효율성을 높임 (일종의 dropout처럼 생각할 수 있음!)</li>
+  <li>하지만, GNN layer의 수가 많다면 여전히 computation graph의 크기가 커지기 때문에 가지치기할 노드 수 $H$ 또는 배치 사이즈를 줄여야 함. 이는 결국 불안정한 학습으로 이어지게 됨</li>
+  <li>Neighbor Sampling 방법은 현업에서 많이 사용됨</li>
+</ul>
+
+<hr />

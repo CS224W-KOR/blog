@@ -1,0 +1,152 @@
+<h1 id="lecture-174">Lecture 17.4</h1>
+
+<h2 id="lecture-174---scaling-up-by-simplifying-gnns"><strong>**Lecture 17.4 - Scaling up by Simplifying GNNs</strong>**</h2>
+
+<p>이때까지 SGD training에서 mini-batch를 구성하는 방식을 바꿔가며 큰 그래프를 학습할 수 있도록 만들었던 것에 반해, <strong>지금부터는 mini-batch는 랜덤 샘플링 그대로 두고, 반대로 GNN 구조를 바꾸어 큰 그래프를 학습하는 방법에 대해서 알아보도록 하겠습니다</strong>. 어떻게 보면 큰 그래프를 학습하려고 하는 목적은 같지만 이전에 배운 방법들에 대해 orthogonal 한 방법이라고 보시면 되겠습니다.</p>
+
+<p><strong>Roadmap of Simplifying GCN</strong></p>
+
+<p>먼저 대표적인 GNN 모델 중 하나인 GCN으로부터 시작해서 모델을 simplify 해 나가 보겠습니다. Wu et al.에 따르면 <strong>단순하게 GCN에서 비선형 활성 함수를 제거함으로써 모델 디자인을 굉장히 scalable하게 만들 수 있다고 합니다</strong>. 더욱 놀라운 점은, 활성 함수 제거라는 simplification을 하더라도 모델의 성능에는 큰 차이가 없다는 것인데요, 이 놀라운 발견에 대해 이제부터 차차 설명 드리도록 하겠습니다.</p>
+
+<aside>
+💡 **GCN에서 ReLU 활성 함수를 뺌으로써 구조를 단순화하자!**
+
+</aside>
+
+<p><strong>Recall: GCN (mean-pool)</strong></p>
+
+<p>설명에 앞서 먼저 GCN을 되짚어 보도록 하죠. 이 부분은 귀가 닳도록 이전 강의들에서 반복한 내용이니 간단하게만 언급하고 넘어갈게요. 여기서 그래프 $G=(V,E)$가 주어졌고, 엣지 집합 $E$는 각 노드에 대한 self-loop을 포함한다고 가정해보겠습니다. 이 때, GCN layer $k$에 대한 이웃 노드 aggregation과 transform 과정은 아래와 같은 벡터식으로 표현됩니다.</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled.png" alt="Untitled" /></p>
+
+<p>Layer 0에서의 초기 노드 임베딩을 $h_v^{(0)} = X_v$로 두고 총 $K$개의 GCN layer을 거치며 반복적으로 노드 임베딩을 업데이트 하면, 마지막 layer에서 최종 노드 임베딩 $z_v = h_v^{(K)}$를 얻을 수 있습니다.</p>
+
+<p>이처럼 벡터식으로 표현된 전 과정을 더욱 간단하게 행렬식으로도 표현할 수 있는데요, 우선 반복적으로 사용할 notation 부터 정리하고 가겠습니다.</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>Layer $k$에서의 노드 임베딩 행렬 : $H^{(k)} = [h_1^{(k)}, …, h_{</td>
+          <td>V</td>
+          <td>}^{(k)}]^T$</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>Self-loop를 포함한 그래프의 인접 행렬 : $A$</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>$D$를 $D_{v,v} = Deg(v) =</td>
+          <td>N(v)</td>
+          <td>$의 대각선 행렬로 정의한다면,</td>
+        </tr>
+        <tr>
+          <td>$D$의 역행렬인 $D^{-1}$ 또한 $D_{v,v}^{-1} = 1/</td>
+          <td>N(v)</td>
+          <td>$를 만족하는 대각선 행렬로 정의 가능</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<p>위와 같은 notation을 통해 GCN의 ‘Mean-pooling’ 부분을 아래와 같이 행렬식으로 변환할 수 있습니다.</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%201.png" alt="Untitled" /></p>
+
+<p>최종적으로 GCN의 벡터식과 행렬식을 이렇게 정리해 볼 수 있겠네요. 행렬식을 통해 계산하면 모든 노드에 대해 한번에 계산이 가능하다는 장점이 있습니다.</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%202.png" alt="Untitled" /></p>
+
+<p><strong>Simplifying GCN</strong></p>
+
+<p><strong>자, 이제 아까 말했듯이 GCN의 수식에서 ReLU 활성 함수를 빼보도록 하겠습니다.</strong> 활성 함수를 뺀 GCN 행렬식은 아래와 같은데요, 이를 길게 전개해서 layer $K$에서의 최종 노드 임베딩을 구하는 식으로 바꿔보겠습니다.</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%203.png" alt="Untitled" /></p>
+
+<p>여기서 여러 선형 변환 행렬 $W_k$의 곱 또한 선형 변환 행렬인 $W$로 쓸 수 있다는 점에 주의하십시오. 단숨에 $K$개의 GCN layer을 통과한 최종 노드 임베딩을 얻기 위해서는, 우선 0번째 layer에서의 초기 노드 임베딩 $X$에 인접 행렬을 $K$번 곱함으로써 $K$-hop 까지의 이웃 노드 정보를 aggregate 해야 합니다. 다만 simplified 된 GCN의 경우 비선형 함수가 제외되어 각 GCN layer에서 행해지는 transformation을 하나의 선형 변환으로 표현할 수 있기 때문에 마지막에 한번 $W$를 곱해주기만 하면 최종 노드 임베딩을 구할 수 있는 것이죠. 최종 행렬식을 직관적으로 이해하는 것도 어렵지 않죠?</p>
+
+<p><strong>이처럼 GCN에서 단순히 비선형 함수를 없애는 것 만으로도 모델 구조를 아주 단순화 시킬 수 있습니다.</strong> 특히, $\tilde{A}^KX$는 학습되지 않는 부분이기 때문에 처음에 먼저 계산해 놓고 그냥 필요할 때 효율적으로 사용하면 된답니다. 간단하게 $\tilde{X} = \tilde{A}^KX$라고 하고 다시 한번 식을 쓴다면 아래와 같습니다. 즉, 최종 노드 임베딩은 그저 미리 연산된 행렬 $\tilde{X}$에 선형 변환을 하여 쉽게 계산할 수 있다는 것이죠.</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%204.png" alt="Untitled" /></p>
+
+<aside>
+💡 **ReLU를 뺀 GCN의 행렬식 전개 결과 →** $H^{(K)} = \tilde{A}^KXW^T = \tilde{X}W^T$
+
+</aside>
+
+<p><strong>Simplified GCN: Summary</strong></p>
+
+<p>우리는 그대로 $M$개의 노드를 랜덤 추출하여 mini-batch를 구성하는 SGD training을 통해 학습을 진행할 것이기 때문에 전 학습 과정을 아래와 같이 표현할 수 있습니다.</p>
+
+<ol>
+  <li>
+    <p><strong>Pre-processing</strong></p>
+
+    <p>먼저 미리 계산 가능한 $\tilde{X}=\tilde{A}^KX$를 구해 놓습니다. 이는 CPU 위에서 빠르게 계산할 수 있습니다.</p>
+  </li>
+  <li>
+    <p><strong>Mini-batch training</strong></p>
+    <ul>
+      <li>전체 노드 중에 $M$개의 노드를 랜덤으로 샘플링 하여 mini-batch를 구성합니다. 각 mini-batch는 ${v_1, v_2, …, v_M}$으로 표현할 수 있겠네요.</li>
+      <li>각 노드에 대한 최종 노드 임베딩을 $h_{v_i}^{(K)} = W\tilde{X}_{v_i}$ 를 통해 구합니다.</li>
+      <li>나머지 과정은 동일합니다. 생성된 노드 임베딩을 갖고 적절한 loss 값을 계산하여 역전파 함으로써 모델 파라미터를 업데이트 하는 것이죠.</li>
+    </ul>
+  </li>
+</ol>
+
+<p><strong>Comparison with Other Methods &amp; Potential Issue of Simplified GCN</strong></p>
+
+<ul>
+  <li>
+    <p><strong>Simplified GCN vs. Neighbor Sampling</strong></p>
+
+    <p>Neighbor Sampling처럼 computation graph를 일일이 만들어서 mini-batch를 구성하지 않아도 되기 때문에 <strong>Simplified GCN이 학습 시간 측면에서는 더 효율적</strong>입니다.</p>
+  </li>
+  <li>
+    <p><strong>Simplified GCN vs. Cluster-GCN</strong></p>
+
+    <p>Cluster-GCN에서 mini-batch가 특정 커뮤니티에 국한되어 전체 그래프를 대표하지 못하여 여러 커뮤니티를 굳이 굳이 붙여서 사용해야 하는데 반해, <strong>Simplified GCN에선 그냥 랜덤으로 노드를 샘플링해서 mini-batch를 구성하면 되므로 훨씬 간편합니다.</strong> 또한, 완전히 랜덤으로 mini-batch를 만들기 때문에 배치 마다의 편차도 작아져서 <strong>학습이 보다 안정적</strong>입니다.</p>
+  </li>
+</ul>
+
+<p>앞에서 배운 두 방법과 Simplified GCN을 비교해보면 Simplified GCN이 여러 측면에서 훨씬 효율적이라는 것을 볼 수 있습니다. 그렇다면 그냥 일괄적으로 Simplified GCN을 사용하여 큰 그래프를 학습하면 되는 것 아닐까요?</p>
+
+<p>하지만, <strong>Simplified GCN은 노드 임베딩을 만드는데 있어서 비선형성을 완전히 제거해 버렸기 때문에 표현력 측면에서는 다른 두 방법에 비해 크게 떨어진다는 단점</strong>이 있습니다.</p>
+
+<p><strong>Performance of Simplified GCN</strong></p>
+
+<p>표현력이 떨어지는 단점에도 불구하고 <strong>GCN은 semi-supervised node classification 태스크에서 오리지널 GCN에 필적할만한 우수한 성능을 보이는데요</strong>, 대체 그 이유가 무엇일까요?</p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%205.png" alt="Untitled" /></p>
+
+<p><strong>Graph Homophily</strong></p>
+
+<p>이전 강의에서도 다루었듯이, <strong>homophily란 유유상종을 나타내는 말</strong>입니다. <strong>즉, 그래프 상에서 엣지로 연결된 노드들은 동일한 정답 라벨을 가질 가능성이 높다고 해석할 수 있겠네요.</strong> Graph homophily는 실생활의 그래프에서도 잘 드러나는데요, 예를 들어 논문-인용 네트워크에서 서로 인용 관계 (엣지)로 연결된 논문 노드들은 서로 비슷한 연구 주제를 다룰 가능성이 높고, 소셜 네트워크에서 서로 친구 관계인 사용자 노드끼리 영화 취향이 비슷할 가능성이 높은 것처럼 말이죠.</p>
+
+<p>반면, Simplified GCN에서 $\tilde{A}^KX$를 계산하는 과정을 다시 생각해 볼까요? 이를 위해 $K$회 반복하여 $X\leftarrow \tilde{A}X$를 연산하면 되는데, 이 과정에서 반복적으로 이웃 노드 feature의 평균을 활용하여 타겟 노드 feature를 업데이트 하기 때문에 <strong>결국 엣지로 연결된 노드 끼리 비슷한 $\tilde{A}^KX$를 갖게 됩니다.</strong></p>
+
+<p><img src="Lecture%2017%204%20122ffdc0103b4e80a8c4ebfe7e997755/Untitled%206.png" alt="Untitled" /></p>
+
+<p>우리의 Simplified GCN 모델은 결국 $\tilde{A}^KX$에 단순 선형 변환을 거친 최종 노드 임베딩을 활용하여 downstream task에서 예측값을 만들게 되는데, 엣지로 연결된 노드끼리는 최종 노드 임베딩이 비슷하므로 결국 비슷한 예측값을 가지게 될 것입니다. <strong>따라서 graph homophily가 강하게 드러나는 그래프의 경우에는 node classification task에서 Simplified GCN의 예측이 정답 라벨과 비슷한 양상을 띠어 좋은 성능을 나타낼 수 밖에 없죠.</strong></p>
+
+<p><strong>Summary: Simplified GCN</strong></p>
+
+<aside>
+💡 **1.  GNN 구조 : ReLU 활성 함수를 빼서 간소화함
+2.  Mini-batch 구성 방식: 일반적인 랜덤 샘플링으로 구성함
+3.  학습 방식: SGD training**
+
+</aside>
+
+<ul>
+  <li>Simplified GCN은 오리지널 GCN에서 ReLU 활성 함수를 빼서 노드 임베딩 생성 과정을 단순한 pre-processing 연산으로 바꿈으로써, 효율적인 임베딩 생성을 가능하게 함 (이 과정은 CPU에서 수행할 수 있을 정도로 가볍고 효율적임!)</li>
+  <li>$\tilde{A}^KX$를 미리 계산해두면, scalable하게 mini-batch를 구성하여 SGD training을 할 수 있음</li>
+  <li>Graph homophily가 잘 드러나는 그래프에 대해 node classification task에서 우수한 성능을 보임</li>
+</ul>
+
+<hr />
