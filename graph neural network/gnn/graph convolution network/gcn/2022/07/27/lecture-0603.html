@@ -324,10 +324,9 @@ window.onload = wrap_img;
         <p>예시) 각 노드가 safe한지 혹은 toxic한지 분류하는 node classification
  → 분류 문제이므로 cross-entropy loss를 사용하고, <strong>노드의 정답 클래스 label을 활용하여 직접 모델 학습 가능</strong></p>
 
-        <aside>
-  💡 아래 loss 식에서 $\sigma(z_v^T\theta)$는 학습된 노드 임베딩 $z_v^T$를 가지고 모델이 예측한 노드 $v$의 클래스 확률을 나타냅니다.
-        
-  </aside>
+        <blockquote>
+          <p>💡 아래 loss 식에서 $\sigma(z_v^T\theta)$는 학습된 노드 임베딩 $z_v^T$를 가지고 <strong>모델이 예측한 노드 $v$의 클래스 확률</strong> 을 나타냅니다.</p>
+        </blockquote>
       </li>
     </ul>
 
@@ -348,11 +347,10 @@ window.onload = wrap_img;
 
         <p>간단하게 DeepWalk로 노드 similarity를 정의하는 경우를 생각해볼까요? 만약 두 노드 $u$와 $v$가 랜덤 워크 상에서 co-occur한다면 두 노드는 ‘similar’하다고 말할 수 있으며, $y_{u,v} = 1$로 임의의 label을 붙입니다. 또한 여기서 $DEC(z_u,z_v)$는 학습된 두 노드의 임베딩을 내적함으로써 임베딩 공간에서의 노드 similarity를 측정합니다. Loss 함수로 cross-entropy를 사용함으로써 그래프에서 노드 similarity를 최대한 잘 보존하도록 노드 임베딩을 학습할 수 있게 됩니다.</p>
 
-        <aside>
-  💡 원본 그래프에서 similar한 노드는 → similar한 임베딩을 갖도록 합니다
-  </aside>
-
-        <p><img src="https://i.imgur.com/UyyVLbR.png?1" alt="Imgur"></p>
+        <blockquote>
+          <p>💡 원본 그래프에서 similar한 노드는 → similar한 임베딩을 갖도록 합니다<br>
+<img src="https://i.imgur.com/UyyVLbR.png?1" alt="Imgur"></p>
+        </blockquote>
       </li>
     </ul>
   </li>
@@ -379,14 +377,9 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/9VE7ZON.png?1" alt="Imgur"></p>
 
-<p><br></p>
-<aside>
-💡 Inductive Capability
-<br>
-1. 새로운 그래프: 예를 들어 분자 그래프에서, 화합물 A에 대해 학습된 GNN 모델이 화합물 B 그래프에서 임베딩을 만드는데 활용될 수 있음
-<br>2. 새로운 노드: 시간에 따라 evolving 하는 그래프에서 새로운 노드가 추가될 때마다 바로바로 임베딩을 생성할 수 있음
-
-</aside>
+<blockquote>
+  <p>💡 Inductive Capability<br>1. <strong>새로운 그래프</strong> : 예를 들어 분자 그래프에서, 화합물 A에 대해 학습된 GNN 모델이 화합물 B 그래프에서 임베딩을 만드는데 활용될 수 있음<br>2. <strong>새로운 노드</strong> : 시간에 따라 evolving 하는 그래프에서 새로운 노드가 추가될 때마다 바로바로 임베딩을 생성할 수 있음</p>
+</blockquote>
 
 <h1 id="summary">
 <a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h1>
