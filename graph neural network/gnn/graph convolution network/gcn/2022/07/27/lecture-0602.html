@@ -199,10 +199,10 @@ window.onload = wrap_img;
 <p><img src="https://i.imgur.com/Jp8GQ7W.png?1" alt="Imgur"></p>
 
 <p>이를 다시 <strong>Gradient 벡터</strong>라는 개념으로 정리해서 이야기 해보겠습니다. Gradient 벡터란 위의 식과 같이 $\theta$에 대한 $\mathcal{L}$의 편미분, 즉 기울기 값으로 구성된 벡터로써, 가장 빠르게 $\mathcal{L}$이 증가하는 방향을 나타내는 방향 도함수 벡터입니다.</p>
-<aside>
-💡 Gradient is the directional derivative in the direction of largest increase
 
-</aside>
+<blockquote>
+  <p>💡 <strong>Gradient is the directional derivative in the direction of largest increase</strong></p>
+</blockquote>
 
 <p><br>일단 Gradient를 구했으면 이제 할 일은 <strong>모델 파라미터 $\theta$를 gradient의 반대방향으로, 즉 $\mathcal{L}$이 작아지는 방향으로, 반복적으로 업데이트</strong> 하는 것입니다.</p>
 
@@ -223,10 +223,9 @@ window.onload = wrap_img;
 
 <p>따라서 <strong>전체 데이터셋을 작은 미니 배치로 나누어 모델 파라미터를 업데이트하는 SGD 방법</strong>이 등장하게 되었습니다. 미니 배치 마다 gradient를 구하고 모델 파라미터를 업데이트하는 것이 전체 데이터셋을 활용한 모델 업데이트 정도를 근사할 수 있기 때문이죠.</p>
 
-<aside>
-💡 SGD is unbiased estimator of full gradient
-
-</aside>
+<blockquote>
+  <p>💡 <strong>SGD is unbiased estimator of full gradient</strong></p>
+</blockquote>
 
 <p><br>오늘날의 최적화 optimizer은 SGD의 여러 발전된 형태로써, Adam, Adagrad, Adadelta, RMSprop 등이 있습니다.</p>
 
@@ -245,7 +244,7 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/WCvz3lZ.png?1" alt="Imgur"></p>
 
-<p>선형 변환 함수가 벡터 형태이든 행렬 형태이든 관계 없이 gradient는 이렇게 간단히 구할 수 있습니다.</p>
+<p>선형 변환 함수가 벡터 형태이든 행렬 형태이든 관계 없이 gradient는 이렇게 간단히 구할 수 있습니다.<br></p>
 
 <p><strong>Case 2</strong></p>
 
@@ -255,12 +254,10 @@ window.onload = wrap_img;
 
 <p>두번째로 조금 더 복잡한 형태의 모델로 확장해보겠습니다. (물론 아직 엄청 단순한 형태긴 하지만..)  이 경우에는 $W_{1}$과 $W_{2}$에 대해 모두 gradient를 구해야 합니다. 여기서 우리가 고등학교 때 배운 합성함수 미분에서의 연쇄법칙이 사용됩니다.</p>
 
-<aside>
-💡 Chain Rule (연쇄법칙)
-
-![Imgur](https://i.imgur.com/IqvyTZ1.png?1)
-
-</aside>
+<blockquote>
+  <p>💡 Chain Rule (연쇄법칙)<br>
+<img src="https://i.imgur.com/IqvyTZ1.png?1" alt="Imgur"></p>
+</blockquote>
 
 <p><br></p>
 
