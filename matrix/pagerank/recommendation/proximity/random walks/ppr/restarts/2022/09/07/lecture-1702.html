@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 17.2 - GraphSAGE Neighbor Sampling | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 17.2 - GraphSAGE Neighbor Sampling" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
+<meta property="og:description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-09-07T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 17.2 - GraphSAGE Neighbor Sampling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-09-07T00:00:00-05:00","datePublished":"2022-09-07T00:00:00-05:00","description":"CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs","headline":"Lecture 17.2 - GraphSAGE Neighbor Sampling","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 17.2 - GraphSAGE Neighbor Sampling</h1><p class="page-description">CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-09-07T00:00:00-05:00" itemprop="datePublished">
+        Sep 7, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#recall-computational-graph">Recall: Computational Graph</a></li>
+<li class="toc-entry toc-h1"><a href="#computing-node-embeddings">Computing Node Embeddings</a></li>
+<li class="toc-entry toc-h1"><a href="#issue-with-stochastic-training">Issue with Stochastic Training</a></li>
+<li class="toc-entry toc-h1"><a href="#neighbor-sampling">Neighbor Sampling</a></li>
+<li class="toc-entry toc-h1"><a href="#remarks-on-neighbor-sampling">Remarks on Neighbor Sampling</a></li>
+<li class="toc-entry toc-h1"><a href="#summary-neighbor-sampling">Summary: Neighbor Sampling</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="recall-computational-graph">
+<a class="anchor" href="#recall-computational-graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recall: Computational Graph</h1>
+
+<p><img src="https://i.imgur.com/K2ihSlN.png" alt="Imgur"></p>
+
+<p>GNN이 노드 임베딩을 어떻게 만드는지 다시 떠올려 볼까요? 타겟 노드가 0번 노드라고 가정하면, 0번 노드를 기점으로 하여 computation graph가 생성됩니다. 오른쪽 그림은 타겟 노드로부터 2-hop 떨어진 이웃 노드까지 aggregate하여 타겟 노드의 임베딩을 생성하는데요, 이는 2개의 GNN layer로 표현됩니다. 이를 일반화하면, $K$<strong>-layer의 GNN은 결국 $K$-hop만큼 떨어진 이웃 노드까지 본다</strong>는 얘기가 되겠죠. 다시 말해, <strong>타겟 노드의 임베딩을 업데이트 하기 위해 $K$-hop까지 떨어진 이웃 노드를 제외한 나머지 모든 노드들은 신경 쓰지 않아도 된다는 말입니다.</strong></p>
+
+<h1 id="computing-node-embeddings">
+<a class="anchor" href="#computing-node-embeddings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Computing Node Embeddings</h1>
+
+<p>위에서 얻은 인사이트를 바탕으로 생각해보면, 결국 아래 왼쪽 그림처럼 mini-batch를 <strong>노드 단위</strong>로 구성해서 이웃 노드 정보가 다 끊기도록 만들기 보다, 오른쪽 그림과 같이 mini-batch를 <strong>computation graph 단위</strong>로 구성한다면 노드 간 연결된 모양새를 유지하며 성공적으로 SGD를 수행할 수 있으리라 기대할 수 있습니다. <strong>다시 말해, $M$개의 랜덤 샘플링된 노드 자체 대신, 그 노드들로부터 뻗어나가는 $M$개의 computation graph로 mini-batch를 구성한다는 것입니다.</strong> 물론 전체 그래프 말고 mini-batch를 사용하기 때문에 GPU에 한꺼번에 올려 계산하는 것이 가능한 선에서 $M$을 설정해야겠죠! Mini-batch를 적당하게 만들었다면, 이후에 진행될 SGD 학습은 동일한 방식으로 일어납니다.</p>
+
+<p><img src="https://i.imgur.com/zoFnQ3u.png" alt="Imgur"> <img src="https://i.imgur.com/HmkfAuu.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 <strong>Computation graph로 mini-batch를 구성하자!</strong></p>
+</blockquote>
+
+<h1 id="issue-with-stochastic-training">
+<a class="anchor" href="#issue-with-stochastic-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issue with Stochastic Training</h1>
+
+<p>하지만 computation graph로 mini-batch를 만드는 데는 여러 문제가 있습니다.</p>
+
+<ol>
+  <li>
+<strong>Computation graph의 크기는 GNN layer 수 $K$에 대해 지수적으로 증가함</strong><br>
+<img src="https://i.imgur.com/UYZELtH.png" alt="Imgur">
+</li>
+  <li>
+<strong>Hub 노드가 존재하면 computation graph의 크기가 폭증함</strong><br>
+<img src="https://i.imgur.com/sgGPOgg.png" alt="Imgur"><br>
+여기서 Hub 노드란 SNS 그래프의 연예인 노드와 같이 차수가 높은 노드를 일컫습니다. 만약 이웃 중 하나라도 이런 hub 노드가 포함된다면 이에 연결된 엄청 많은 이웃 노드들까지 고려해야 하기 때문에 computation graph의 사이즈가 폭증합니다.</li>
+</ol>
+
+<p>따라서 단순하게 computation graph를 그대로 갖다 mini-batch에 넣어버리기 보다, <strong>computation graph 자체를 더욱더 작게 만들어줄 필요가 생겼습니다!</strong></p>
+
+<h1 id="neighbor-sampling">
+<a class="anchor" href="#neighbor-sampling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Neighbor Sampling</h1>
+
+<p><img src="https://i.imgur.com/uKWtJ6t.png" alt="Imgur"></p>
+
+<p><strong>따라서 우리는 하나의 뻗어나간 가지에서 최대로 랜덤하게 $H$개의 이웃 노드만을 내버려 두고, 나머지 노드들은 버리는 방법을 취합니다.</strong> 만약 $H=2$로 둔다면, 위 그림처럼 한 노드의 이웃 노드를 갖고 computation graph를 그릴때, 딱 2개의 이웃 노드들만 사용하는 것이죠. 이렇게 가지치기된 (pruned) computation graph는 감당 가능한 사이즈로 유지되기 때문에, 이를 활용해서 mini-batch를 구성한다면 더욱 효율적으로 큰 그래프를 SGD로 학습할 수 있습니다.</p>
+
+<blockquote>
+  <p>💡 <strong>최대 $H$개의 랜덤한 이웃 노드만 사용하여 computation graph를 생성하자!</strong></p>
+</blockquote>
+
+<p>따라서 결국에 $K$ layer의 GNN은 매 hop마다 $H$개의 이웃 노드로 뻗어나가는 computation graph를 생성할 것이기 때문에 computation graph 내에 총 $\prod_{k=1}^K H_k$ 개의 leaf 노드를 가지게 될 것입니다. 즉, 여전히 $K$에 대해 지수적으로 computation graph의 크기가 증가하긴 하지만, fanout에 상한계 (upper bound)가 생김으로써 너무 커지지 않게 조절할 수 있게 된다는 말입니다.</p>
+
+<h1 id="remarks-on-neighbor-sampling">
+<a class="anchor" href="#remarks-on-neighbor-sampling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Remarks on Neighbor Sampling</h1>
+
+<p><strong>논점 1 .   $H$와 학습 안정성의 trade-off 관계</strong></p>
+
+<ul>
+  <li>작은 $H$는 computation graph의 크기를 작게 만들어 효율적이고 빠른 학습이 가능하게 합니다 ↔ 하지만 한 노드를 업데이트 하기 위해 너무 일부의 이웃 노드만 활용하기 때문에 aggregation 단계의 variance를 크게 하고, 결국 불안정한 학습을 야기합니다.</li>
+</ul>
+
+<p><strong>논점 2 .  학습 과정의 시간 복잡도</strong></p>
+
+<ul>
+  <li>앞에서 언급했듯이 Neighbor Sampling을 하더라도 computation graph의 크기는 여전히 $K$에 대해 지수적으로 증가합니다.</li>
+</ul>
+
+<p><strong>논점 3 .  어떤 이웃 노드들을 샘플링 할 것인지?</strong></p>
+
+<ul>
+  <li>랜덤하게 $H$개의 이웃 노드를 샘플링하는 방식은 매우 빠르지만, 대다수의 중요치 않은 (차수가 낮은) 노드들이 선택될 가능성이 높기 때문에 최적의 방식은 아닙니다.</li>
+  <li>
+    <p><strong>Random Walk with Restarts 방식을 활용하여 중요한 노드들을 위주로 샘플링 해봅시다.</strong></p>
+
+    <p><img src="https://i.imgur.com/kvR0dtZ.png" alt="Imgur"></p>
+
+    <ul>
+      <li>초록색 노드가 타겟 노드라고 할 때, 초록색 노드의 이웃 노드들 중 $H=3$개의 노드만 샘플링 해봅시다 (이해의 편의를 위해 1-hop만 고려하겠습니다~)</li>
+      <li>먼저 초록색 노드로부터 시작하는 Random Walk를 수행한 후, 각 이웃 노드들이 random walk상 방문될 score $R_i$를 계산합니다.</li>
+      <li>총 9개의 이웃 노드 중, 가장 큰 $R_i$를 갖는 3개의 파란색 노드만 샘플링하여 computation graph를 구성합니다.</li>
+      <li>보통 차수가 높은 중요한 노드들이 random walk상 등장할 가능성이 더 높기 때문에 이 방법으로 더 중요한 이웃 노드들을 성공적으로 샘플링 할 수 있습니다!</li>
+    </ul>
+  </li>
+  <li>이웃 노드들을 샘플링하는 방식들은 여전히 연구가 진행되고 있는 주제라고 하네요~</li>
+</ul>
+
+<h1 id="summary-neighbor-sampling">
+<a class="anchor" href="#summary-neighbor-sampling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary: Neighbor Sampling</h1>
+
+<blockquote>
+  <p>💡 <strong>1.  GNN 구조 : 그대로 사용<br>2.  Mini-batch 구성 방식: $M$개의 Computation graph로 구성<br>3.  학습 방식: SGD training</strong></p>
+</blockquote>
+
+<ul>
+  <li>$M$개의 노드에 대해 computation graph를 생성하여 mini-batch에 넣음</li>
+  <li>Neighbor Sampling 단계에서 computation graph가 가지치기되어 계산상의 효율성을 높임 (일종의 dropout처럼 생각할 수 있음!)</li>
+  <li>하지만, GNN layer의 수가 많다면 여전히 computation graph의 크기가 커지기 때문에 가지치기할 노드 수 $H$ 또는 배치 사이즈를 줄여야 함. 이는 결국 불안정한 학습으로 이어지게 됨</li>
+  <li>Neighbor Sampling 방법은 현업에서 많이 사용됨</li>
+</ul>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
