@@ -121,17 +121,13 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
-<li class="toc-entry toc-h1"><a href="#lecture-62---basics-of-deep-learning">Lecture 6.2 - Basics of Deep Learning</a>
-<ul>
-<li class="toc-entry toc-h3"><a href="#machine-learning-as-optimization">Machine Learning as Optimization</a></li>
-<li class="toc-entry toc-h3"><a href="#gradient-descent">Gradient Descent</a></li>
-<li class="toc-entry toc-h3"><a href="#stochastic-gradient-descent-sgd">Stochastic Gradient Descent (SGD)</a></li>
-<li class="toc-entry toc-h3"><a href="#back-propagation">Back-propagation</a></li>
-<li class="toc-entry toc-h3"><a href="#non-linearity">Non-linearity</a></li>
-<li class="toc-entry toc-h3"><a href="#multi-layer-perceptron-mlp">Multi-layer Perceptron (MLP)</a></li>
-<li class="toc-entry toc-h3"><a href="#summary">Summary</a></li>
-</ul>
-</li>
+<li class="toc-entry toc-h1"><a href="#machine-learning-as-optimization">Machine Learning as Optimization</a></li>
+<li class="toc-entry toc-h1"><a href="#gradient-descent">Gradient Descent</a></li>
+<li class="toc-entry toc-h1"><a href="#stochastic-gradient-descent-sgd">Stochastic Gradient Descent (SGD)</a></li>
+<li class="toc-entry toc-h1"><a href="#back-propagation">Back-propagation</a></li>
+<li class="toc-entry toc-h1"><a href="#non-linearity">Non-linearity</a></li>
+<li class="toc-entry toc-h1"><a href="#multi-layer-perceptron-mlp">Multi-layer Perceptron (MLP)</a></li>
+<li class="toc-entry toc-h1"><a href="#summary">Summary</a></li>
 </ul><hr>
 <blockquote>
   <p><strong>Lecture 6. Graph Neural Networks (1) GNN Model</strong></p>
@@ -146,14 +142,10 @@ window.onload = wrap_img;
 
 <hr>
 
-<h1 id="lecture-62---basics-of-deep-learning">
-<a class="anchor" href="#lecture-62---basics-of-deep-learning" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 6.2 - Basics of Deep Learning</strong>
-</h1>
-
 <p>이번 파트는 본격적으로 그래프 데이터를 위한 딥러닝을 설명하기에 앞서 딥러닝에 익숙하지 않은 사람들을 위해 <strong>딥러닝의 기본 개념</strong>을 간단하게 설명하는 부분입니다. 많은 내용을 커버하긴 하지만 딥러닝 초심자들은 CS231n과 같은 딥러닝 강의를 먼저 수강하고 오심을 추천드립니다!</p>
 
-<h3 id="machine-learning-as-optimization">
-<a class="anchor" href="#machine-learning-as-optimization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Machine Learning as Optimization</h3>
+<h1 id="machine-learning-as-optimization">
+<a class="anchor" href="#machine-learning-as-optimization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Machine Learning as Optimization</h1>
 
 <p>먼저 간단한 지도 학습 문제를 생각해 봅시다. 지도 학습(Supervised Learning)이란 데이터에 대한 ground truth label이 존재하는 경우를 일컫는데, 다시 말해 input $x$가 주어졌을 때, label $y$를 예측하는 문제라고 할 수 있습니다. 이러한 task는 아래와 같은 식을 통해 최적화 문제로 바꾸어 해결할 수 있습니다.</p>
 
@@ -191,8 +183,8 @@ window.onload = wrap_img;
 
 <p>그럼 이제 위에서 공부한 각 구성 요소를 바탕으로 다시 이 최적화 식을 해석해 봅시다. 결국 우리가 풀고자 하는 머신러닝 문제는, <strong>정답 label $y$와 모델이 예측한 label $f(x)$의 차이를 나타내는 loss 함수를  최소화 하는 방향으로 모델 파라미터 $\theta$를 최적화하는 문제</strong>로 해석할 수 있습니다.</p>
 
-<h3 id="gradient-descent">
-<a class="anchor" href="#gradient-descent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradient Descent</h3>
+<h1 id="gradient-descent">
+<a class="anchor" href="#gradient-descent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradient Descent</h1>
 
 <p>지금까진 두루뭉술하게만 보였던 머신러닝 문제를 동일한 의미인 최적화 문제로 재정의했습니다. 그렇다면 이 최적화 문제를 어떻게 해결해야 할까요?</p>
 
@@ -218,8 +210,8 @@ window.onload = wrap_img;
 
 <p>위 식에서 $\eta$는 learning rate로, 한번 파라미터를 업데이트 시 얼마나 변경할 것인지 보폭을 나타내는 값입니다. 이는 학습 과정 동안 동일하게 유지할 수도 있고, 목적에 따라 계속 변하게 할 수도 있습니다. 이론적으로 모델 파라미터의 업데이트는 loss 함수의 local minimum에 도달하여 gradient가 0이 될 때까지 진행하는 것이 맞지만, 실전에서는 검증 데이터셋에서의 성능이 더 이상 증가하지 않는 기점에서 모델 파라미터 업데이트를 중단합니다.</p>
 
-<h3 id="stochastic-gradient-descent-sgd">
-<a class="anchor" href="#stochastic-gradient-descent-sgd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stochastic Gradient Descent (SGD)</h3>
+<h1 id="stochastic-gradient-descent-sgd">
+<a class="anchor" href="#stochastic-gradient-descent-sgd" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stochastic Gradient Descent (SGD)</h1>
 
 <p><strong>Gradient Descent의 문제점</strong></p>
 
@@ -238,8 +230,8 @@ window.onload = wrap_img;
 
 <p><br>오늘날의 최적화 optimizer은 SGD의 여러 발전된 형태로써, Adam, Adagrad, Adadelta, RMSprop 등이 있습니다.</p>
 
-<h3 id="back-propagation">
-<a class="anchor" href="#back-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Back-propagation</h3>
+<h1 id="back-propagation">
+<a class="anchor" href="#back-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Back-propagation</h1>
 
 <p>지금까지 머신러닝 문제를 최적화 문제로 재정의하고, 최적화 문제를 풀기 위해 gradient를 활용해 모델 파라미터를 업데이트 하는 방법에 대해서 배웠습니다. 잘 따라오고 계신가요?</p>
 
@@ -278,15 +270,15 @@ window.onload = wrap_img;
 
 <p>연쇄법칙에 따라 gradient가 $\mathcal{L}$ → $f(x)$ → $W_{2}$ → $W_{1}$ 을 따라 차례로 거꾸로 흐르면서 계산됩니다. 이렇게 말단에서부터 앞쪽까지 gradient가 흘러오기 때문에 역전파(back-propagation)이라는 이름이 붙었다고 합니다.</p>
 
-<h3 id="non-linearity">
-<a class="anchor" href="#non-linearity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Non-linearity</h3>
+<h1 id="non-linearity">
+<a class="anchor" href="#non-linearity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Non-linearity</h1>
 
 <p>지금까지 예시로써 다뤄본 두 케이스는 사실 모두 선형 모델로써, 비선형적인 데이터를 잘 모델링할 수 없습니다. 따라서 오늘날의 머신러닝 모델은 비선형적인 활성 함수(Activation function)를 도입함으로써 이러한 문제를 해결합니다. 대표적인 비선형 함수로는 <strong>ReLU, Sigmoid</strong> 등이 있습니다.</p>
 
 <p><img src="https://i.imgur.com/9F5rpJS.png?1" alt="Imgur"></p>
 
-<h3 id="multi-layer-perceptron-mlp">
-<a class="anchor" href="#multi-layer-perceptron-mlp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multi-layer Perceptron (MLP)</h3>
+<h1 id="multi-layer-perceptron-mlp">
+<a class="anchor" href="#multi-layer-perceptron-mlp" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multi-layer Perceptron (MLP)</h1>
 
 <p><img src="https://i.imgur.com/p2cEKZr.png?1" alt="Imgur"></p>
 
@@ -294,8 +286,8 @@ window.onload = wrap_img;
 
 <p><img src="https://i.imgur.com/54tlQil.png?1" alt="Imgur"></p>
 
-<h3 id="summary">
-<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h3>
+<h1 id="summary">
+<a class="anchor" href="#summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary</h1>
 
 <p>지금까지 간단하게 배운 딥러닝의 기본 개념을 정리해보고, 본격적인 오늘 강의의 주제로 넘어가겠습니다.</p>
 
