@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 13.2 - Network Communities | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 13.2 - Network Communities" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 13. Community Detection in Networks" />
+<meta property="og:description" content="CS224W Lecture 13. Community Detection in Networks" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1302.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1302.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-24T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 13.2 - Network Communities" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-24T00:00:00-05:00","datePublished":"2022-08-24T00:00:00-05:00","description":"CS224W Lecture 13. Community Detection in Networks","headline":"Lecture 13.2 - Network Communities","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1302.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1302.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 13.2 - Network Communities</h1><p class="page-description">CS224W Lecture 13. Community Detection in Networks</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-24T00:00:00-05:00" itemprop="datePublished">
+        Aug 24, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#examples-of-network-communities">Examples of Network Communities</a></li>
+<li class="toc-entry toc-h1"><a href="#modularity-based-community-detection-concept-overview">Modularity-based Community Detection: Concept Overview</a></li>
+<li class="toc-entry toc-h1"><a href="#null-model-configuration-model">Null Model: Configuration Model</a></li>
+<li class="toc-entry toc-h1"><a href="#modularity-based-community-detection">Modularity-based Community Detection</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 13. Community Detection in Networks</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<p>13.1 파트를 통해 우리는 네트워크에 서로 밀집되어 연결된 노드 커뮤니티가 존재한다는 사실을 알게 되었습니다. 그렇다면 그래프가 주어졌을 때, 이런 노드 커뮤니티를 어떻게 자동으로 찾을 수 있을까요?</p>
+
+<p><img src="https://i.imgur.com/iVYSzde.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 <strong>How do we automatically find such densely connected groups of nodes?</strong></p>
+</blockquote>
+
+<h1 id="examples-of-network-communities">
+<a class="anchor" href="#examples-of-network-communities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples of Network Communities</h1>
+
+<ol>
+  <li>
+    <p>Zachary’s Karate Club Network</p>
+
+    <p><img src="https://i.imgur.com/T7bDEip.png" alt="Imgur"></p>
+
+    <p>GNN을 다뤄보신 분이라면 익숙할 Zachary’s Karate Club 네트워크에도 국소적인 고밀집 커뮤니티가 존재합니다. Zachary가 대학 내 태권도 동아리의 부원들을 대상으로 데이터를 수집하던 당시, 부원 사이에 갈등이 생겨 자연스레 두 무리로 나뉘었다고 합니다. 친구들이 다퉈서 무리가 나뉘는 경우를 생각해보면, 자연스럽게 그 중 더 끈끈한 친구들끼리 각 무리를 형성하게 됩니다. 이러한 현상이 뚜렷하게 나타난 위 그래프에서도 커뮤니티 분리는 <strong>엣지를 최소한으로 자르는 형태</strong>로 일어납니다.</p>
+  </li>
+  <li>
+    <p>Micro-Markets in Sponsored Search</p>
+
+    <p><img src="https://i.imgur.com/85Y95QN.png" alt="Imgur"></p>
+
+    <p><strong>Query-to-Advertiser 그래프를 분할함으로써</strong> 국소 마켓(커뮤니티)들을 찾을 수 있습니다. 위 그림에 표시된 파란색 박스는 gambling에 관심이 있는 인터넷 사용자들에게 광고하길 원하는 advertiser의 커뮤니티라고 볼 수 있겠군요.</p>
+  </li>
+  <li>
+    <p>NCAA Football Network</p>
+  </li>
+</ol>
+
+<p><img src="https://i.imgur.com/RQy086I.png" alt="Imgur"> <img src="https://i.imgur.com/ePqHmUB.png" alt="Imgur"></p>
+
+<p>위의 왼쪽 그래프는 미식축구 팀들과 팀 사이 경기를 나타낸 그래프입니다. 뚜렷한 고밀집 부위를 육안으로 판단하기 힘든 왼쪽 그래프에서도 노드 커뮤니티를 찾을 수 있을까요? 네, 가능합니다 😊 <strong>NCAA(전미 대학 체육 협회)의 division에 따라</strong> 그래프를 좀 정리해본다면 동일 division에 속한 팀들끼리 크게 밀집되어 있음을 쉽게 확인할 수 있습니다!</p>
+
+<h1 id="modularity-based-community-detection-concept-overview">
+<a class="anchor" href="#modularity-based-community-detection-concept-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modularity-based Community Detection: Concept Overview</h1>
+
+<p>하지만 앞에서 살펴본 커뮤니티 split 방법들은 너무 domain-specific하고 일반화하기 어렵습니다. 따라서 우리는 그래프가 주어졌을 때 자동으로 커뮤니티를 탐지하고 분리하는 방법을 알아보겠습니다.</p>
+
+<p>들어가기에 앞서 <strong>Modularity</strong>라는 새로운 metric을 정의하고 가겠습니다.</p>
+
+<blockquote>
+  <p><strong>Modularity Q</strong>
+<strong>네트워크가 커뮤니티로 얼마나 잘 분리되었는지 판단하는 측정치</strong>
+<em>(cf. 커뮤니티: 밀도 높게 연결된 노드의 집합을 의미함)</em></p>
+
+</blockquote>
+
+<p>우리가 주어진 네트워크를 서로 나뉜 subgraph $s$의 집합 $S$로 분리했다고 가정해봅시다($s \in S$). 그렇다면 우리는 modularity를 구함으로써 우리가 주어진 그래프를 얼마나 잘 분리했는지 정량적으로 측정할 수 있습니다. Modularity Q를 구하는 식은 아래와 같습니다.</p>
+
+<p><img src="https://i.imgur.com/NOdutpH.png" alt="Imgur"></p>
+
+<p>식을 그대로 해석해보자면 modularity는 각각의 subgraph $s$에 대해 subgraph 내부에 실제로 존재하는 엣지 수와 null model을 통해 예측된 엣지 수의 차이를 구한 후, $S$ 내의 모든 subgraph에 대해 이 값을 총합함으로써 구할 수 있습니다. 만약 우리가 네트워크를 기가 막히게 커뮤니티 별로 분리해냈다면, 분리된 subgraph $s$는 tightly-connected, 즉 내부 엣지의 수가 많을 것이기 때문에 modularity가 커질 것입니다. 따라서 커뮤니티를 잘 찾아낸다는 것은 곧 modularity가 크다는 의미이고, 그렇기 때문에 우리는 <strong>modularity를 최대화하는 방향으로 커뮤니티 분리를 진행할 것</strong>입니다.</p>
+
+<h1 id="null-model-configuration-model">
+<a class="anchor" href="#null-model-configuration-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Null Model: Configuration Model</h1>
+
+<p>여기서 잠깐! Modularity를 정의할 때 subgraph $s$내에 몇 개의 엣지가 존재할 지 예측하는 부분에서 null model을 활용해야 한다고 했는데요. 여기서 나온 null model은 사실 지난 12강 subgraph mining 강의에서 다뤘던 내용이지만 이해를 위해 여기서도 간략히 설명하고 넘어가도록 하겠습니다.</p>
+
+<p>Null model은 $n$개의 노드를 가지고, $m$개의 엣지로 이루어진 그래프 $G$를 노드 단위로 다 자르고 엣지 연결을 재배치한 그래프 $G’$를 만듭니다. 이 때 각 노드의 차수를 유지하기 위해 노드의 연결부들은 보존한채로 그래프 $G$를 아래 그림처럼 노드 단위로 분해합니다. 엣지 재배치는 단순하게 하나의 연결부를 여러 가능한 연결부 중 랜덤하게 접합함으로써 이루어집니다. 이 때 계산상의 편의성을 위해 $G’$는 두 노드 사이에 여러 엣지가 존재할 수 있는 multigraph로 간주합니다.</p>
+
+<p><img src="https://i.imgur.com/nREqpvx.png" alt="Imgur"></p>
+
+<p>이제 엣지 재배치를 좀 더 심도있게 살펴보겠습니다. 위 그림에서 노드 $i$와 노드$j$사이에 몇 개의 엣지가 생성될지는 $k_i \cdot \frac{k_j}{2m} = \frac{k_ik_j}{2m}$을 통해 구할 수 있습니다. 노드 $i$에서 뻗어 나가는 연결부 $k_i$에 대해서 각 연결부가 노드 $j$로 접합될 확률은 전체 연결부 $2m$개 중에 $k_j$개의 연결부로 도달할 때 뿐이기 때문에 $\frac{k_j}{2m}$으로 나타낼 수 있습니다.</p>
+
+<blockquote>
+  <p>💡 <strong>The expected number of edges between nodes $i$ and $j$ of degrees $k_i$ and $k_j$ equals</strong> $\frac{k_ik_j}{2m}$</p>
+</blockquote>
+
+<p>그렇다면 재배치 된 그래프 $G’$ 전체에 대해서 예상되는 엣지의 수는,</p>
+
+<p><img src="https://i.imgur.com/bgtMlxS.png" alt="Imgur"></p>
+
+<p>다음과 같이 구할 수 있습니다. 여기서 주목할 점은 null model을 사용하여 엣지를 싹 재배치 한다고 하더라도, 전체 노드 차수 분포나 총 엣지 수는 보존 된다는 것입니다.</p>
+
+<h1 id="modularity-based-community-detection">
+<a class="anchor" href="#modularity-based-community-detection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modularity-based Community Detection</h1>
+
+<p>이제 다시 modularity 설명으로 돌아와서, null model의 수식적 표현을 활용하여 modularity를 다시 표현해보면 아래와 같습니다.</p>
+
+<p><img src="https://i.imgur.com/zFB27om.png" alt="Imgur"></p>
+
+<p>즉, 모든 분리된 subgraph $s$에 대해서 $s$내의 모든 가능한 노드 쌍에 대해 실제 두 노드의 연결 여부($A_{ij}$)와 null model로써 예측된 두 노드 사이의 엣지 갯수($\frac{k_ik_j}{2m}$)의 차이를 총합함으로써 modularity $Q$를 구할 수 있습니다. 여기서 계수 $\frac{1}{2m}$은 단순히 $Q$값을 -1과 1 사이로 만들기 위해 붙었다고 보시면 됩니다.</p>
+
+<p><strong>만약 우리가 밀도 높은 커뮤니티들을 잘 분리해냈다면 modularity $Q$가 양수의 값을 가지게 될 것이고, 이 값이 1에 가까워질 수록 더욱 더 잘 분리했다고 생각할 수 있습니다.</strong> 일반적으로 $Q$가 0.3-0.7 사이의 값을 가질 때 커뮤니티 구조를 잘 파악했다고 본다고 합니다. <strong>따라서 앞으로 다룰 community detection은 모두 이 modularity 값을 최대화 하는 objective을 가지고 이야기가 진행될 것입니다.</strong></p>
+
+<blockquote>
+  <p>💡 <strong>Community Detection ↔ Maximizing Modularity</strong></p>
+</blockquote>
+
+<p>앗! 참고로 지금까지는 unweighted 그래프 기준으로 설명드렸지만, 단순하게 이진 인접행렬을 weighted 인접행렬, 그리고 노드 차수를 weighted 차수(edge weights의 합)로 바꿈으로써 weighted 그래프에도 확장 적용할 수 있습니다 🤭 (unweighted 그래프 = edge weight가 모두 1인 weighted 그래프로 생각할 수 있으므로…)</p>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1302.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
