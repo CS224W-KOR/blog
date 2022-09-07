@@ -177,15 +177,13 @@ window.onload = wrap_img;
   <li>$O(|V|)$ <strong>파라미터가 필요함</strong>
 <br>그래프의 크기가 커지면 커질수록, 즉 노드의 갯수 $|V|$가 증가함에 따라, 임베딩 행렬의 크기도 선형적으로 증가합니다. 또한 각 노드가 모두 서로 다른 d 차원의 임베딩 벡터를 가지기 때문에 파라미터 공유도 일어나지 않습니다.</li>
   <li>
-    <p><strong>Transductivity</strong></p>
-
-    <aside>
-  💡 Transductive Learning
-  <br>그래프 학습 관점에서 Transductive Learning이란 하나의 그래프 상 일부 노드와 엣지의 ground truth를 아는 상태에서 나머지 노드와 엣지의 값을 추정하는 방식입니다. 학습 과정 중, 모델은 ground truth를 알지 못하는 노드를 포함한 모든 노드와 엣지를 사용합니다.
-    
-  ![Imgur](https://i.imgur.com/Jpte1Hu.png?1)
-    
-  </aside>
+<strong>Transductivity</strong>
+    <ul>
+      <li>Transductive Learning
+그래프 학습 관점에서 Transductive Learning이란 하나의 그래프 상 일부 노드와 엣지의 ground truth를 아는 상태에서 나머지 노드와 엣지의 값을 추정하는 방식입니다. 학습 과정 중, 모델은 ground truth를 알지 못하는 노드를 포함한 모든 노드와 엣지를 사용합니다.
+<img src="https://i.imgur.com/Jpte1Hu.png?1" alt="Imgur">
+</li>
+    </ul>
 
     <aside>
   💡 Inductive Learning
