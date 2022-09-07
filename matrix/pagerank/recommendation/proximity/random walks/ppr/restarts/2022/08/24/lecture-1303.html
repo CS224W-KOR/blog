@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 13.3 - Louvain Algorithm | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 13.3 - Louvain Algorithm" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 13. Community Detection in Networks" />
+<meta property="og:description" content="CS224W Lecture 13. Community Detection in Networks" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1303.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1303.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-24T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 13.3 - Louvain Algorithm" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-24T00:00:00-05:00","datePublished":"2022-08-24T00:00:00-05:00","description":"CS224W Lecture 13. Community Detection in Networks","headline":"Lecture 13.3 - Louvain Algorithm","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1303.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1303.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 13.3 - Louvain Algorithm</h1><p class="page-description">CS224W Lecture 13. Community Detection in Networks</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-24T00:00:00-05:00" itemprop="datePublished">
+        Aug 24, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#louvain-algorithm-at-high-level">Louvain Algorithm: At High Level</a></li>
+<li class="toc-entry toc-h1"><a href="#louvain-1st-phase-partitioning">Louvain: 1st phase (Partitioning)</a></li>
+<li class="toc-entry toc-h1"><a href="#louvain-modularity-gain">Louvain: Modularity Gain</a></li>
+<li class="toc-entry toc-h1"><a href="#deriving-triangle-qirightarrow-c">Deriving $\triangle Q(i\rightarrow C)$</a></li>
+<li class="toc-entry toc-h1"><a href="#louvain-2nd-phase-restructuring">Louvain: 2nd phase (Restructuring)</a></li>
+<li class="toc-entry toc-h1"><a href="#louvain-algorithm-정리">Louvain Algorithm 정리</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 13. Community Detection in Networks</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<p>지금까지 community detection의 objective이 modularity의 최대화라는 것을 배웠습니다. 하지만 아직 <strong>HOW</strong>라는 중요한 문제가 빠져있죠. 13.3 파트에서는 바로 이 HOW, 즉 <strong>어떻게 modularity를 최대화 할 것인지</strong>에 대해 알아보도록 하겠습니다.</p>
+
+<h1 id="louvain-algorithm-at-high-level">
+<a class="anchor" href="#louvain-algorithm-at-high-level" aria-hidden="true"><span class="octicon octicon-link"></span></a>Louvain Algorithm: At High Level</h1>
+
+<p><strong>Louvain 알고리즘은 community detection을 위한 탐욕적 알고리즘</strong>으로 잘 알려져 있습니다. 간단하게 Louvain 알고리즘의 특징을 짚고 넘어가도록 하겠습니다.</p>
+
+<ul>
+  <li>
+<strong>낮은 시간 복잡도 &amp; 빠른 수렴</strong>: 시간 복잡도가 $O(nlogn)$로써 굉장히 빠르기 때문에 큰 그래프에도 쉽게 적용할 수 있습니다.</li>
+  <li>
+<strong>높은 modularity를 갖는 output</strong>: Community detection을 ‘잘’합니다!</li>
+  <li>
+    <p><strong>계층적 커뮤니티 구조를 파악할 수 있습니다.</strong></p>
+
+    <p><img src="https://i.imgur.com/G4yDBIu.png" alt="Imgur"></p>
+  </li>
+</ul>
+
+<p>Louvain 알고리즘은 반복적인 pass를 통해 탐욕적으로 modularity를 최대화합니다. 각 pass는 2 phase로 구성되어 있는데, 각 phase는 다음과 같이 작동합니다.</p>
+
+<ol>
+  <li>
+<strong>Phase 1 - Partitioning</strong>
+노드-커뮤니티 <strong>소속을 국소적으로 바꾸어 modularity 값의 변화를 살핌</strong>으로써 최종적으로 modularity가 극대화되는 방향으로 <strong>노드-커뮤니티 소속을 적합</strong>시킴</li>
+  <li>
+<strong>Phase 2 - Restructuring</strong>
+현재 적합된 노드-커뮤니티 소속을 기반으로 동일 커뮤니티 속 노드를 <strong>super-node로 aggregate</strong>하여 <strong>새로운 상위 단계의 네트워크를 생성함 → 이를 통해 계층적 커뮤니티 구조 파악 가능</strong>
+</li>
+  <li>다시 Phase 1으로 돌아감</li>
+</ol>
+
+<ul>
+  <li>Pass는 더 이상 modularity를 증가시킬 수 없을 때까지 반복적으로 일어남</li>
+</ul>
+
+<p><img src="https://i.imgur.com/Y8Fw4c6.png" alt="Imgur"></p>
+
+<p>원래 그래프가 unweighted 그래프였을지라도 phase 2에서 weighted 그래프가 생성되기 때문에 기본적으로 Louvain 알고리즘은 인풋 그래프를 weighted 그래프로 간주하고 진행됩니다. 하지만 앞에서 언급했듯이 unweighted 그래프는 그저 특별한 weighted 그래프의 인스턴스로 볼 수 있기 때문에 큰 문제가 되지 않습니다!</p>
+
+<h1 id="louvain-1st-phase-partitioning">
+<a class="anchor" href="#louvain-1st-phase-partitioning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Louvain: 1st phase (Partitioning)</h1>
+
+<p>이제 Louvain의 각 phase를 좀 더 심도 있게 다뤄볼까요? 첫번째 phase에서는 <strong>주어진 그래프에 대해 modularity의 local maxima를 찍도록 커뮤니티를 분리</strong>하기 때문에 <strong>Partitioning</strong> 단계라고 불립니다. Partitioning은 다음과 같은 방식으로 일어납니다.</p>
+
+<ol>
+  <li>먼저 그래프 상 모든 노드를 각기 다른 커뮤니티에 소속시킴 (한 커뮤니티 당 하나의 노드가 소속된 형태)</li>
+  <li>각 노드 $i$에 대해서,
+    <ol>
+      <li>노드 $i$를 이웃 노드 $j$의 커뮤니티로 소속 이동시켰을 때 modularity gain($\triangle Q$)를 구함 (이 또한 노드 $i$의 모든 이웃들에 대해서 다 구함)</li>
+      <li>노드 $i$의 이웃 노드 중, 노드 $i$의 소속 변경 시 가장 큰 modularity gain이 생기는 노드 $j$의 커뮤니티로 $i$를 이동시킴</li>
+    </ol>
+  </li>
+</ol>
+
+<ul>
+  <li>사실 어떤 노드를 먼저 보냐에 따라서 알고리즘의 결과가 바뀔 수 있긴 하지만, 여러 문헌에 따르면 그 차이가 굉장히 미미하기 때문에 노드 순서는 크게 중요치 않다고 합니다.</li>
+</ul>
+
+<h1 id="louvain-modularity-gain">
+<a class="anchor" href="#louvain-modularity-gain" aria-hidden="true"><span class="octicon octicon-link"></span></a>Louvain: Modularity Gain</h1>
+
+<p>그렇다면 본래 커뮤니티 $D$에 소속되어 있던 노드 $i$를 커뮤니티 $C$로 옮길 때 발생하는 modularity gain은 어떻게 계산할 수 있을까요? <strong>전 과정에 대한 modularity gain은 먼저 노드 $i$를 커뮤니티 $D$로부터 제거하고, 그 후 노드 $i$를 커뮤니티 $C$에 소속 시키는 두 단계의 modularity gain 합으로 구할 수 있습니다</strong>. 이를 각각 식과 그림으로 표현하면 아래와 같습니다.</p>
+
+<p><img src="https://i.imgur.com/QZeAPmo.png" alt="Imgur"></p>
+
+<p>사실상 $\triangle Q(D\rightarrow i)$는 단순히 $\triangle Q(i\rightarrow C)$의 역과정으로써 비슷한 방법으로 구할 수 있기 때문에 여기서는 $\triangle Q(i\rightarrow C)$만 수식적으로 도출해보도록 하겠습니다.</p>
+
+<h1 id="deriving-triangle-qirightarrow-c">
+<a class="anchor" href="#deriving-triangle-qirightarrow-c" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deriving $\triangle Q(i\rightarrow C)$</h1>
+
+<p>도출에 앞서서 먼저 커뮤니티 $C$의 modularity를 구하기 위해 $\sum_{in}$과 $\sum_{tot}$를 정의하겠습니다.</p>
+
+<p><img src="https://i.imgur.com/RgtD9WV.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 네트워크 $G$의 분리된 subgraph 집합 $S$가 있다고 할 때, modularity는 다음 수식으로 구할 수 있었습니다! 기억하시나요?<br> <img src="https://i.imgur.com/rqBcg0L.png" alt="Imgur"></p>
+</blockquote>
+
+<p>앞서 정의한 $\sum_{in}$과 $\sum_{tot}$를 바탕으로 커뮤니티 $C$의 modularity $Q(C)$를 구하면 아래와 같습니다.</p>
+
+<p><img src="https://i.imgur.com/EdtILyA.png" alt="Imgur"></p>
+
+<p>이제 더 나아가 노드 $i$를 커뮤니티 $C$에 새로 소속 시키는 상황까지 고려하기 위해 $k_{i,in}$과 $k_i$를 추가로 정의하겠습니다.</p>
+
+<p><img src="https://i.imgur.com/NuGSKYv.png" alt="Imgur"></p>
+
+<p>최종적으로 $\triangle Q(i\rightarrow C)$를 구하기 위해서는 노드 $i$가 커뮤니티 $C$에 소속되지 않았을 때의 modularity $Q_{before}$과 소속된 후의 modularity $Q_{after}$을 각각 따로 구하여 그 차이를 계산해야 합니다. 따라서 먼저 $Q_{before}$을 구해보도록 하겠습니다. 이 때 노드 $i$는 혼자 따로 떨어진 타 커뮤니티에 소속되어 있기 때문에 $Q_{before}$은 $Q(C)$와 $Q({i})$의 합으로 구할 수 있습니다. 이 때 노드 $i$만으로 구성된 커뮤니티 ${i}$는 내부의 엣지가 존재하지 않기 때문에 $Q$의 앞 term이 0이 됨에 주의하세요!</p>
+
+<p><img src="https://i.imgur.com/K5i50vh.png" alt="Imgur"></p>
+
+<p>다음으로 $Q_{after}$을 구해보도록 하겠습니다. 확장된 커뮤니티 $C+{i}$에 대한 modularity는 아래 수식을 통해 구할 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/WCW4tfq.png" alt="Imgur"></p>
+
+<p>최종적으로 $\triangle Q(i\rightarrow C)$는 $Q_{after}$과 $Q_{before}$의 차이로 구할 수 있습니다. 최종 수식은 다음과 같습니다.</p>
+
+<p><img src="https://i.imgur.com/NG0HVP0.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 <strong>Louvain 1st Phase Summary</strong><br>1. 현재 커뮤니티 $C$에 속해있는 모든 노드 $i$에 대해 이웃 노드의 커뮤니티로 소속을 변경함에 따르는 modularity gain을 구한다.<br>2. 소속 변경에 따르는 modularity gain이 가장 큰 community $C’$를 구한다.<br>$C’ = argmax_C, \triangle Q(C\rightarrow i \rightarrow C’)$<br>3. 만약 $\triangle Q(C\rightarrow i \rightarrow C’)$이 0보다 크다면, 노드 $i$의 소속을 $C$에서 $C’$으로 옮긴다.<br>$C \leftarrow C - {i}$<br>$C’ \leftarrow C’ + {i}$<br><br>*  모든 노드가 최적의 커뮤니티에 속해 있을 때까지 위 과정을 반복한다.</p>
+</blockquote>
+
+<h1 id="louvain-2nd-phase-restructuring">
+<a class="anchor" href="#louvain-2nd-phase-restructuring" aria-hidden="true"><span class="octicon octicon-link"></span></a>Louvain: 2nd phase (Restructuring)</h1>
+
+<p><img src="https://i.imgur.com/o1OfM5e.png" alt="Imgur"></p>
+
+<p>Phase 1이 끝난 후, 네트워크의 각 노드들은 특정 커뮤니티에 소속되게 됩니다. 이 후, phase 2에서는 <strong>동일 커뮤니티에 속한 노드끼리 aggregate 되어 super-node를 형성함으로써 더 축약된 형태의 상위 단계 네트워크가 생성</strong>됩니다. 각 커뮤니티에 속한 노드 간에 적어도 하나 이상의 엣지가 존재하는 경우 대응되는 super-node 사이에도 엣지가 형성되며, 축약된 엣지의 weight는 원본 그래프의 edge weight를 합산함으로써 구할 수 있다. Phase 2가 종료된 후, 비로소 1번의 pass가 종결되며 이어 다시 phase 1이 축약된 네트워크에 수행된다.</p>
+
+<blockquote>
+  <p>💡 Q) 축약된 오른쪽 그래프에서 <strong>self-edge</strong>는 무엇인가요?<br><br>
+A) 축약되기 이전 원본 그래프에서 <strong>각 커뮤니티에 속하는 노드 간 edge weight를 합산하여 전달하기 위해</strong> 축약 그래프에서 self-edge를 만들게 됩니다!</p>
+</blockquote>
+
+<h1 id="louvain-algorithm-정리">
+<a class="anchor" href="#louvain-algorithm-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>Louvain Algorithm 정리</h1>
+
+<p>다시 정리하는 느낌으로 지금까지 배운 Louvain 알고리즘을 하나의 도식으로 나타내면 아래 그림과 같습니다.</p>
+
+<p><img src="https://i.imgur.com/NIXq7wz.png" alt="Imgur"></p>
+
+<p>Louvain 알고리즘은 탐욕적 탐색 방법으로써 시간 복잡도가 낮아 큰 그래프에도 쉽게 적용할 수 있으며, modularity를 효과적으로 최대화하기 때문에 community detection에서 우수한 성능을 보입니다. 실제 task에 적용해보면 Louvain 알고리즘의 우수성을 더욱 명확하게 알 수 있는데요, 프랑스어와 네덜란드어를 주로 사용하는 벨기에 인구에 대해 제공된 통화 네트워크를 Louvain 알고리즘으로 분석하면 사용 언어에 따라 정확하게 커뮤니티가 분리되는 것을 볼 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/ILVumYE.png" alt="Imgur"></p>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1303.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
