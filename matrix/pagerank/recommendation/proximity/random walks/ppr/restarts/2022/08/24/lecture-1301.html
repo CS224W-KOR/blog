@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 13.1 - Community Detection in Networks | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 13.1 - Community Detection in Networks" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 13. Community Detection in Networks" />
+<meta property="og:description" content="CS224W Lecture 13. Community Detection in Networks" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-24T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 13.1 - Community Detection in Networks" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-24T00:00:00-05:00","datePublished":"2022-08-24T00:00:00-05:00","description":"CS224W Lecture 13. Community Detection in Networks","headline":"Lecture 13.1 - Community Detection in Networks","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 13.1 - Community Detection in Networks</h1><p class="page-description">CS224W Lecture 13. Community Detection in Networks</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-24T00:00:00-05:00" itemprop="datePublished">
+        Aug 24, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#networks--communities">Networks &amp; Communities</a></li>
+<li class="toc-entry toc-h1"><a href="#flow-of-job-information">Flow of Job Information</a></li>
+<li class="toc-entry toc-h1"><a href="#granovetters-explanation">Granovetter’s Explanation</a></li>
+<li class="toc-entry toc-h1"><a href="#triadic-closure">Triadic Closure</a></li>
+<li class="toc-entry toc-h1"><a href="#edge-strength-in-real-data-1---실험-세팅">Edge Strength in Real Data (1) - 실험 세팅</a></li>
+<li class="toc-entry toc-h1"><a href="#edge-strength-in-real-data-2---실험-결과">Edge Strength in Real Data (2) - 실험 결과</a></li>
+<li class="toc-entry toc-h1"><a href="#conceptual-picture-of-networks">Conceptual Picture of Networks</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 13. Community Detection in Networks</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="networks--communities">
+<a class="anchor" href="#networks--communities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Networks &amp; Communities</h1>
+
+<p>우리는 직관적으로 네트워크를 아래 그림과 같은 형태로 생각하곤 합니다. 가장 단적인 예로, 자신의 인간관계 그래프를 떠올려 보십시오. 나의 가족과 친구로 구성된 최측근 집단이 있는 반면, 직장 혹은 학교에서 이름과 얼굴 정도만 아는 좀 더 먼 관계들도 있을 수 있습니다.</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled.png" alt="Untitled"></p>
+
+<h1 id="flow-of-job-information">
+<a class="anchor" href="#flow-of-job-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flow of Job Information</h1>
+
+<p>1960년도에 Granovetter은 이런 소셜 네트워크 상 사람들이 어떤 경로로 직업을 소개 및 추천 받는지에 대한 분석을 수행하였습니다. 분석 결과, 사람들은 주로 주변 사람들로부터 직업을 소개 받지만, 놀랍게도 <strong>가까운 지인(close-friend)보다 가벼운 친분이 있는 사람들(acquaintance)로 부터 소개 받는 경우가 더 많았습니다</strong>. 왜 이런 결과가 도출되었을까요?</p>
+
+<p><img src="https://imgur.com/ou14xQL" alt="Imgur"></p>
+
+<h1 id="granovetters-explanation">
+<a class="anchor" href="#granovetters-explanation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Granovetter’s Explanation</h1>
+
+<p>위 의문점에 대한 해답으로 Granovetter은 그래프 상 엣지, 즉 사람들 사이에 형성된 관계들을 <strong>구조적인 관점</strong>과 <strong>사회적인 관점</strong>으로 동시에 봐야 한다고 이야기 했습니다. 더 나아가 Granovetter은 엣지의 구조적인 역할과 사회적인 역할을 결부하려고 하였는데요, 그 요점은 아래와 같습니다.</p>
+
+<ul>
+  <li>구조적으로 밀도 높게 모여있는 노드들 간의 엣지 ↔사회적으로 더 가까운 관계를 나타냄
+<strong>(Tightly-connected edges ↔ Socially strong)</strong>
+</li>
+  <li>구조적으로 멀리 떨어진 노드들 사이를 잇는 엣지 ↔ 사회적으로 더 먼 관계를 나타냄
+<strong>(Long-range edges ↔ Socially weak)</strong>
+</li>
+</ul>
+
+<p>이를 정보 흐름의 관점에서 재해석하면 왜 사람들이 사회적으로 친분이 덜한 사람들에게서 직업 소개를 더 많이 받는지 알 수 있습니다 🙂</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%202.png" alt="Untitled"></p>
+
+<ul>
+  <li>위 그래프 상 Weak/ W로 표시된 <strong>long-range 엣지를 통해 네트워크의 다른 부분들에서 유의미한 정보가 흘러 들어올 수 있습니다</strong>.</li>
+  <li>위 그래프 상 Strong/ S로 표시된 <strong>tightly-connected 엣지를 통해 흘러 들어오는 정보들은 보다 불필요하거나 중복된 정보일 확률이 높습니다</strong>.</li>
+</ul>
+
+<p>여러분들도 정기적으로 만나는 가장 친한 친구들과 대화하다 보면 항상 대화가 거기서 거기라고 느껴본 적 있으신가요? 아무래도 가장 자주 소통하는 친구들이다 보니까 자연스레 서로 알고 있는 정보가 비슷해지는 반면, 오랜만에 만나는 사람들과 얘기해보면 생각치 못했던 새로운 정보나 사실을 알게 되곤 하죠. 이런 실생활의 예시로도 위와 같은 현상이 설명되는 것 같네요!</p>
+
+<h1 id="triadic-closure">
+<a class="anchor" href="#triadic-closure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Triadic Closure</h1>
+
+<p>그렇다면 네트워크에 존재하는 밀도 높은 군집들은 어떻게 해서 생겨나는 것일까요?</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%203.png" alt="Untitled"></p>
+
+<p>그 이유를 알아보기에 앞서서 위와 같은 그래프에서 노드 a와 b가 엣지로 연결될 확률이 더 높을까요 혹은 노드 a와 c가 연결될 확률이 더 높을까요? 아마 공통된 이웃 노드를 갖고 있는 a와 b가 연결될 확률이 더 높을 것입니다. 이렇게 서로 완전 연결된 삼각형 구조를 <strong>triadic(3인조의) closure</strong>이라고 합니다. 네트워크 상 triadic closure이 많다는 것은 곧 우리가 2강에서 다뤘던 clustering coefficient가 높다는 것과 동일한 의미를 가집니다.</p>
+
+<blockquote>
+  <p>💡 <strong>Clustering Coefficient</strong> (2강 참조)<br>
+<img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%204.png" alt="Untitled"></p>
+</blockquote>
+
+<p>네트워크에서 triadic closure이 생겨서 결국 밀도 높은 군집들이 형성되는 이유는 다음과 같습니다.</p>
+
+<p>만약 B와 C라는 사람이 A라는 공통인 친구가 있다고 가정한다면,</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%205.png" alt="Untitled"></p>
+
+<ol>
+  <li>B와 C는 둘 다 A와 시간을 보낼 것이기 때문에 서로 만날 확률이 높습니다.</li>
+  <li>B와 C는 공통 지인이 있기 때문에 서로를 신뢰할 수 있을 것입니다.</li>
+  <li>A는 B와 C를 따로 만나 시간을 보내기 보다, B와 C를 서로 소개 시켜준 후 다같이 함께 만난다면 시간적, 금전적으로 이득이 생깁니다. 따라서 A는 B와 C를 서로 소개 시켜주려는 경향이 있을 것입니다.</li>
+</ol>
+
+<p>실제로 연구 결과에 따르면 소셜 네트워크 상 triadic closure을 많이 갖고 있지 않은 십대 소녀들은 사회적인 군집을 이루고 있는 학생들에 비해 자살을 생각하는 경우가 더 많다고 합니다. 이렇게 triadic closure을 만들어 사회적으로 어떤 군집 혹은 커뮤니티에 소속되고자 하는 것은 인간의 본성인가 봅니다 😂</p>
+
+<h1 id="edge-strength-in-real-data-1---실험-세팅">
+<a class="anchor" href="#edge-strength-in-real-data-1---%EC%8B%A4%ED%97%98-%EC%84%B8%ED%8C%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>Edge Strength in Real Data (1) - 실험 세팅</h1>
+
+<p>수년동안 큰 소셜 네트워크의 부재로 인해 Granovetter의 이론은 검증되지 못했습니다. 하지만 오늘날에는 이메일, 메신저, 휴대폰, SNS를 통해 사람들 사이에 폭넓은 소통이 가능해지게 됨으로써 비로소 Granovetter의 이론을 테스트해볼 수 있게 되었죠.</p>
+
+<p>우리는 EU 국가 인구 일부의 통화 네트워크를 활용하여 Granovetter 이론의 타당성을 검증해보도록 하겠습니다<em>(Onnela et al. 2007)</em>.  <strong>Granovetter의 주장에 따르면 네트워크 상에서 밀도 높게 모여 있는 노드들이 곧 사회적으로 더 가까운 관계를 나타내기 때문에, 과연 정말로 밀집된 노드 간 실제 통화량(edge weight/ edge strength)이 더 높은지 직접 확인해볼까요?</strong></p>
+
+<ul>
+  <li>
+    <p><strong>구조적인 노드 밀집도 (Tightly-connected edges)</strong>
+이어진 두 노드가 구조적으로 얼마나 밀도 높게 모여 있는지 확인하기 위해 <strong>Edge overlap</strong>이라는 개념을 새로 도입하겠습니다. Edge overlap은 아래의 식으로 구할 수 있으며, 0과 1 사이의 값으로 도출됩니다. Edge overlap이 1에 가까워질수록 두 노드는 한 커뮤니티에 속하는 노드일 가능성이 높으며, 0에 가까워질수록 두 노드를 잇는 엣지는 커뮤니티와 커뮤니티를 잇는 local bridge에 가까워집니다.</p>
+
+    <p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%206.png" alt="Untitled"></p>
+  </li>
+  <li>
+    <p><strong>사회적인 밀접도 (Socially strong)</strong>
+사회적인 밀접도는 통화량을 나타내는 <strong>edge weight(edge strength)</strong>로 판단할 것입니다.</p>
+  </li>
+</ul>
+
+<blockquote>
+  <p>💡 Q ) <strong>Edge Overlap  $\propto$  Edge Strength(# phone calls)</strong></p>
+</blockquote>
+
+<h1 id="edge-strength-in-real-data-2---실험-결과">
+<a class="anchor" href="#edge-strength-in-real-data-2---%EC%8B%A4%ED%97%98-%EA%B2%B0%EA%B3%BC" aria-hidden="true"><span class="octicon octicon-link"></span></a>Edge Strength in Real Data (2) - 실험 결과</h1>
+
+<ol>
+  <li>
+    <p><strong>Edge Overlap vs. Strength</strong>
+각 엣지에 대한 edge overlap 값과 edge strength를 나타낸 그래프는 아래와 같습니다. 파란색으로 표현된 우리 데이터에 대해서 예상 그대로 <strong>edge overlap과 edge strength가 정비례하는 관계</strong>를 보입니다. 빨간색으로 표현된 선은 실험의 베이스라인으로써, 우리 데이터의 네트워크 구조는 그대로 유지하되 edge strength 값만 랜덤하게 재배치한 그래프에 대한 결과입니다.</p>
+
+    <p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%207.png" alt="Untitled"></p>
+  </li>
+</ol>
+
+<p>데이터를 직접 시각화 해보면 이러한 경향이 더 확연하게 보입니다. 아래의 왼쪽 그래프가 우리의 실제 통화량 그래프이며, 여기서 엣지의 색깔이 edge weight를 나타냅니다. 보다시피 밀집되어있는 노드들 사이가 붉은색 엣지로 연결되어 상호 통화량이 많다는 사실을 확인할 수 있습니다. 반면, 오른쪽에 제시된 랜덤 edge weight의 베이스라인 네트워크에선 구조적인 밀집도와 관계 없이 붉은색 엣지가 산재되어 있는 것을 볼 수 있습니다.</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%208.png" alt="Untitled"></p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%209.png" alt="Untitled"></p>
+
+<ol>
+  <li>
+<strong>Edge Removal</strong>
+더 나아가 그래프의 엣지를 삭제해가면서 나뉘는 그래프의 sub-components 중 가장 큰 subgraph의 크기를 확인해보도록 하겠습니다. 여기서 각각 edge strength와 edge overlap을 기준으로 하여 그래프의 엣지를 삭제할텐데, 만약 <strong>Granovetter의 주장대로 edge strength와 edge overlap이 비례하는 관계라면, 두 경우 모두 엣지 삭제 결과의 경향성이 비슷해야 할 것입니다</strong>.</li>
+</ol>
+
+<p>아래 결과 그래프에서 볼 수 있다시피, <strong>두 경우에서 모두 edge strength와 edge overlap의 값이 작은 엣지부터 삭제했을 때 가장 큰 subgraph의 크기가 더 작아진다</strong>는 것을 확인할 수 있습니다. 이는 edge strength와 edge overlap값이 작은 엣지는 커뮤니티 간 local bridge일 확률이 높기 때문에 비교적 더 빠르게 전체 네트워크를 subgraph로 나눌 수 있기 때문입니다.</p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2010.png" alt="Untitled"></p>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2011.png" alt="Untitled"></p>
+
+<h1 id="conceptual-picture-of-networks">
+<a class="anchor" href="#conceptual-picture-of-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conceptual Picture of Networks</h1>
+
+<p><img src="Lecture%2013%201%2084b9af6dcf304f40ac11839446e49b4b/Untitled%2012.png" alt="Untitled"></p>
+
+<p>지금까지 Granovetter의 이론의 검증을 마쳤습니다. 그의 이론에 따르면 결론적으로 그래프는 <strong>1) 국소적으로 밀집되어 strong 엣지로 연결된 노드 커뮤니티</strong>와, <strong>2) 서로 다른 커뮤니티를 잇는 weak 엣지</strong>들로 구성됩니다.</p>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
