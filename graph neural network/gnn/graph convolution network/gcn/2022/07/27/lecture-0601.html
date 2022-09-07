@@ -121,10 +121,9 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
-<li class="toc-entry toc-h1"><a href="#lecture-61---introduction-to-graph-neural-networks">Lecture 6.1 - Introduction to Graph Neural Networks</a>
+<li class="toc-entry toc-h1"><a href="#recap-shallow-encoders">Recap: Shallow Encoders</a></li>
+<li class="toc-entry toc-h1"><a href="#limitations-of-shallow-encoder">Limitations of Shallow Encoder</a>
 <ul>
-<li class="toc-entry toc-h3"><a href="#recap-shallow-encoders">Recap: Shallow Encoders</a></li>
-<li class="toc-entry toc-h3"><a href="#limitations-of-shallow-encoder">Limitations of Shallow Encoder</a></li>
 <li class="toc-entry toc-h3"><a href="#deep-graph-encoders">Deep Graph Encoders</a></li>
 <li class="toc-entry toc-h3"><a href="#why-is-it-hard">Why is it Hard?</a></li>
 </ul>
@@ -143,12 +142,8 @@ window.onload = wrap_img;
 
 <hr>
 
-<h1 id="lecture-61---introduction-to-graph-neural-networks">
-<a class="anchor" href="#lecture-61---introduction-to-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Lecture 6.1 - Introduction to Graph Neural Networks</strong>
-</h1>
-
-<h3 id="recap-shallow-encoders">
-<a class="anchor" href="#recap-shallow-encoders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recap: Shallow Encoders</h3>
+<h1 id="recap-shallow-encoders">
+<a class="anchor" href="#recap-shallow-encoders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recap: Shallow Encoders</h1>
 
 <p>이전 강의에서 배운 내용을 다시 떠올려 봅시다. 다양한 downstream task를 머신러닝으로 푸는 과정에서 비정형 데이터인 그래프 인풋을 활용하기 위해 그래프를 임베딩하는 방법을 공부했었습니다.</p>
 
@@ -172,12 +167,12 @@ window.onload = wrap_img;
   </li>
   <li>
     <p><strong>Similarity Function: Random Walk (DeepWalk, Node2vec)</strong>
-<br>또한, <strong>Random Walk</strong>상에서 <strong>co-occur 되는 두 노드는 그래프 상 similar한 노드</strong>라고 정의하였습니다. Random Walk의 전략에 따라 서로 다른 DeepWalk와 Node2vec 등의 방법을 배웠던 것 기억 나시나요?
-#</p>
-    <h3 id="limitations-of-shallow-encoder">
-<a class="anchor" href="#limitations-of-shallow-encoder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations of Shallow Encoder</h3>
+<br>또한, <strong>Random Walk</strong>상에서 <strong>co-occur 되는 두 노드는 그래프 상 similar한 노드</strong>라고 정의하였습니다. Random Walk의 전략에 따라 서로 다른 DeepWalk와 Node2vec 등의 방법을 배웠던 것 기억 나시나요?</p>
   </li>
 </ol>
+
+<h1 id="limitations-of-shallow-encoder">
+<a class="anchor" href="#limitations-of-shallow-encoder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations of Shallow Encoder</h1>
 
 <p>이렇듯 Shallow Encoder을 통해서도 성공적으로 노드와 그래프를 임베딩할 수 있지만,  다음과 같은 한계점 때문에 보다 더 고도화된 Encoder를 재정의 할 필요가 있습니다.</p>
 
