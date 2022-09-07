@@ -122,9 +122,9 @@ window.onload = wrap_img;
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="toc" class="section-nav">
 <li class="toc-entry toc-h1"><a href="#recap-shallow-encoders">Recap: Shallow Encoders</a></li>
-<li class="toc-entry toc-h1"><a href="#limitations-of-shallow-encoder">Limitations of Shallow Encoder</a>
+<li class="toc-entry toc-h1"><a href="#limitations-of-shallow-encoder">Limitations of Shallow Encoder</a></li>
+<li class="toc-entry toc-h1"><a href="#deep-graph-encoders">Deep Graph Encoders</a>
 <ul>
-<li class="toc-entry toc-h3"><a href="#deep-graph-encoders">Deep Graph Encoders</a></li>
 <li class="toc-entry toc-h3"><a href="#why-is-it-hard">Why is it Hard?</a></li>
 </ul>
 </li>
@@ -183,7 +183,7 @@ window.onload = wrap_img;
     <p><strong>Transductivity</strong></p>
 
     <aside>
-  💡 Transductive Learning
+  💡 **Transductive Learning**
   <br>그래프 학습 관점에서 Transductive Learning이란 하나의 그래프 상 일부 노드와 엣지의 ground truth를 아는 상태에서 나머지 노드와 엣지의 값을 추정하는 방식입니다. 학습 과정 중, 모델은 ground truth를 알지 못하는 노드를 포함한 모든 노드와 엣지를 사용합니다.
     
   ![Imgur](https://i.imgur.com/Jpte1Hu.png?1)
@@ -191,7 +191,7 @@ window.onload = wrap_img;
   </aside>
 
     <aside>
-  💡 Inductive Learning
+  💡 **Inductive Learning**
   <br>그래프 학습 관점에서 Inductive Learning이란 ground truth를 알고 있는 그래프(들)에 대해 모델을 학습 한 후, 전혀 새로운 그래프의 노드와 엣지의 값을 추정하는 방식입니다. 즉, 학습이 완료된 후에는 모델이 새로운 처음 보는 노드의 값을 추정하는 데에도 적용될 수 있다는 의미이죠.
     
   ![Imgur](https://i.imgur.com/Fi3vDRg.png?1)
@@ -205,8 +205,8 @@ window.onload = wrap_img;
 <br>대부분의 그래프 데이터셋은 우리가 활용할 수 있는 노드 feature이 존재합니다. 예를 들어, 소셜 그래프의 경우, 단순히 철수가 영희가 친구라는 정보 이외에도, 철수는 성균관대학교에 다니는 23세 남학생이라는 정보도 존재합니다. 단순한 노드 간 연결 상태 이외에도 이러한 노드 feature를 고려하여 노드를 임베딩 한다면 정보량이 더 풍부해져 효과적일 것입니다.</li>
 </ul>
 
-<h3 id="deep-graph-encoders">
-<a class="anchor" href="#deep-graph-encoders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deep Graph Encoders</h3>
+<h1 id="deep-graph-encoders">
+<a class="anchor" href="#deep-graph-encoders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deep Graph Encoders</h1>
 
 <p>이제 지금껏 다뤄왔던 간단한 look-up table로 이루어진 encoder에서 벗어나, 좀 더 복잡한 형태의 <strong>Deep Encoder</strong>을 공부해봅시다.</p>
 
