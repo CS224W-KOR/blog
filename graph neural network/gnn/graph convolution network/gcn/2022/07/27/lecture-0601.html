@@ -180,19 +180,24 @@ window.onload = wrap_img;
 <strong>Transductivity</strong>
     <ul>
       <li>
-        <p>Transductive Learning
-<br>그래프 학습 관점에서 Transductive Learning이란 하나의 그래프 상 일부 노드와 엣지의 ground truth를 아는 상태에서 나머지 노드와 엣지의 값을 추정하는 방식입니다. 학습 과정 중, 모델은 ground truth를 알지 못하는 노드를 포함한 모든 노드와 엣지를 사용합니다.
-<img src="https://i.imgur.com/Jpte1Hu.png?1" alt="Imgur"></p>
-      </li>
-      <li>
-        <p>Inductive Learning
-<br>그래프 학습 관점에서 Inductive Learning이란 ground truth를 알고 있는 그래프(들)에 대해 모델을 학습 한 후, 전혀 새로운 그래프의 노드와 엣지의 값을 추정하는 방식입니다. 즉, 학습이 완료된 후에는 모델이 새로운 처음 보는 노드의 값을 추정하는 데에도 적용될 수 있다는 의미이죠.
-<img src="https://i.imgur.com/Fi3vDRg.png?1" alt="Imgur"></p>
-      </li>
+<strong>Transductive Learning</strong>
+<br>그래프 학습 관점에서 Transductive Learning이란 <strong>하나의 그래프 상</strong> 일부 노드와 엣지의 ground truth를 아는 상태에서 나머지 노드와 엣지의 값을 추정하는 방식입니다. <strong>학습 과정 중, 모델은 ground truth를 알지 못하는 노드를 포함한 모든 노드와 엣지를 사용합니다.</strong>
+</li>
     </ul>
-
-    <p>Shallow Encoder은 Transductive Learning으로 학습해야 하는 대표적인 케이스입니다. 학습 도중 보지 못한 노드는 look-up table상 존재할 리 없으니 맵핑되는 임베딩 벡터가 없을 것이고, 임베딩 벡터가 없다면 node classification 등의 downstream task에서 예측이 불가능하겠죠? 이런 특성 때문에 시간에 따라 노드가 추가될 수 있는 evolving 그래프와 같은 경우 그래프가 변할 때마다 전체 임베딩을 다시 scratch부터 학습해야 한다는 불편함이 있습니다.</p>
   </li>
+</ul>
+
+<p><img src="https://i.imgur.com/Jpte1Hu.png?1" alt="Imgur"></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* **Inductive Learning** &lt;br&gt;그래프 학습 관점에서 Inductive Learning이란 ground truth를 알고 있는 그래프(들)에 대해 모델을 학습 한 후, 전혀 새로운 그래프의 노드와 엣지의 값을 추정하는 방식입니다. **즉, 학습이 완료된 후에는 모델이 새로운 처음 보는 노드의 값을 추정하는 데에도 적용될 수 있다는 의미이죠.** 
+</code></pre></div></div>
+
+<p><img src="https://i.imgur.com/Fi3vDRg.png?1" alt="Imgur"></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Shallow Encoder은 Transductive Learning으로 학습해야 하는 대표적인 케이스입니다. 학습 도중 보지 못한 노드는 look-up table상 존재할 리 없으니 맵핑되는 임베딩 벡터가 없을 것이고, 임베딩 벡터가 없다면 node classification 등의 downstream task에서 예측이 불가능하겠죠? 이런 특성 때문에 시간에 따라 노드가 추가될 수 있는 evolving 그래프와 같은 경우 그래프가 변할 때마다 전체 임베딩을 다시 scratch부터 학습해야 한다는 불편함이 있습니다.
+</code></pre></div></div>
+
+<ul>
   <li>
 <strong>노드 feature을 활용하지 않음</strong>
 <br>대부분의 그래프 데이터셋은 우리가 활용할 수 있는 노드 feature이 존재합니다. 예를 들어, 소셜 그래프의 경우, 단순히 철수가 영희가 친구라는 정보 이외에도, 철수는 성균관대학교에 다니는 23세 남학생이라는 정보도 존재합니다. 단순한 노드 간 연결 상태 이외에도 이러한 노드 feature를 고려하여 노드를 임베딩 한다면 정보량이 더 풍부해져 효과적일 것입니다.</li>
