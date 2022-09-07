@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 13.4 - Detecting Overlapping Communities | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 13.4 - Detecting Overlapping Communities" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 13. Community Detection in Networks" />
+<meta property="og:description" content="CS224W Lecture 13. Community Detection in Networks" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1304.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1304.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-24T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 13.4 - Detecting Overlapping Communities" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-24T00:00:00-05:00","datePublished":"2022-08-24T00:00:00-05:00","description":"CS224W Lecture 13. Community Detection in Networks","headline":"Lecture 13.4 - Detecting Overlapping Communities","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1304.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1304.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 13.4 - Detecting Overlapping Communities</h1><p class="page-description">CS224W Lecture 13. Community Detection in Networks</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-24T00:00:00-05:00" itemprop="datePublished">
+        Aug 24, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#overlapping-communities">Overlapping Communities</a></li>
+<li class="toc-entry toc-h1"><a href="#plan-of-action">Plan of Action</a></li>
+<li class="toc-entry toc-h1"><a href="#agm-community-affiliation-graph-model">AGM: Community-Affiliation Graph Model</a></li>
+<li class="toc-entry toc-h1"><a href="#graph-fitting">Graph Fitting</a></li>
+<li class="toc-entry toc-h1"><a href="#graph-likelihood-pgf">Graph Likelihood $P(G|F)$</a></li>
+<li class="toc-entry toc-h1"><a href="#bigclam-model-1--objective-function">BigCLAM Model (1) — Objective Function</a></li>
+<li class="toc-entry toc-h1"><a href="#bigclam-model-2--optimization">BigCLAM Model (2) — Optimization</a></li>
+<li class="toc-entry toc-h1"><a href="#bigclam-summary">BigCLAM: Summary</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 13. Community Detection in Networks</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="overlapping-communities">
+<a class="anchor" href="#overlapping-communities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overlapping Communities</h1>
+
+<p><img src="https://i.imgur.com/YTCQHFx.png" alt="Imgur"></p>
+
+<p><img src="https://i.imgur.com/FUIyTM0.png" alt="Imgur"></p>
+
+<p>여기까지 잘 따라오셨나요? 여지껏 우리는 위 그림의 제일 왼쪽 그래프에서 보시는 것과 같이 서로 겹치지 않는 커뮤니티에 대해서만 다뤄왔습니다. 하지만, <strong>실생활의 네트워크의 커뮤니티는 서로 겹칠 가능성이 훨씬 높기</strong> 때문에 이런 서로 겹치는 커뮤니티를 detect하는 방법도 공부해야 합니다. 서로 겹치는 커뮤니티는 그래프를 인접 행렬로 표현하면 시각적으로 더욱 명확하게 확인할 수 있는데요, 상단 오른쪽 그림과 같이 인접 행렬의 밀집된 부위 일부가 겹치는 것을 볼 수 있습니다. 들어가기에 앞서 먼저 실제 네트워크 데이터의 커뮤니티 구조를 직접 확인해보는 시간을 갖도록 하겠습니다.</p>
+
+<p><img src="https://i.imgur.com/AYVOlLc.png" alt="Imgur"> <img src="https://i.imgur.com/G9Tb6Rv.png" alt="Imgur"></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                       &lt; SNS 소셜 네트워크의 커뮤니티 구조 &gt;
+</code></pre></div></div>
+
+<p><img src="https://i.imgur.com/9tKRGip.png" alt="Imgur"> <img src="https://i.imgur.com/f6fdU73.png" alt="Imgur"></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                       &lt; 단백질 상호 작용 네트워크의 커뮤니티 구조 &gt;
+</code></pre></div></div>
+
+<h1 id="plan-of-action">
+<a class="anchor" href="#plan-of-action" aria-hidden="true"><span class="octicon octicon-link"></span></a>Plan of Action</h1>
+
+<p>이렇게 서로 겹치는 커뮤니티 구조 또한 detect하기 위해 어떻게 할 것인지 전체적인 계획을 간단히 설명한 후, 각 부분의 세부 사항으로 넘어가겠습니다.</p>
+
+<ol>
+  <li>
+<strong>Step 1</strong>
+    <ul>
+      <li>여러 노드가 각각 어떤 커뮤니티에 소속되어 있는지 나타내는 node community affiliation을 가지고 전체 그래프를 생성하는 생성 모델인 <strong>Community Affiliation Graph Model(AGM)</strong>을 정의합니다. 쉽게 말해 노드 집합 $V$에 소속된 노드 간에 엣지를 생성하는 모델이라고 생각하면 됩니다.</li>
+    </ul>
+
+    <blockquote>
+      <p>💡 <strong>AGM: Community Affiliation → Network</strong></p>
+    </blockquote>
+  </li>
+  <li>
+<strong>Step 2</strong>
+    <ul>
+      <li>반대로 그래프 $G$가 주어졌을 때 <strong>어떤 AGM 모델이 어떤 인풋 community affiliation을 가지고 그래프 $G$를 생성했는지 역으로 찾아나갑니다</strong>.</li>
+      <li>$G$를 생성했을 법한 가장 그럴싸한 AGM 모델을 찾음으로써 각 노드의 커뮤니티 소속 정보를 알 수 있게 됩니다.</li>
+    </ul>
+  </li>
+</ol>
+
+<h1 id="agm-community-affiliation-graph-model">
+<a class="anchor" href="#agm-community-affiliation-graph-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>AGM: Community-Affiliation Graph Model</h1>
+
+<p><img src="https://i.imgur.com/5tovkH0.png" alt="Imgur"></p>
+
+<ul>
+  <li>
+<strong>모델 파라미터 $F = (V,C,M,{p_c})$</strong>
+    <ul>
+      <li>$V$: 노드 집합</li>
+      <li>$C$: 커뮤니티 집합</li>
+      <li>$M$: 소속 여부</li>
+      <li>$p_c$: 각 커뮤니티마다 갖고 있는 하나의 확률 값으로, 동일 커뮤니티 내에 속한 노드 사이에 엣지가 형성될 확률을 의미함</li>
+    </ul>
+  </li>
+  <li>
+<strong>네트워크 생성 과정</strong>
+    <ol>
+      <li>동일 커뮤니티  $c$ 내에 있는 노드 사이에 $p_c$의 확률로 엣지를 형성합니다.</li>
+      <li>만약 두 노드가 여러 커뮤니티에 동시에 소속되어 있다면(”overlapping community”), 적어도 하나의 커뮤니티로부터 $p_c$가 충족되어 엣지가 형성되었으면 두 노드는 연결되었다고 봅니다.
+  → <strong>즉, 여러 커뮤니티에 동시에 소속되어 있는 노드들은 그만큼 엣지로 연결된 가능성이 높다는 말이지요!</strong> 🤩</li>
+    </ol>
+
+    <p>따라서, 노드 $u$와 $v$ 사이에 엣지가 형성될 확률은 $p(u,v) = 1-\prod_{c\in M_u\cap M_v} (1-p_c)$로 표현할 수 있습니다. AGM은 이러한 방식으로 non-overlapping, overlapping, hierarchical(nesting) 등 다양한 커뮤니티 구조를 다룰 수 있다고 합니다!</p>
+  </li>
+</ul>
+
+<p><img src="https://i.imgur.com/EwIDmsc.png" alt="Imgur"> <img src="https://i.imgur.com/VtVtC7O.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 만약 노드 $u$와 $v$가 서로 공통으로 소속된 커뮤니티가 없다면, 두 노드는 절대 엣지로 연결될 수 없을 것입니다. 이러한 문제를 해결하기 위해 $p_{background}=\epsilon$를 갖는 background community를 정의합니다. background community에는 모든 노드가 소속되어 있으므로, 노드 $u$와 $v$도 $\epsilon$의 확률로 연결될 수 있겠죠?</p>
+</blockquote>
+
+<h1 id="graph-fitting">
+<a class="anchor" href="#graph-fitting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graph Fitting</h1>
+
+<p><img src="https://i.imgur.com/YNaL5W5.png" alt="Imgur"></p>
+
+<p>이제 우리는 반대로 네트워크 구조가 주어졌다고 했을 때 이를 생성했을 법한 AGM 모델 $F$를 구해볼 것입니다. 즉 그래프 $G$를 알고 있는 조건에서,</p>
+
+<ul>
+  <li>Community Affiliation 그래프 $M$</li>
+  <li>커뮤니티의 집합 $C$</li>
+  <li>각 커뮤니티에 대응되는 엣지 생성 확률 $p_c$</li>
+</ul>
+
+<p>를 찾아야 합니다.</p>
+
+<p><img src="https://i.imgur.com/rqqE9BU.png" alt="Imgur"></p>
+
+<p>가장 그럴싸한 AGM 모델 $F$는 <strong>Maximum Likelihood Estimation</strong>으로 구할 수 있는데요, 수식은 위 그림과 같이 적을 수 있습니다. 즉, 모델 $F$로 부터 생성된 합성 그래프가 실제 그래프 $G$와 유사할 확률을 최대화하는 모델 파라미터 $F$를 구하는 것이 목적이라고 해석해 볼 수 있겠죠. 위 수식을 풀기 위해 우리는 다음 두 가지를 정의해야 합니다.</p>
+
+<ol>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>**$P(G</td>
+          <td>F)$를 전개하여 목적 함수(Objective function)를 수학적으로 정리해야 합니다!**</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li><strong>1단계에서 만들어진 목적 함수를 모델 파라미터 $F$에 대해 최대화하기 위해 최적화 기법을 선택해야 합니다! (예. Gradient ascent)</strong></li>
+</ol>
+
+<h1 id="graph-likelihood-pgf">
+<a class="anchor" href="#graph-likelihood-pgf" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graph Likelihood $P(G|F)$</h1>
+
+<p><img src="https://i.imgur.com/LgWJTr8.png" alt="Imgur"></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>만약 모델 $F$와 결과 그래프 $G$가 각각 위의 그림과 같이 주어졌다고 가정해봅시다. 여기서 $F$ 옆의 행렬은 community affiliation 그래프로부터 각 노드 쌍에 대해 엣지가 생성될 확률을 구한 것이고, $G$는 알고 있는 그래프 구조를 활용하여 인접 행렬을 구한 것입니다. 이 경우 $P(G</td>
+      <td>F)$는 그림 아래의 식과 같이 전개할 수 있습니다. 즉, **그래프 상 존재하는 엣지들에 대해서는 엣지가 생성될 확률을, 존재하지 않는 엣지들에 대해서는 엣지가 생성되지 않을 확률을 각각 구한 후 모두 곱함으로써 $P(G</td>
+      <td>F)$를 구할 수 있습니다.**</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <table>
+    <tbody>
+      <tr>
+        <td>💡 $P(G</td>
+        <td>F)=\prod_{(u,v)\in G} P(u,v) \prod_{(u,v)\notin G} 1-P(u,v)$</td>
+      </tr>
+    </tbody>
+  </table>
+</blockquote>
+
+<p>하지만 문제가 있습니다! 🙄 <strong>우리는 현재 community affiliation 그래프를 모르는 상황</strong>입니다. 즉, 어떤 노드가 어떤 커뮤니티에 소속되어 있는지, 또 커뮤니티마다 갖는 $p_c$의 확률이 무엇인지 전혀 알 수 없습니다. 따라서 우리는 $p(u,v)$를 위와 같이 구할 수 없게 되는데요, 그렇기 때문에 <strong>AGM의 조건을 “Relaxing”하여 $p(u,v)$를 구해보도록 하겠습니다</strong>.</p>
+
+<p><img src="https://i.imgur.com/blOruZL.png" alt="Imgur"></p>
+
+<p>일단 노드의 커뮤니티 소속(membership) 여부를 몰라도 되도록, <strong>기본적으로 모든 노드가 각각 모든 커뮤니티에 소속되어 있고, 각 membership에는 0 이상의 강도가 부여된다고 가정</strong>합시다. 예를 들어 $F_{uA}$는 노드 $u$가 커뮤니티 $A$에 소속되는 강도가 됩니다. 위 그림에서 노드 $v$는 커뮤니티 $A$의 소속이 아닌 것처럼 그려졌는데, 사실상 소속되어 있지만 강도가 0, 즉 $F_{vA}=0$으로 해석하는 것이 올바릅니다.</p>
+
+<p>이 경우 기존에 AGM 모델에서 사용하던 notation $p_c$는 <strong>$p_c(u,v)=1-exp(-F_{uC}\cdot F_{vC})$</strong> 로 바꿔 쓸 수 있습니다. $F$값이 항상 0보다 크거나 같기 때문에 $0\le p_c(u,v)\le 1$의 조건이 항상 만족되며, 아래와 같이 해석할 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/o4MVLle.png" alt="Imgur"></p>
+
+<ul>
+  <li>두 노드 $u$와 $v$가 각각 커뮤니티 $C$에 높은 강도로 소속되어 있다면 → $p_c(u,v)$ 값이 큼 (1에 가까워짐)</li>
+  <li>두 노드 $u$와 $v$중 하나 이하만이 커뮤니티 $C$에 소속되어 있다면 → $p_c(u,v)=0$로 두 노드는 서로 연결되지 않음</li>
+</ul>
+
+<p>존재하는 모든 커뮤니티의 집합을 $\Gamma$라고 하였을 때, 기존에 $p(u,v) = 1-\prod_{c\in M_u\cap M_v} (1-p_c)$로 표현되던 식은 비슷하게 $p(u,v)=1-\prod_{C\in\Gamma} (1-P_c(u,v))$로 바꾸어 쓸 수 있습니다.</p>
+
+<blockquote>
+  <p>💡 $p_c(u,v)=1-exp(-F_{uC}\cdot F_{vC})$        ····· (1)<br><br>
+$p(u,v)=1-\prod_{C\in\Gamma} (1-P_c(u,v))$    ····· (2)</p>
+</blockquote>
+
+<p>자, 이제 다왔습니다. 위 (2)식에 (1)식을 대입하여 최종적으로 식을 전개하면 최종적으로 아래와 같은 수식을 얻을 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/rsK2VYI.png" alt="Imgur"></p>
+
+<h1 id="bigclam-model-1--objective-function">
+<a class="anchor" href="#bigclam-model-1--objective-function" aria-hidden="true"><span class="octicon octicon-link"></span></a>BigCLAM Model (1) — Objective Function</h1>
+
+<blockquote>
+  <p>📢 $P(G|F)=\prod_{(u,v)\in G} P(u,v) \prod_{(u,v)\notin G} 1-P(u,v)$<br><br>
+$p(u,v)=1-exp(-F_u^TF_v)$</p>
+</blockquote>
+
+<table>
+  <tbody>
+    <tr>
+      <td>앞에서 다룬 두 수식을 이용하여 최종적으로 $P(G</td>
+      <td>F)$ 수식을 전개해보도록 하겠습니다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://i.imgur.com/1KSzrqW.png" alt="Imgur"></p>
+
+<p>사실 $1-exp(-F_u^TF_v)$와 $exp(-F_u^TF_v)$로 표현되는 likelihood 값은 0과 1 사이의 작은 값으로 서로 연속해서 곱하다보면 굉장히 작은 수가 되는 등 수치적으로 불안정한 값을 만들어 냅니다. 따라서 우리는 로그 함수를 도입하여 곱을 합으로 바꿈으로써 이 문제를 해결할 수 있습니다.</p>
+
+<p><img src="https://i.imgur.com/RPO3pVc.png" alt="Imgur"></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>**최종적으로 우리의 목적 함수는 $log(P(G</td>
+      <td>F))$로 우리는 이를 최대화 함으로써 그래프 $G$를 만들었을 법한 AGM 모델 $F$의 파라미터를 추정할 수 있게 됩니다.** 앞서 다룬 목적 함수를 최대화함으로써 overlapping 커뮤니티를 detect하는 이 모델은 <strong>BigCLAM</strong>이라고 합니다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>💡 $l(F) = \sum_{(u,v)\in E} log(1-exp(-F_u^TF_v))-\sum_{(u,v)\notin E} F_u^TF_v$</p>
+</blockquote>
+
+<h1 id="bigclam-model-2--optimization">
+<a class="anchor" href="#bigclam-model-2--optimization" aria-hidden="true"><span class="octicon octicon-link"></span></a>BigCLAM Model (2) — Optimization</h1>
+
+<p>지금까지 BigCLAM의 목적 함수를 알아보았습니다. 그렇다면 이 목적 함수를 최적화(최대화)하는 방법은 무엇일까요? 여느 최적화 과정과 다를 바 없이 목적 함수 $l(F)$의 최적화는 아래 단계를 반복하며 일어납니다.</p>
+
+<ol>
+  <li>랜덤한 소속 강도 $F$로 초기화 합니다.</li>
+  <li>모든 노드 $u$에 대해 각각,
+    <ol>
+      <li>목적 함수의 gradient을 갖고 <strong>Gradient Ascent</strong>를 진행합니다. 이 말인즉슨, $F_u$ 값이 커지는 방향으로 이동한다는 것으로 생각할 수 있습니다. 노드 $u$의 소속 강도 $F_u$에 대해 업데이트를 진행할 때, 다른 모든 노드의 $F$값은 고정해 놓음에 주의하십시오!</li>
+    </ol>
+  </li>
+</ol>
+
+<ul>
+  <li>상기 과정을 수렴 시까지 반복합니다.</li>
+</ul>
+
+<p><img src="https://i.imgur.com/c6TbWBa.png" alt="Imgur"></p>
+
+<p>이 때, 위에서 정의한 목적 함수에 대한 gradient는 위 식과 같지만, 이를 바로 사용하여 최적화를 진행하기에는 무리가 있습니다. 전체 그래프 상 노드 $u$의 이웃 노드는 한정적인 반면 이웃 노드가 아닌 노드에 대해서 뒷 term을 계속 반복하여 계산하는 것은 연산 부담이 매우 크기 때문입니다.</p>
+
+<p><img src="https://i.imgur.com/7lTmY7A.png" alt="Imgur"></p>
+
+<p>여기서 살짝 트릭을 사용하여, 뒷 term을 위와 같이 바꿔줍니다. 이렇게 바꿀 경우, 모든 노드에 대해 계산하는 첫 번째 term은 처음에 한번만 계산해 놓으면 계속해서 재사용 할 수 있기 때문에 효율적이며, 뒤따르는 두,세 번째 term은 노드 $u$와 노드 $u$의 이웃 노드들에 대해서만 계산하면 되기 때문에 훨씬 빨리 계산할 수 있습니다. <strong>이렇게 변형하여 gradient ascent를 진행하면 한번의 가중치 업데이트에 노드 $u$의 차수에 선형 비례하는 시간 복잡도를 가지게 됩니다</strong>.</p>
+
+<h1 id="bigclam-summary">
+<a class="anchor" href="#bigclam-summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>BigCLAM: Summary</h1>
+
+<p>마지막으로 지금까지 다룬 BigCLAM 모델을 정리하고 오늘 포스트를 마무리 하도록 하겠습니다! 수고하셨습니다~ 🤗</p>
+
+<p><img src="https://i.imgur.com/bgsbiBc.png" alt="Imgur"></p>
+
+<ul>
+  <li>BigCLAM은 overlapping 커뮤니티 구조를 파악하기 위한 모델($F$)을 우선 정의합니다.</li>
+  <li>어떤 그래프 $G$가 주어졌을 때, 모델 $F$로 $G$를 생성할 log likelihood를 최대화함으로써 각 노드가 각 커뮤니티에 소속될 강도 ($F_u$)를 추정할 수 있습니다.</li>
+</ul>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1304.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
