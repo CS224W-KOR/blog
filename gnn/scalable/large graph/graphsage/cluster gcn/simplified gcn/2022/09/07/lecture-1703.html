@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 17.3 - Cluster GCN - Scaling up GNNs | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 17.3 - Cluster GCN - Scaling up GNNs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
+<meta property="og:description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-09-07T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 17.3 - Cluster GCN - Scaling up GNNs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-09-07T00:00:00-05:00","datePublished":"2022-09-07T00:00:00-05:00","description":"CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs","headline":"Lecture 17.3 - Cluster GCN - Scaling up GNNs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html"},"url":"https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 17.3 - Cluster GCN - Scaling up GNNs</h1><p class="page-description">CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-09-07T00:00:00-05:00" itemprop="datePublished">
+        Sep 7, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#scalable">scalable</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#large graph">large graph</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GraphSAGE">GraphSAGE</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Cluster GCN">Cluster GCN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Simplified GCN">Simplified GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#issues-with-neighbor-sampling">Issues with Neighbor Sampling</a></li>
+<li class="toc-entry toc-h1"><a href="#insight-from-full-batch-gnn">Insight from Full-batch GNN</a></li>
+<li class="toc-entry toc-h1"><a href="#subgraph-sampling">Subgraph Sampling</a></li>
+<li class="toc-entry toc-h1"><a href="#exploiting-community-structure">Exploiting Community Structure</a></li>
+<li class="toc-entry toc-h1"><a href="#cluster-gcn">Cluster-GCN</a></li>
+<li class="toc-entry toc-h1"><a href="#issues-with-cluster-gcn">Issues with Cluster-GCN</a></li>
+<li class="toc-entry toc-h1"><a href="#advanced-cluster-gcn-overview">Advanced Cluster-GCN: Overview</a></li>
+<li class="toc-entry toc-h1"><a href="#advanced-cluster-gcn">Advanced Cluster-GCN</a></li>
+<li class="toc-entry toc-h1"><a href="#comparison-of-time-complexity">Comparison of Time Complexity</a></li>
+<li class="toc-entry toc-h1"><a href="#summary-cluster-gcn">Summary: Cluster-GCN</a></li>
+</ul><hr>
+
+<blockquote>
+  <p><strong>Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</strong></p>
+
+  <ul>
+    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<h1 id="issues-with-neighbor-sampling">
+<a class="anchor" href="#issues-with-neighbor-sampling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues with Neighbor Sampling</h1>
+
+<p>17.2에서 말했듯이 Neighbor Sampling 방식으로 mini-batch를 구성하는데는 여러 문제점이 있습니다.</p>
+
+<ul>
+  <li>
+<strong>Computation graph의 크기가 GNN layer의 갯수에 대해 지수적으로 증가</strong>하여 계산 효율성이 크게 떨어지게 됩니다.</li>
+  <li>
+<strong>샘플링 된 이웃 노드들이 많이 겹치는 경우, redundant한 계산이 많이 일어나기 때문에 효율적이지 않습니다.</strong> 아래 그림에서 보다시피 노드 C와 D는 두 computation graph에 모두 포함되어 여러번 불필요하게 연산에 참여하게 됩니다.</li>
+</ul>
+
+<p><img src="https://i.imgur.com/qKxOpZP.png" alt="Imgur"></p>
+
+<h1 id="insight-from-full-batch-gnn">
+<a class="anchor" href="#insight-from-full-batch-gnn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Insight from Full-batch GNN</h1>
+
+<p>이러한 비효율성을 어떻게 해결하면 좋을까요? 해답은 full-batch GNN에서 얻을 수 있었습니다. 다시 full-batch를 떠올려보죠.</p>
+
+<p><img src="https://i.imgur.com/WwJ9UuP.png" alt="Imgur"></p>
+
+<p>Full-batch training으로 학습할 때, 한 GNN layer에서 위 식을 통해 모든 노드의 임베딩을 동시에 업데이트 합니다. <strong>일괄적으로 $l-1$번째 layer의 노드 임베딩을 한번씩만 사용하여 $l$번째 layer의 노드 임베딩을 생성하기 때문에 Neighbor Sampling에서처럼 redundant한 연산은 일어나지 않게 됩니다.</strong> 이를 더 자세히 들여다 보면 아래와 같이 동작하게 됩니다.</p>
+
+<p><img src="https://i.imgur.com/8gbMkky.png" alt="Imgur"></p>
+
+<ul>
+  <li>하나의 GNN layer을 기준으로 computation graph를 만들고 자시고 할 것 없이 전체 그래프에 대해 일괄적으로 노드 임베딩을 생성합니다. 이 때 모든 엣지에 대해 양방향으로 두 번의 message passing이 일어납니다.
+<br>→ <strong>시간 복잡도</strong> $\propto O(2*no.(edges))$</li>
+  <li>$K$-layer GNN을 기준으로 하면,
+<br>→ <strong>시간 복잡도</strong> $\propto O(2K*no.(edges))$</li>
+</ul>
+
+<p>따라서 full-batch training의 시간 복잡도는 엣지의 갯수와 GNN layer의 갯수에 선형 비례하기 때문에 이론적으론 굉장히 빨라야 합니다. 하지만, 우리가 다루는 그래프가 큰 그래프인만큼 엣지의 수가 굉~장히 크고 전체 그래프를 GPU 메모리 상에 로딩하는 것이 불가능하기 때문에 full-batch training을 사용할 수 없는 것이었죠.</p>
+
+<h1 id="subgraph-sampling">
+<a class="anchor" href="#subgraph-sampling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgraph Sampling</h1>
+
+<p>그렇다면 <strong>전체 그래프 말고 더 작은 subgraph를 추출하여 subgraph에 대해 full-batch training을 적용하면 어떨까요?</strong> 즉, 이 아이디어는 곧 <strong>mini-batch를 전체 그래프에서 추출한 subgraph로 구성</strong>하여 SGD training을 하면 보다 계산 redundancy를 줄이고, 더 효율적으로 큰 그래프를 학습할 수 있다는 말과 같습니다. 그러려면 아래 그림과 같이 전체 그래프로부터 GPU에 올려질 수 있을 법한 작은 subgraph들을 잘 추출해내야 합니다.</p>
+
+<p><img src="https://i.imgur.com/DqpdHeU.png" alt="Imgur"></p>
+
+<blockquote>
+  <p>💡 <strong>Subgraph로 mini-batch를 구성하자!</strong></p>
+</blockquote>
+
+<p>그럼 여기서, 어떻게 전체 그래프를 잘 설명할 수 있는 subgraph들을 추출할 수 있을까요? Full-batch training에서는 엣지를 따라 일어나는 message passing을 통해 노드 임베딩을 업데이트하기 때문에, <strong>좋은 subgraph란 전체 그래프의 엣지 연결 구조를 잘 드러내는 모양새여야 할 것입니다.</strong></p>
+
+<p><img src="https://i.imgur.com/bWeraOZ.png" alt="Imgur"></p>
+
+<p>위 그림의 왼쪽, 오른쪽 subgraph 중에 어떤 subgraph가 더 좋을까요? 왼쪽 subgraph는 원본 그래프의 커뮤니티 구조를 잘 유지하고 있어서 좋은 subgraph가 될 수 있는 반면, 오른쪽 subgraph는 원본 그래프의 중요한 엣지들을 많이 버린 구조기 때문에 안 좋은 subgraph라 볼 수 있습니다. 특히나 오른쪽 subgraph에서 생긴 고립된 노드들은 어떠한 엣지로도 연결 되어 있지 않기 때문에 노드 임베딩을 제대로 만들 수 없을 것입니다.</p>
+
+<h1 id="exploiting-community-structure">
+<a class="anchor" href="#exploiting-community-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Exploiting Community Structure</h1>
+
+<p><img src="https://i.imgur.com/yOfDJEP.png" alt="Imgur"></p>
+
+<p>13장에서 설명하였듯이 실생활에 쓰이는 대부분의 그래프는 위와 같이 커뮤니티 구조를 가집니다. 따라서 좋은 subgraph로 mini-batch를 구성하기 위해 <strong>원본 그래프의 국소적 엣지 연결 구조를 잘 보존하고 있는 커뮤니티가 subgraph로 사용되는 것이 좋아 보입니다.</strong></p>
+
+<blockquote>
+  <p>💡 <strong>원본 그래프의 커뮤니티 구조를 subgraph로 사용하자!</strong></p>
+</blockquote>
+
+<h1 id="cluster-gcn">
+<a class="anchor" href="#cluster-gcn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cluster-GCN</h1>
+
+<p>Cluster-GCN은 mini-batch로 subgraph를 쓰자는 아이디어로부터 제안되었으며 두 단계를 통해 학습이 수행됩니다.</p>
+
+<p><img src="https://i.imgur.com/cl9AjCs.png" alt="Imgur"></p>
+
+<ol>
+  <li><strong>Pre-processing</strong></li>
+</ol>
+
+<p><img src="https://i.imgur.com/Pisbjr3.png" alt="Imgur"></p>
+
+<p>원본의 큰 그래프 $G$가 주어졌을 때, 아무 scalable한 community detection 알고리즘 (e.g., Louvain, METIS, BigCLAM 등)을 사용해서 위 그림과 같이 <strong>$G_i$로 커뮤니티를 분리해냅니다</strong>. 이 때, 각 커뮤니티 $G_i$가 subgraph로 사용될 것이기 때문에 커뮤니티 내부의 엣지는 보존하되 커뮤니티 사이의 엣지는 버립니다. 여기서 subgraph를 랜덤하게 뽑아서 mini-batch로 사용할 것이기 때문에 각 subgraph는 GPU에 통째로 올릴 수 있을 크기여야겠죠?</p>
+
+<ol>
+  <li><strong>Mini-batch training</strong></li>
+</ol>
+
+<p><img src="https://i.imgur.com/js9jJiK.png" alt="Imgur"></p>
+
+<p><strong>여러 subgraph 중 랜덤하게 뽑은 하나 (편의상 $G_c$라고 하겠습니다!) 를 mini-batch로 사용합니다.</strong> 이제 이 온전한 그래프에 대하여 <strong>full-batch training을 통해 노드 임베딩을 생성</strong>하면 됩니다. 이후로는 동일하게 downstream task에 걸맞는 mini-batch의 loss 값이 계산되고, 역전파를 통해 한번 GNN 모델의 파라미터가 업데이트 되겠네요. 계속 full-batch training의 계산상 효율성 때문에 Cluster-GCN이 제안되었다면서 교안에는 mini-batch training이라는 용어가 쓰여서 혹여나 헷갈리실까봐 덧붙여 설명드리겠습니다. 결국 subgraph를 mini-batch로 활용하여 학습을 진행하는 것이기 때문에 크게 보면 SGD, 즉 mini-batch training의 범주에 포함되는 것이 맞습니다. 다만, mini-batch 자체가 Neighbor Sampling에서 처럼 따로따로 구분된 computation graph로 구성되는 것이 아니고 하나의 온전한 그래프 모양을 갖는 subgraph이기 때문에, 한번에 노드 임베딩을 생성해버리는 full-batch training처럼 학습할 수 있는 것입니다!</p>
+
+<h1 id="issues-with-cluster-gcn">
+<a class="anchor" href="#issues-with-cluster-gcn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues with Cluster-GCN</h1>
+
+<p><img src="https://i.imgur.com/xPuh2l6.png" alt="Imgur"> <img src="https://i.imgur.com/739L1gl.png" alt="Imgur"></p>
+
+<p>하지만 Cluster-GCN에도 문제는 있습니다. <strong>그래프 community detection은 비슷한 노드들을 같은 커뮤니티에 집어넣기 때문에 추출되는 subgraph들은 원본 그래프를 대표한다고 볼 수 없을 뿐더러 커뮤니티 사이의 엣지들이 소실되며 중요한 메세지들을 잃을 수 있습니다.</strong> 13강의 Granovetter의 실험을 되짚어보면 커뮤니티 사이의 연결로부터 직업 소개와 같은 중요한 정보들이 많이 전달된다는 거 기억나시죠? 중요한 엣지들이 소실됨에 따라 subgraph 마다 마다 계산된 gradient 값의 편차가 심할 것이고, 이는 학습의 불안정성을 야기하며 수렴 속도를 더디게 합니다.</p>
+
+<h1 id="advanced-cluster-gcn-overview">
+<a class="anchor" href="#advanced-cluster-gcn-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Cluster-GCN: Overview</h1>
+
+<p><img src="https://i.imgur.com/9Q6wYSR.png" alt="Imgur"></p>
+
+<p><strong>이러한 문제는 여러 커뮤니티 (subgraph)를 하나의 mini-batch에 같이 넣음으로써 해결할 수 있습니다.</strong> 이런 방식으로 mini-batch를 구성한다면, subgraph 내에 로컬 커뮤니티 구조도 보존하면서 동시에 <strong>커뮤니티 간 엣지도 포함</strong>하게 되면서 보다 원본 그래프를 잘 대표할 수 있는 subgraph를 만들 수 있습니다. 다만 community detection시에 커뮤니티 사이즈를 좀 더 작게 함으로 여러 커뮤니티를 합쳐서 subgraph를 만들 때에도 subgraph가 GPU에 잘 올라가도록 해야 함에 주의하세요.</p>
+
+<blockquote>
+  <p>💡 <strong>여러 개의 커뮤니티 구조를 합쳐서 subgraph로 사용하자!</strong></p>
+</blockquote>
+
+<h1 id="advanced-cluster-gcn">
+<a class="anchor" href="#advanced-cluster-gcn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Cluster-GCN</h1>
+
+<p>Advanced Cluster-GCN의 두 단계 또한 subgraph를 생성하는 부분 이외에는 vanilla Cluster-GCN과 동일하기 때문에 간략하게만 언급하고 넘어가도록 하겠습니다.</p>
+
+<ol>
+  <li>
+    <p><strong>Pre-processing</strong></p>
+
+    <p>Community detection 알고리즘을 활용하여 원본 그래프를 여러 커뮤니티로 분리합니다. 이 때, 커뮤니티 사이즈를 작게 하여 detection을 진행하도록 합니다.</p>
+  </li>
+  <li>
+    <p><strong>Mini-batch training</strong></p>
+
+    <p>분리된 여러 커뮤니티 중 몇 개를 랜덤하게 골라 aggregate 함으로써 subgraph, 즉 mini-batch를 구성할 것입니다. 이 때, <strong>커뮤니티 사이의 엣지 또한 보존됨에 주목하세요</strong>!</p>
+  </li>
+</ol>
+
+<h1 id="comparison-of-time-complexity">
+<a class="anchor" href="#comparison-of-time-complexity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Comparison of Time Complexity</h1>
+
+<p>자, 그럼 지금까지 큰 그래프를 GNN으로 학습하기 위해 배운 두 가지 방법, Neighbor Sampling과 Cluster-GCN을 시간 복잡도 측면에서 비교해보도록 하겠습니다. 두 방법에서 모두 머신러닝 모델은 $K$개의 GNN layer을 가지며, mini-batch의 사이즈는 $M$이라고 가정하겠습니다.</p>
+
+<ul>
+  <li>
+    <p><strong>Neighbor Sampling (Sampling factor = $H$일 때)</strong><br></p>
+
+    <p><img src="https://i.imgur.com/xVEmTPn.png" alt="Imgur"></p>
+
+    <p>이 방법의 경우 한 mini-batch가 $M$개의 computation graph들로 구성되며, 각 computation graph에서 한 노드 당 $H$개의 이웃 노드만이 샘플링되며 $H^K$의 크기를 갖게 됩니다. 따라서 전체 시간 복잡도는 $M \cdot H^K$ 입니다.</p>
+    <blockquote>
+      <p><strong>시간 복잡도 =</strong> $O(M \cdot H^K)$</p>
+
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>Cluster-GCN</strong></p>
+
+    <p>한 mini-batch에 대해 계산되는 시간 복잡도는 subgraph 내 엣지의 수에 비례합니다. 만약 전체 그래프에 대한 평균 차수가 $D_{avg}$이라면, mini-batch로 사용되는 subgraph 내의 노드 갯수가 $M$개이기 때문에 전체 엣지 수는 $M \cdot D_{avg}$가 됩니다. 따라서 전체 $K$ layer에 대한 시간 복잡도는 $K \cdot M \cdot D_{avg}$ 입니다.</p>
+
+    <blockquote>
+      <p><strong>시간 복잡도 =</strong> $O(K \cdot M \cdot D_{avg})$</p>
+
+    </blockquote>
+  </li>
+</ul>
+
+<p>일반적으로 시간 복잡도가 GNN layer의 갯수 $K$에 지수적으로 비례하는 Neighbor Sampling에 비해 선형 비례하는 Cluster-GCN이 계산 측면으로는 더 효율적이라고 합니다. 다만, 만약 $K$를 작게 두는 경우에 보통 현업에서는 Neighbor Sampling 방식이 더 우세하다고 하는데요, 이는 Cluster-GCN 방법이 Neighbor Sampling 방식에 비해 원본 그래프를 잘 대표할 수 있는 mini-batch를 구성하지 못하기 때문이라고 합니다. 어쨌거나 Cluster-GCN 방법은 community detection을 통해 추출된 커뮤니티 구조에 크게 의존하고 있으니까요 🙂</p>
+
+<h1 id="summary-cluster-gcn">
+<a class="anchor" href="#summary-cluster-gcn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary: Cluster-GCN</h1>
+
+<blockquote>
+  <p>💡 <strong>1.  GNN 구조 : 그대로 사용<br>2.  Mini-batch 구성 방식: 커뮤니티 구조를 포함하는 subgraph로 구성<br>3.  학습 방식: SGD training</strong></p>
+</blockquote>
+
+<ul>
+  <li>Cluster-GCN은 먼저 community detection을 통해 원본 그래프를 여러 커뮤니티로 분리함</li>
+  <li>여러 커뮤니티가 합쳐진 subgraph가 mini-batch로 사용됨</li>
+  <li>온전한 그래프 모양을 띠는 mini-batch에 대해 full-batch training이 수행됨</li>
+  <li>$K$가 클 때 Cluster-GCN은 Neighbor Sampling에 비해 더 효율적임</li>
+  <li>하지만 일반적으로 Cluster-GCN은 편향된 gradient를 만들게 되는데, $K$가 커진다 하더라도 동일 구조의 subgraph에 대해서만 aggregation이 일어나므로 진짜 원본 그래프를 $K$-hop만큼 explore하는 효과를 낼 수 없기 때문임</li>
+</ul>
+
+<hr>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

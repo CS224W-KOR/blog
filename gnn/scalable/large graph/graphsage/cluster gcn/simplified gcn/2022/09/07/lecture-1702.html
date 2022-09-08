@@ -10,15 +10,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
 <meta property="og:description" content="CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs" />
-<link rel="canonical" href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" />
-<meta property="og:url" content="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html" />
 <meta property="og:site_name" content="CS224W-KOR" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-09-07T00:00:00-05:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Lecture 17.2 - GraphSAGE Neighbor Sampling" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-09-07T00:00:00-05:00","datePublished":"2022-09-07T00:00:00-05:00","description":"CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs","headline":"Lecture 17.2 - GraphSAGE Neighbor Sampling","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html"},"url":"https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-09-07T00:00:00-05:00","datePublished":"2022-09-07T00:00:00-05:00","description":"CS224W Lecture 17. Scaling Up Graph Neural Networks to Large Graphs","headline":"Lecture 17.2 - GraphSAGE Neighbor Sampling","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html"},"url":"https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -102,25 +102,22 @@ window.onload = wrap_img;
     
       <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
       
-        <a class="category-tags-link" href="/blog/categories/#matrix">matrix</a>
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/blog/categories/#pagerank">pagerank</a>
+        <a class="category-tags-link" href="/blog/categories/#scalable">scalable</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/blog/categories/#recommendation">recommendation</a>
+        <a class="category-tags-link" href="/blog/categories/#large graph">large graph</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/blog/categories/#proximity">proximity</a>
+        <a class="category-tags-link" href="/blog/categories/#GraphSAGE">GraphSAGE</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/blog/categories/#random walks">random walks</a>
+        <a class="category-tags-link" href="/blog/categories/#Cluster GCN">Cluster GCN</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/blog/categories/#ppr">ppr</a>
-        &nbsp;
-      
-        <a class="category-tags-link" href="/blog/categories/#restarts">restarts</a>
+        <a class="category-tags-link" href="/blog/categories/#Simplified GCN">Simplified GCN</a>
         
       
       </p>
@@ -280,7 +277,7 @@ window.onload = wrap_img;
     })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="u-url" href="/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/09/07/lecture-1702.html" hidden></a>
+<a class="u-url" href="/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html" hidden></a>
 </article>
 
       </div>
