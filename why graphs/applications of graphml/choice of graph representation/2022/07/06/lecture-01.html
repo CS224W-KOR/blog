@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 01 | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 01" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 1. Introduction to Graph" />
+<meta property="og:description" content="CS224W Lecture 1. Introduction to Graph" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/why%20graphs/applications%20of%20graphml/choice%20of%20graph%20representation/2022/07/06/lecture-01.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/why%20graphs/applications%20of%20graphml/choice%20of%20graph%20representation/2022/07/06/lecture-01.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-06T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 01" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-06T00:00:00-05:00","datePublished":"2022-07-06T00:00:00-05:00","description":"CS224W Lecture 1. Introduction to Graph","headline":"Lecture 01","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/why%20graphs/applications%20of%20graphml/choice%20of%20graph%20representation/2022/07/06/lecture-01.html"},"url":"https://cs224w-kor.github.io/blog/why%20graphs/applications%20of%20graphml/choice%20of%20graph%20representation/2022/07/06/lecture-01.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 01</h1><p class="page-description">CS224W Lecture 1. Introduction to Graph</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-06T00:00:00-05:00" itemprop="datePublished">
+        Jul 6, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Why Graphs">Why Graphs</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Applications of GraphML">Applications of GraphML</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Choice of Graph Representation">Choice of Graph Representation</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#cs224w-machine-learning-with-graphs-2021--lecture-1-정리">CS224W: Machine Learning with Graphs |2021 | Lecture 1 정리</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#그래프-딥러닝-모델에서-우리가-바라는-플로우">그래프 딥러닝 모델에서 우리가 바라는 플로우</a></li>
+</ul>
+</li>
+</ul><h1 id="cs224w-machine-learning-with-graphs-2021--lecture-1-정리">
+<a class="anchor" href="#cs224w-machine-learning-with-graphs-2021--lecture-1-%EC%A0%95%EB%A6%AC" aria-hidden="true"><span class="octicon octicon-link"></span></a>CS224W: Machine Learning with Graphs |2021 | Lecture 1 정리</h1>
+
+<hr>
+<blockquote>
+  <p>** Lecutre 1. Introduction to Graph</p>
+
+  <ul>
+    <li>Lecture 1.1 Why Graphs</li>
+    <li>Lecture 1.2 Applications of GraphML</li>
+    <li>Lecture 1.3 Choice of Graph Representation</li>
+  </ul>
+
+</blockquote>
+
+<hr>
+
+<p><strong>1.1 - Why Graphs</strong></p>
+
+<p><strong>그래프란?</strong></p>
+
+<p>⇒ a general language for describing and analyzing entities with relations/interactions</p>
+
+<p>⇒ 서로 관계/상호작용하는 entity들을 설명하고 분석하기 위한 언어라고 할 수 있음
+(여기서 entity란 정보의 세계에서 의미있는 하나의 정보 단위)</p>
+
+<ul>
+  <li>그래프 예시
+    <ul>
+      <li>event graphs</li>
+      <li>computer networks</li>
+      <li>disease pathways</li>
+      <li>food webs</li>
+      <li>particle networks</li>
+      <li>underground networks</li>
+      <li>social networks</li>
+      <li>economic networks</li>
+      <li>communication networks</li>
+      <li>citation networks</li>
+      <li>internet</li>
+      <li>networks of neurons</li>
+      <li>knowledge graphs</li>
+      <li>regulatory networks</li>
+      <li>scene graphs</li>
+      <li>code graphs</li>
+      <li>molecules</li>
+      <li>3D shapes</li>
+    </ul>
+  </li>
+</ul>
+
+<p>⇒ 그래프로 세상에 일어나는 모든 현상과 구조들을 설명할 수 있다(broadly applicable).</p>
+
+<p>(관심있는 분야의 현상을 그래프로 표현하여 딥러닝 모델 구조로 변환할 수 있는 능력이 있다면…)</p>
+
+<p>e.g) 분자 구조, 3D 이미지 모형(voxel), 먹이사슬, 소셜 네트워크 등</p>
+
+<p>(graph와 network의 차이?)</p>
+
+<p><strong>그래프에서 얻을 수 있는 정보 유형</strong></p>
+
+<ul>
+  <li>데이터 포인트 간의 구성(organization)과 연결</li>
+  <li>유사한 데이터 포인트 간의 밀접성(similarity)</li>
+  <li>데이터 포인트 간의 연결들이 이루는 그래프 구조</li>
+</ul>
+
+<p><strong>그래프가 갖는 구조를 어떻게 활용해 나은 예측을 할 수 있을까?</strong></p>
+
+<p>⇒ 현상을 명시적(explicitly)으로 잘 반영한 그래프 모델링이 중요하다!</p>
+
+<p><strong>그래프 ML이 더 어려운 이유?</strong></p>
+
+<p>⇒ arbitrary size and complex topology</p>
+
+<p>⇒ spatial locality(공간 지역성)가 없다</p>
+
+<p>⇒ 이미지나 텍스트 인풋의 경우 어느 한 데이터포인트로부터 다른 데이터 포인트 간 상대적 위치가 정해져있다(e.g 상하좌우). 하지만, 그래프의 경우 축이 되는 데이터 포인트가 존재하지 않는다.</p>
+
+<p><strong>그래프를 사용한 딥러닝</strong></p>
+
+<p>⇒ 인풋으로는 그래프를 받고, 아웃풋으로는 아래와 같은 형식(ground truth도 동일한 형식)이 가능하다.</p>
+<blockquote>
+
+</blockquote>
+
+<ul>
+  <li>node-level</li>
+  <li>edge-level</li>
+  <li>graph/subgraph generation</li>
+  <li>graph/subgraph classification</li>
+</ul>
+
+<h2 id="그래프-딥러닝-모델에서-우리가-바라는-플로우">
+<a class="anchor" href="#%EA%B7%B8%EB%9E%98%ED%94%84-%EB%94%A5%EB%9F%AC%EB%8B%9D-%EB%AA%A8%EB%8D%B8%EC%97%90%EC%84%9C-%EC%9A%B0%EB%A6%AC%EA%B0%80-%EB%B0%94%EB%9D%BC%EB%8A%94-%ED%94%8C%EB%A1%9C%EC%9A%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>그래프 딥러닝 모델에서 우리가 바라는 플로우</strong>
+</h2>
+
+<p><img src="https://imgur.com/IR2Gl9X" alt="Imgur"></p>
+
+<p>위 플로우를 거친 좋은 성능의 모델을 만들기 위해서는, 인풋이 현상을 잘 반영한 embedding vector로 변환될 수 있도록 학습하는 것이 중요하다.(Representation Learning)</p>
+
+<ul>
+  <li>코스 과정동안 배울 그래프 방법들
+    <ul>
+      <li>traditional methods : graphlets, graph kernels</li>
+      <li>node embeddings : DeepWalk, Node2Vec</li>
+      <li>Graph Neural Networks : GCN, GraphSAGE, GAT, Theory of GNNs</li>
+      <li>Knowledge graphs and reasoning : TransE, BetaE</li>
+      <li>Deep Generative Models for graphs</li>
+      <li>Applications</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>1.2 - Applications of Graph ML</strong></p>
+
+<p>그래프 ML은 다양한 태스크 커버가 가능하다</p>
+
+<ol>
+  <li><strong>Node Level(node classification)</strong></li>
+</ol>
+
+<hr>
+
+<p>example1) protein folding (구글의 알파폴드)</p>
+
+<ul>
+  <li>배경 : 단백질은 아미노산으로 이루어져있는데, 복잡한 3D 입체 구조의 아미노산 연결 때문에 단백질 구조를 파악하는 태스크는 많게는 1-2년까지 걸린다고 함.</li>
+  <li>key idea : spatial graph
+    <ul>
+      <li>graph : 단백질</li>
+      <li>nodes : 아미노산</li>
+      <li>edges : 사슬구조</li>
+    </ul>
+  </li>
+</ul>
+
+<ol>
+  <li><strong>Edge Level</strong></li>
+</ol>
+
+<hr>
+
+<p>example1) Recommender system (PinSage)</p>
+
+<ul>
+  <li>nodes : users and items</li>
+  <li>
+    <p>edges : user-item interactions</p>
+
+    <p><img src="https://imgur.com/gallery/5h2HIFY" alt="Imgur"></p>
+  </li>
+</ul>
+
+<p>example2) drugs and side effects</p>
+
+<ul>
+  <li>nodes : drugs &amp; proteins</li>
+  <li>edges : interaction</li>
+</ul>
+
+<p>using 2 heterogeneous graphs(drugs &amp; proteins)</p>
+
+<p><img src="%5BImgur%5D(https://i.imgur.com/AEONN7T.png)" alt="스크린샷 2022-07-05 오후 11.15.49.png"></p>
+
+<p>⇒ drug A와 B를 함께 썼을 때, 생길 수 있는 interaction(edge)는 무엇인가?</p>
+
+<ol>
+  <li><strong>Community(subgraph) level</strong></li>
+</ol>
+
+<hr>
+
+<p>example1) Traffic Prediction</p>
+
+<ul>
+  <li>nodes : Road Segments(도로 구간)</li>
+  <li>edges : 도로 구간 교차점</li>
+</ul>
+
+<p><img src="https://imgur.com/gallery/MjIw0AS" alt="Imgur"></p>
+
+<p>⇒ 아웃풋 : 도착 예정 시간</p>
+
+<ol>
+  <li><strong>Graph-level prediction</strong></li>
+</ol>
+
+<hr>
+
+<p>4-1) <strong>graph classification</strong></p>
+
+<p>example1) drug discovery</p>
+
+<ul>
+  <li>nodes : atoms</li>
+  <li>edges : chemical bonds</li>
+  <li>graph : molecules</li>
+</ul>
+
+<p>⇒ 노드와 에지 정보를 통해 그래프(분자) 예측</p>
+
+<p>4-2 ) <strong>Graph-level generation</strong></p>
+
+<p>example1) drug generation</p>
+
+<ul>
+  <li>nodes : atoms</li>
+  <li>edges : chemical bonds</li>
+  <li>graph : moelcules</li>
+</ul>
+
+<p>⇒ 새로운 그래프(분자) 생성</p>
+
+<p>example2) physics simulation (graph evolution)</p>
+
+<ul>
+  <li>nodes : particles</li>
+  <li>edges : interaction between particles</li>
+</ul>
+
+<p>⇒ t시점 전의 정보로 t시점 이후의 그래프 생성</p>
+
+<p><img src="https://imgur.com/gallery/c9s2K6o" alt="Imgur"></p>
+
+<p><strong>1.3 - Choice of Graph</strong></p>
+
+<p><strong>그래프 구성요소</strong></p>
+
+<p><img src="https://imgur.com/gallery/c9s2K6o" alt="Imgur"></p>
+
+<p>objects : nodes, vertices</p>
+
+<p>Interactions : links, edges</p>
+
+<p>system : network, graph</p>
+
+<p>**object와 interactions로 이루어진 데이터 구조 ⇒ graph</p>
+
+<p>그래프로 세상에 일어나는 모든 현상과 구조들을 설명할 수 있다(broadly applicable).</p>
+
+<p><img src="https://imgur.com/gallery/Xmg96Y0" alt="Imgur"></p>
+
+<ul>
+  <li>표현법에 따라 그래프의 활용방법은 무궁무진하다. 중요한 것은 적절한 표현을 선택하는 것.</li>
+  <li>설명하고자하는 현상을 그래프로 정의하고 싶다면, 먼저 아래 두가지 질문을 하자.
+    <ol>
+      <li>what are nodes?</li>
+      <li>what are edges?</li>
+    </ol>
+  </li>
+</ul>
+
+<p><strong>Directed vs Undirected Graphs</strong></p>
+
+<p><img src="https://imgur.com/gallery/DOHiiPS" alt="Imgur"></p>
+
+<p>‘페이스북의 친구와 인스타그램의 팔로우’는 directed와 undirected graph를 이해하기에 좋은 예이다.</p>
+
+<p><strong>Node Degrees (차수)</strong></p>
+
+<ul>
+  <li>undirected graph
+    <ul>
+      <li>undirected graph의 경우, node degree는 해당 노드에 연결된 에지의 총 갯수</li>
+      <li>average degree는 연결된 에지의 총 갯수 곱하기 2(쌍방향 연결이기 때문)를 그래프를 이루는 전체 노드 수로 나눈 값</li>
+    </ul>
+  </li>
+  <li>directed graph
+    <ul>
+      <li>directed graph의 경우, 해당 노드로 향하는 in-degree와 해당 노드로부터 뻗어나가는 out-degree로 나눌 수 있다. node degree는 이 in-degree와 out-degree의 합.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Bipartite Graph</strong></p>
+
+<p><img src="https://imgur.com/gallery/6HMdMds" alt="Imgur"></p>
+
+<ul>
+  <li>자주 등장하는 또다른 그래프의 종류는 bipartite graph(이분 그래프)이다.</li>
+  <li>이분 그래프는 2개의 집합 U와 V의 interaction을 나타낸 그래프이다. U와 V는 서로 독립적인 집합이며, 같은 집합의 원소끼리는 연관되지 않는다. e.g) A와 B 간 연결X</li>
+  <li>이분 그래프의 예로는 구매자-구매 아이템 관계 등이 있다.</li>
+</ul>
+
+<p><strong>Folded/Projected Bipartite Graph</strong></p>
+
+<ul>
+  <li>Bipartite 그래프에서 집합 간의 요소들 간의 상관관계가 명시되어있다면 Folded 또는 Projected Bipartite Graph라고 부른다.</li>
+</ul>
+
+<p>(정보에 depth가 생긴다는 의미에서 folded라고 붙인듯하다.)</p>
+
+<p><img src="https://imgur.com/gallery/Ol84y3q" alt="Imgur"></p>
+
+<p><strong>Adjacency Matrix</strong></p>
+
+<p><img src="https://imgur.com/gallery/Ol84y3q" alt="Imgur"></p>
+
+<ul>
+  <li>그래프의 노드 간 연결관계(edge)를 나타낸 매트릭스이다.</li>
+  <li>각 행과 열은 노드의 번수를 의미하고, 0은 연결되지 않음, 1은 연결됨을 의미한다. 만약 3번째 행에 4번째 열이 1이라면, 3번 노드와 4번 노드는 연결되어있음을 의미한다.</li>
+  <li>undirect graph라면, 주대각선을 기준으로 adj matrix는 대칭이고, directed graph라면, 대칭이 아닐 수도 있다.</li>
+  <li>adjacency matrix는 컴퓨터가 그래프를 이해할 수 있는 형태이지만, 문제는 노드의 수가 수백개에서 수십만개로 늘어나고, 많은 노드들의 연결이 몇 개 없을 때, 메모리 사이즈에 비해 0인 값이 너무 많게되는 문제(sparse)가 발생한다.</li>
+</ul>
+
+<p><strong>Edge List</strong></p>
+
+<p><img src="https://imgur.com/gallery/OWW5Kd4" alt="Imgur"></p>
+
+<ul>
+  <li>Edge List는 그래프를 엣지들의 리스트로 나타낸 값이다.</li>
+  <li>서로 연결된 노드를 짝지어 리스트에 배열한다.</li>
+  <li>그래프가 크고 sparse할 때 유용하다.</li>
+</ul>
+
+<p><strong>Node and Edge Attributes</strong></p>
+
+<p>⇒ 노드와 엣지로 나타낼 수 있는 값들은 어떤 것들이 있을까?</p>
+
+<p>⇒ 그래프에서 어떤 정보들을 얻을 수 있을까?</p>
+
+<ul>
+  <li>weight (e.g., frequency of communication)
+    <ul>
+      <li>엣지가 0과 1 이외의 값을 갖는다면?</li>
+    </ul>
+
+    <p><img src="https://imgur.com/gallery/LkoQdhF" alt="Imgur"></p>
+  </li>
+  <li>ranking (best friend, second best friend, …)</li>
+  <li>type (friend, relative, co-worker)</li>
+  <li>sign (+ / - )</li>
+  <li>properties depending on the structure of the rest of the graph : Number of common friends</li>
+</ul>
+
+<p><strong>More Types of Graphs</strong></p>
+
+<ul>
+  <li>Connected(undirected) graph</li>
+</ul>
+
+<p><img src="https://imgur.com/gallery/vsXc3yq" alt="Imgur"></p>
+
+<p>**연결이 부분적으로만 되어 있어도, 그래프는 adjacency matrix에 표현 가능하다.</p>
+
+<p><img src="https://imgur.com/gallery/rsKz6Rt" alt="Imgur"></p>
+
+<p><strong>Connectivity of Driected Graphs</strong></p>
+
+<ul>
+  <li>Strongly connected directed graph
+    <ul>
+      <li>모든 노드들이 다른 모든 노드들로 방향 상관없이 다다르는 path가 항상 있다면, strongly connected directed graph이다.</li>
+    </ul>
+  </li>
+  <li>Weakly connected directed graph
+    <ul>
+      <li>에지 방향을 무시했을 때, 노드 간 전부 연결되어있다면, weakly connected directed graph이다.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Strongly connected components(SCC)</p>
+
+    <p><img src="https://imgur.com/gallery/AEONN7T" alt="Imgur"></p>
+
+    <ul>
+      <li>그래프에 속한 다른 노드들 전부는 아니지만, 해당 그룹 간의 연결이 한 노드에서 다른 노드로 항상 도달할 수 있다면(strong connection)한다면, 그 그룹을 strongly connected components라고 지칭한다.</li>
+    </ul>
+  </li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/why%20graphs/applications%20of%20graphml/choice%20of%20graph%20representation/2022/07/06/lecture-01.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
