@@ -137,10 +137,10 @@ window.onload = wrap_img;
   <p><strong>Lecture 13. Community Detection in Networks</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/08/24/lecture-1301.html">Lecture 13.1 - Community Detection in Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1301.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1302.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1303.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1304.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
   </ul>
 
 </blockquote>
@@ -223,13 +223,13 @@ window.onload = wrap_img;
 
 <ul>
   <li>
-    <p><strong>구조적인 노드 밀집도 (Tightly-connected edges)</strong>
+    <p><strong>구조적인 노드 밀집도 (Tightly-connected edges)</strong><br>
 이어진 두 노드가 구조적으로 얼마나 밀도 높게 모여 있는지 확인하기 위해 <strong>Edge overlap</strong>이라는 개념을 새로 도입하겠습니다. Edge overlap은 아래의 식으로 구할 수 있으며, 0과 1 사이의 값으로 도출됩니다. Edge overlap이 1에 가까워질수록 두 노드는 한 커뮤니티에 속하는 노드일 가능성이 높으며, 0에 가까워질수록 두 노드를 잇는 엣지는 커뮤니티와 커뮤니티를 잇는 local bridge에 가까워집니다.</p>
 
     <p><img src="https://i.imgur.com/XS7Ejbu.png" alt="Imgur"></p>
   </li>
   <li>
-    <p><strong>사회적인 밀접도 (Socially strong)</strong>
+    <p><strong>사회적인 밀접도 (Socially strong)</strong><br>
 사회적인 밀접도는 통화량을 나타내는 <strong>edge weight(edge strength)</strong>로 판단할 것입니다.</p>
   </li>
 </ul>
@@ -243,7 +243,7 @@ window.onload = wrap_img;
 
 <ol>
   <li>
-    <p><strong>Edge Overlap vs. Strength</strong>
+    <p><strong>Edge Overlap vs. Strength</strong><br>
 각 엣지에 대한 edge overlap 값과 edge strength를 나타낸 그래프는 아래와 같습니다. 파란색으로 표현된 우리 데이터에 대해서 예상 그대로 <strong>edge overlap과 edge strength가 정비례하는 관계</strong>를 보입니다. 빨간색으로 표현된 선은 실험의 베이스라인으로써, 우리 데이터의 네트워크 구조는 그대로 유지하되 edge strength 값만 랜덤하게 재배치한 그래프에 대한 결과입니다.</p>
 
     <p><img src="https://i.imgur.com/hFILenV.png" alt="Imgur"></p>
@@ -253,7 +253,7 @@ window.onload = wrap_img;
     <p><img src="https://i.imgur.com/x6GIByq.png" alt="Imgur"> <img src="https://i.imgur.com/iD54mSs.png" alt="Imgur"></p>
   </li>
   <li>
-    <p><strong>Edge Removal</strong>
+    <p><strong>Edge Removal</strong><br>
 더 나아가 그래프의 엣지를 삭제해가면서 나뉘는 그래프의 sub-components 중 가장 큰 subgraph의 크기를 확인해보도록 하겠습니다. 여기서 각각 edge strength와 edge overlap을 기준으로 하여 그래프의 엣지를 삭제할텐데, 만약 <strong>Granovetter의 주장대로 edge strength와 edge overlap이 비례하는 관계라면, 두 경우 모두 엣지 삭제 결과의 경향성이 비슷해야 할 것입니다</strong>.</p>
 
     <p>아래 결과 그래프에서 볼 수 있다시피, <strong>두 경우에서 모두 edge strength와 edge overlap의 값이 작은 엣지부터 삭제했을 때 가장 큰 subgraph의 크기가 더 작아진다</strong>는 것을 확인할 수 있습니다. 이는 edge strength와 edge overlap값이 작은 엣지는 커뮤니티 간 local bridge일 확률이 높기 때문에 비교적 더 빠르게 전체 네트워크를 subgraph로 나눌 수 있기 때문입니다.</p>
