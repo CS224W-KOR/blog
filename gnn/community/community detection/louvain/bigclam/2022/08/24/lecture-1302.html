@@ -134,10 +134,10 @@ window.onload = wrap_img;
   <p><strong>Lecture 13. Community Detection in Networks</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 13.1 - Community Detection in Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 13.2 - Network Communities</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 13.3 - Louvain Algorithm</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1301.html">Lecture 13.1 - Community Detection in Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1302.html">Lecture 13.2 - Network Communities</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1303.html">Lecture 13.3 - Louvain Algorithm</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/community/community%20detection/louvain/bigclam/2022/08/24/lecture-1304.html">Lecture 13.4 - Detecting Overlapping Communities</a></li>
   </ul>
 
 </blockquote>
@@ -172,12 +172,12 @@ window.onload = wrap_img;
   </li>
   <li>
     <p>NCAA Football Network</p>
+
+    <p><img src="https://i.imgur.com/RQy086I.png" alt="Imgur"> <img src="https://i.imgur.com/ePqHmUB.png" alt="Imgur"></p>
+
+    <p>위의 왼쪽 그래프는 미식축구 팀들과 팀 사이 경기를 나타낸 그래프입니다. 뚜렷한 고밀집 부위를 육안으로 판단하기 힘든 왼쪽 그래프에서도 노드 커뮤니티를 찾을 수 있을까요? 네, 가능합니다 😊 <strong>NCAA(전미 대학 체육 협회)의 division에 따라</strong> 그래프를 좀 정리해본다면 동일 division에 속한 팀들끼리 크게 밀집되어 있음을 쉽게 확인할 수 있습니다!</p>
   </li>
 </ol>
-
-<p><img src="https://i.imgur.com/RQy086I.png" alt="Imgur"> <img src="https://i.imgur.com/ePqHmUB.png" alt="Imgur"></p>
-
-<p>위의 왼쪽 그래프는 미식축구 팀들과 팀 사이 경기를 나타낸 그래프입니다. 뚜렷한 고밀집 부위를 육안으로 판단하기 힘든 왼쪽 그래프에서도 노드 커뮤니티를 찾을 수 있을까요? 네, 가능합니다 😊 <strong>NCAA(전미 대학 체육 협회)의 division에 따라</strong> 그래프를 좀 정리해본다면 동일 division에 속한 팀들끼리 크게 밀집되어 있음을 쉽게 확인할 수 있습니다!</p>
 
 <h1 id="modularity-based-community-detection-concept-overview">
 <a class="anchor" href="#modularity-based-community-detection-concept-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modularity-based Community Detection: Concept Overview</h1>
