@@ -169,10 +169,10 @@ window.onload = wrap_img;
 
 <ol>
   <li>
-<strong>Phase 1 - Partitioning</strong>
+<strong>Phase 1 - Partitioning</strong><br>
 노드-커뮤니티 <strong>소속을 국소적으로 바꾸어 modularity 값의 변화를 살핌</strong>으로써 최종적으로 modularity가 극대화되는 방향으로 <strong>노드-커뮤니티 소속을 적합</strong>시킴</li>
   <li>
-<strong>Phase 2 - Restructuring</strong>
+<strong>Phase 2 - Restructuring</strong><br>
 현재 적합된 노드-커뮤니티 소속을 기반으로 동일 커뮤니티 속 노드를 <strong>super-node로 aggregate</strong>하여 <strong>새로운 상위 단계의 네트워크를 생성함 → 이를 통해 계층적 커뮤니티 구조 파악 가능</strong>
 </li>
   <li>다시 Phase 1으로 돌아감</li>
@@ -247,7 +247,7 @@ window.onload = wrap_img;
 <p><img src="https://i.imgur.com/NG0HVP0.png" alt="Imgur"></p>
 
 <blockquote>
-  <p>💡 <strong>Louvain 1st Phase Summary</strong><br>1. 현재 커뮤니티 $C$에 속해있는 모든 노드 $i$에 대해 이웃 노드의 커뮤니티로 소속을 변경함에 따르는 modularity gain을 구한다.<br>2. 소속 변경에 따르는 modularity gain이 가장 큰 community $C’$를 구한다.<br>$C’ = argmax_C, \triangle Q(C\rightarrow i \rightarrow C’)$<br>3. 만약 $\triangle Q(C\rightarrow i \rightarrow C’)$이 0보다 크다면, 노드 $i$의 소속을 $C$에서 $C’$으로 옮긴다.<br>$C \leftarrow C - {i}$<br>$C’ \leftarrow C’ + {i}$<br><br>*  모든 노드가 최적의 커뮤니티에 속해 있을 때까지 위 과정을 반복한다.</p>
+  <p>💡 <strong>Louvain 1st Phase Summary</strong><br>1. 현재 커뮤니티 $C$에 속해있는 모든 노드 $i$에 대해 이웃 노드의 커뮤니티로 소속을 변경함에 따르는 modularity gain을 구한다.<br>2. 소속 변경에 따르는 modularity gain이 가장 큰 community $C’$를 구한다.<br>$C’ = argmax_C, \triangle Q(C\rightarrow i \rightarrow C’)$<br>3. 만약 $\triangle Q(C\rightarrow i \rightarrow C’)$이 0보다 크다면, 노드 $i$의 소속을 $C$에서 $C’$으로 옮긴다.<br>$C \leftarrow C - \{i\}$<br>$C’ \leftarrow C’ + \{i\}$<br><br>*  모든 노드가 최적의 커뮤니티에 속해 있을 때까지 위 과정을 반복한다.</p>
 </blockquote>
 
 <h1 id="louvain-2nd-phase-restructuring">
