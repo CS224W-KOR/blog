@@ -364,18 +364,15 @@ window.onload = wrap_img;
 <ol>
   <li><strong>이웃 노드 임베딩을 aggregate하는 함수를 정함</strong></li>
   <li><strong>Task의 특성에 맞추어 loss 함수를 정의함</strong></li>
-</ol>
-
-<p><img src="https://i.imgur.com/hK8yNIW.png?1" alt="Imgur"></p>
-
-<p><img src="https://i.imgur.com/IVjcjvq.png?1" alt="Imgur"></p>
-
-<ol>
   <li><strong>여러 computation graph에 대해 GNN 모델을 학습시킴</strong></li>
-  <li><strong>학습된 모델을 갖고 노드에 대한 임베딩을 생성할 수 있음. 이 때, 모든 노드에 대해 뉴럴 네트워크의 파라미터가 공유되기 때문에 학습에 사용되지 않은 노드에 대해서도 임베딩을 생성할 수 있음 (Inductive Capability)</strong></li>
-</ol>
+  <li>
+    <p><strong>학습된 모델을 갖고 노드에 대한 임베딩을 생성할 수 있음. 이 때, 모든 노드에 대해 뉴럴 네트워크의 파라미터가 공유되기 때문에 학습에 사용되지 않은 노드에 대해서도 임베딩을 생성할 수 있음 (Inductive Capability)</strong></p>
 
-<p><img src="https://i.imgur.com/9VE7ZON.png?1" alt="Imgur"></p>
+    <p><img src="https://i.imgur.com/hK8yNIW.png?1" alt="Imgur">
+ <img src="https://i.imgur.com/IVjcjvq.png?1" alt="Imgur">
+ <img src="https://i.imgur.com/9VE7ZON.png?1" alt="Imgur"></p>
+  </li>
+</ol>
 
 <blockquote>
   <p>💡 Inductive Capability<br>1. <strong>새로운 그래프</strong> : 예를 들어 분자 그래프에서, 화합물 A에 대해 학습된 GNN 모델이 화합물 B 그래프에서 임베딩을 만드는데 활용될 수 있음<br>2. <strong>새로운 노드</strong> : 시간에 따라 evolving 하는 그래프에서 새로운 노드가 추가될 때마다 바로바로 임베딩을 생성할 수 있음</p>
