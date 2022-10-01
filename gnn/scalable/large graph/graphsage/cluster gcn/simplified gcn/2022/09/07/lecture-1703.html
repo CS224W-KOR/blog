@@ -143,10 +143,10 @@ window.onload = wrap_img;
   <p><strong>Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1701.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1704.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
   </ul>
 
 </blockquote>
@@ -223,20 +223,21 @@ window.onload = wrap_img;
 <p><img src="https://i.imgur.com/cl9AjCs.png" alt="Imgur"></p>
 
 <ol>
-  <li><strong>Pre-processing</strong></li>
+  <li>
+    <p><strong>Pre-processing</strong></p>
+
+    <p><img src="https://i.imgur.com/Pisbjr3.png" alt="Imgur"></p>
+
+    <p>원본의 큰 그래프 $G$가 주어졌을 때, 아무 scalable한 community detection 알고리즘 (e.g., Louvain, METIS, BigCLAM 등)을 사용해서 위 그림과 같이 <strong>$G_i$로 커뮤니티를 분리해냅니다</strong>. 이 때, 각 커뮤니티 $G_i$가 subgraph로 사용될 것이기 때문에 커뮤니티 내부의 엣지는 보존하되 커뮤니티 사이의 엣지는 버립니다. 여기서 subgraph를 랜덤하게 뽑아서 mini-batch로 사용할 것이기 때문에 각 subgraph는 GPU에 통째로 올릴 수 있을 크기여야겠죠?</p>
+  </li>
+  <li>
+    <p><strong>Mini-batch training</strong></p>
+
+    <p><img src="https://i.imgur.com/js9jJiK.png" alt="Imgur"></p>
+
+    <p><strong>여러 subgraph 중 랜덤하게 뽑은 하나 (편의상 $G_c$라고 하겠습니다!) 를 mini-batch로 사용합니다.</strong> 이제 이 온전한 그래프에 대하여 <strong>full-batch training을 통해 노드 임베딩을 생성</strong>하면 됩니다. 이후로는 동일하게 downstream task에 걸맞는 mini-batch의 loss 값이 계산되고, 역전파를 통해 한번 GNN 모델의 파라미터가 업데이트 되겠네요. 계속 full-batch training의 계산상 효율성 때문에 Cluster-GCN이 제안되었다면서 교안에는 mini-batch training이라는 용어가 쓰여서 혹여나 헷갈리실까봐 덧붙여 설명드리겠습니다. 결국 subgraph를 mini-batch로 활용하여 학습을 진행하는 것이기 때문에 크게 보면 SGD, 즉 mini-batch training의 범주에 포함되는 것이 맞습니다. 다만, mini-batch 자체가 Neighbor Sampling에서 처럼 따로따로 구분된 computation graph로 구성되는 것이 아니고 하나의 온전한 그래프 모양을 갖는 subgraph이기 때문에, 한번에 노드 임베딩을 생성해버리는 full-batch training처럼 학습할 수 있는 것입니다!</p>
+  </li>
 </ol>
-
-<p><img src="https://i.imgur.com/Pisbjr3.png" alt="Imgur"></p>
-
-<p>원본의 큰 그래프 $G$가 주어졌을 때, 아무 scalable한 community detection 알고리즘 (e.g., Louvain, METIS, BigCLAM 등)을 사용해서 위 그림과 같이 <strong>$G_i$로 커뮤니티를 분리해냅니다</strong>. 이 때, 각 커뮤니티 $G_i$가 subgraph로 사용될 것이기 때문에 커뮤니티 내부의 엣지는 보존하되 커뮤니티 사이의 엣지는 버립니다. 여기서 subgraph를 랜덤하게 뽑아서 mini-batch로 사용할 것이기 때문에 각 subgraph는 GPU에 통째로 올릴 수 있을 크기여야겠죠?</p>
-
-<ol>
-  <li><strong>Mini-batch training</strong></li>
-</ol>
-
-<p><img src="https://i.imgur.com/js9jJiK.png" alt="Imgur"></p>
-
-<p><strong>여러 subgraph 중 랜덤하게 뽑은 하나 (편의상 $G_c$라고 하겠습니다!) 를 mini-batch로 사용합니다.</strong> 이제 이 온전한 그래프에 대하여 <strong>full-batch training을 통해 노드 임베딩을 생성</strong>하면 됩니다. 이후로는 동일하게 downstream task에 걸맞는 mini-batch의 loss 값이 계산되고, 역전파를 통해 한번 GNN 모델의 파라미터가 업데이트 되겠네요. 계속 full-batch training의 계산상 효율성 때문에 Cluster-GCN이 제안되었다면서 교안에는 mini-batch training이라는 용어가 쓰여서 혹여나 헷갈리실까봐 덧붙여 설명드리겠습니다. 결국 subgraph를 mini-batch로 활용하여 학습을 진행하는 것이기 때문에 크게 보면 SGD, 즉 mini-batch training의 범주에 포함되는 것이 맞습니다. 다만, mini-batch 자체가 Neighbor Sampling에서 처럼 따로따로 구분된 computation graph로 구성되는 것이 아니고 하나의 온전한 그래프 모양을 갖는 subgraph이기 때문에, 한번에 노드 임베딩을 생성해버리는 full-batch training처럼 학습할 수 있는 것입니다!</p>
 
 <h1 id="issues-with-cluster-gcn">
 <a class="anchor" href="#issues-with-cluster-gcn" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues with Cluster-GCN</h1>
