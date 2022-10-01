@@ -137,10 +137,10 @@ window.onload = wrap_img;
   <p><strong>Lecture 17. Scaling Up Graph Neural Networks to Large Graphs</strong></p>
 
   <ul>
-    <li><a href="https://cs224w-kor.github.io/blog/web/matrix/pagerank/rank/flow%20model/flow%20equations/eigenvector/stationary%20distribution/power%20iteration/2022/07/13/lecture-0401.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/spider%20trap/dead%20ends/teleports/2022/07/13/lecture-0402.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/pagerank/recommendation/proximity/random%20walks/ppr/restarts/2022/07/13/lecture-0403.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
-    <li><a href="https://cs224w-kor.github.io/blog/matrix/node%20embedding/factorization/random%20walks/2022/07/13/lecture-0404.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1701.html">Lecture 17.1 - Scaling up Graph Neural Networks</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1702.html">Lecture 17.2 - GraphSAGE Neighbor Sampling</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1703.html">Lecture 17.3 - Cluster GCN: Scaling up GNNs</a></li>
+    <li><a href="https://cs224w-kor.github.io/blog/gnn/scalable/large%20graph/graphsage/cluster%20gcn/simplified%20gcn/2022/09/07/lecture-1704.html">Lecture 17.4 - Scaling up by Simplifying GNNs</a></li>
   </ul>
 
 </blockquote>
@@ -153,36 +153,35 @@ window.onload = wrap_img;
 <p>오늘날 그래프는 어떠한 도메인에서 널리 활용될까요? 예를 들어 살펴보겠습니다.</p>
 
 <ol>
-  <li><strong>추천 시스템 (Recommender systems)</strong></li>
+  <li>
+    <p><strong>추천 시스템 (Recommender systems)</strong></p>
+
+    <p><img src="https://i.imgur.com/GqpLYQJ.png" alt="Imgur"></p>
+
+    <p>아마존, 유튜브, 핀터레스트와 같은 기업들에서는 user-item의 이분 그래프 (bipartite graph)를 활용하여 유저들에게 아이템을 추천하거나 (link prediction), 유저 또는 아이템을 분류하는 (node classification) 서비스를 제공하고 있습니다. 보통 대기업 서비스를 이용하는 유저가 매우 많고 판매하는 아이템 또한 굉장히 다양하기 때문에 활용되는 이분 그래프의 크기는 매우 큽니다.</p>
+  </li>
+  <li>
+    <p><strong>소셜 네트워크 (Social networks)</strong></p>
+
+    <p><img src="https://i.imgur.com/h6YFkSC.png" alt="Imgur"></p>
+
+    <p>페이스북, 트위터, 인스타그램과 같은 기업들에서는 사용자 그래프를 활용하여 친구를 추천하거나 (link-level), 성별과 같은 사용자의 특징을 파악하는 (nodel-level) 서비스를 제공하고 있습니다. 대형 SNS를 활용하는 사용자가 매우 많기 때문에 해당 기업들이 다루어야 하는 그래프의 크기 또한 매우 큽니다.</p>
+  </li>
+  <li>
+    <p><strong>학술 그래프 (Academic graph)</strong></p>
+
+    <p><img src="https://i.imgur.com/8OQ1uTY.png" alt="Imgur"></p>
+
+    <p>마이크로소프트 학술 그래프는 약 120M 편의 논문과 120M 명의 저자로 구성되어 있는 매우 큰 그래프로써, 이를 활용하여 논문 분류 (node classification), 협력 연구자 추천 및 논문 인용 추천 (link prediction) 등과 같은 서비스를 제공합니다.</p>
+  </li>
+  <li>
+    <p><strong>지식 그래프 (Knowledge Graphs (KGs))</strong></p>
+
+    <p><img src="https://i.imgur.com/rpb0lEF.png" alt="Imgur"></p>
+
+    <p>위키피디아, 프리베이스 등에서 제공하는 지식 그래프를 활용하여 KG completion이나 reasoning과 같은 머신러닝 태스크를 수행합니다. 이 때, 지식 그래프에 포함된 entity의 갯수는 약 80M-90M로 또한 매우 큰 그래프를 다루게 됩니다.</p>
+  </li>
 </ol>
-
-<p><img src="https://i.imgur.com/GqpLYQJ.png" alt="Imgur"></p>
-
-<p>아마존, 유튜브, 핀터레스트와 같은 기업들에서는 user-item의 이분 그래프 (bipartite graph)를 활용하여 유저들에게 아이템을 추천하거나 (link prediction), 유저 또는 아이템을 분류하는 (node classification) 서비스를 제공하고 있습니다. 보통 대기업 서비스를 이용하는 유저가 매우 많고 판매하는 아이템 또한 굉장히 다양하기 때문에 활용되는 이분 그래프의 크기는 매우 큽니다.</p>
-
-<ol>
-  <li><strong>소셜 네트워크 (Social networks)</strong></li>
-</ol>
-
-<p><img src="https://i.imgur.com/h6YFkSC.png" alt="Imgur"></p>
-
-<p>페이스북, 트위터, 인스타그램과 같은 기업들에서는 사용자 그래프를 활용하여 친구를 추천하거나 (link-level), 성별과 같은 사용자의 특징을 파악하는 (nodel-level) 서비스를 제공하고 있습니다. 대형 SNS를 활용하는 사용자가 매우 많기 때문에 해당 기업들이 다루어야 하는 그래프의 크기 또한 매우 큽니다.</p>
-
-<ol>
-  <li><strong>학술 그래프 (Academic graph)</strong></li>
-</ol>
-
-<p><img src="https://i.imgur.com/8OQ1uTY.png" alt="Imgur"></p>
-
-<p>마이크로소프트 학술 그래프는 약 120M 편의 논문과 120M 명의 저자로 구성되어 있는 매우 큰 그래프로써, 이를 활용하여 논문 분류 (node classification), 협력 연구자 추천 및 논문 인용 추천 (link prediction) 등과 같은 서비스를 제공합니다.</p>
-
-<ol>
-  <li><strong>지식 그래프 (Knowledge Graphs (KGs))</strong></li>
-</ol>
-
-<p><img src="https://i.imgur.com/rpb0lEF.png" alt="Imgur"></p>
-
-<p>위키피디아, 프리베이스 등에서 제공하는 지식 그래프를 활용하여 KG completion이나 reasoning과 같은 머신러닝 태스크를 수행합니다. 이 때, 지식 그래프에 포함된 entity의 갯수는 약 80M-90M로 또한 매우 큰 그래프를 다루게 됩니다.</p>
 
 <h1 id="what-is-in-common">
 <a class="anchor" href="#what-is-in-common" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is in Common?</h1>
@@ -218,20 +217,21 @@ window.onload = wrap_img;
 <p>하지만 만약 $N$이 굉장히 크다면, 모든 데이터 포인트에 대해 loss 값을 계산하는 데 시간이 너무 많이 들기 때문에 우리는 <strong>full-batch training 대신 mini-batch를 활용하는 Stochastic Gradient Descent (SGD)를 수행하게 됩니다.</strong> 6강에서 SGD를 자세히 설명하였으니 자세한 설명은 넘어가도록 하겠습니다. 간략하게 말해서, $M(\ll N)$ 개의 데이터 포인트를 반복적으로 랜덤하게 샘플링하여 추출된 mini-batch에 대해서 gradient descent를 각각 수행하는 방법입니다. SGD는 full-batch training에 비해 빠르게 수렴하며, 계산상의 효율성을 가집니다.</p>
 
 <ol>
-  <li>그렇다면 효율적인 <strong>SGD를 GNN에 적용</strong>해볼까요?</li>
+  <li>
+    <p>그렇다면 효율적인 <strong>SGD를 GNN에 적용</strong>해볼까요?</p>
+
+    <p><img src="https://i.imgur.com/b4TwLKG.png" alt="Imgur"></p>
+
+    <p>Mini-batch를 구성할 때, $M$개의 노드가 랜덤하게 샘플링되기 때문에 위 그림과 같이 각 샘플링된 노드들은 서로 연결되지 않고 고립되어 있을 가능성이 큽니다. GNN이 이웃 노드의 feature을 aggregate하여 타겟 노드의 feature을 업데이트 한다는 것을 생각한다면 고립된 노드로는 올바르게 노드 feature을 업데이트 할 수 없게 됩니다. <strong>따라서 SGD를 단순히 GNN에 적용하는 것은 좋은 생각이 아닙니다.</strong></p>
+  </li>
+  <li>
+    <p>그렇다면 그냥 <strong>full-batch training 방식으로 GNN을 학습</strong>시켜 볼까요?</p>
+
+    <p><img src="https://i.imgur.com/ew9EDGU.png" alt="Imgur"></p>
+
+    <p>Full-batch training 방식으로 GNN을 학습시키려면, 먼저 전체 그래프와 초기 노드 feature를 로드한 후, 매 GNN layer 마다 이전 layer에서 얻은 노드 임베딩을 활용하여 전체 노드 임베딩을 한꺼번에 업데이트 해야 합니다. 따라서, 매 GNN layer 마다의 전체 노드 임베딩을 모두 GPU 메모리에 올려야 위와 같은 계산이 가능하게 됩니다. 하지만 GPU는 빠른 연산 속도를 갖는 반면 수용할 수 있는 메모리의 양이 10GB ~ 20GB으로 굉장히 작기 때문에 <strong>full-batch training으로 GNN을 학습할 수 없습니다.</strong></p>
+  </li>
 </ol>
-
-<p><img src="https://i.imgur.com/b4TwLKG.png" alt="Imgur"></p>
-
-<p>Mini-batch를 구성할 때, $M$개의 노드가 랜덤하게 샘플링되기 때문에 위 그림과 같이 각 샘플링된 노드들은 서로 연결되지 않고 고립되어 있을 가능성이 큽니다. GNN이 이웃 노드의 feature을 aggregate하여 타겟 노드의 feature을 업데이트 한다는 것을 생각한다면 고립된 노드로는 올바르게 노드 feature을 업데이트 할 수 없게 됩니다. <strong>따라서 SGD를 단순히 GNN에 적용하는 것은 좋은 생각이 아닙니다.</strong></p>
-
-<ol>
-  <li>그렇다면 그냥 <strong>full-batch training 방식으로 GNN을 학습</strong>시켜 볼까요?</li>
-</ol>
-
-<p><img src="https://i.imgur.com/ew9EDGU.png" alt="Imgur"></p>
-
-<p>Full-batch training 방식으로 GNN을 학습시키려면, 먼저 전체 그래프와 초기 노드 feature를 로드한 후, 매 GNN layer 마다 이전 layer에서 얻은 노드 임베딩을 활용하여 전체 노드 임베딩을 한꺼번에 업데이트 해야 합니다. 따라서, 매 GNN layer 마다의 전체 노드 임베딩을 모두 GPU 메모리에 올려야 위와 같은 계산이 가능하게 됩니다. 하지만 GPU는 빠른 연산 속도를 갖는 반면 수용할 수 있는 메모리의 양이 10GB ~ 20GB으로 굉장히 작기 때문에 <strong>full-batch training으로 GNN을 학습할 수 없습니다.</strong></p>
 
 <p>SGD도 안된다, full-batch training 학습 방식도 안된다. 그럼 대체 큰 그래프를 어떻게 GNN으로 학습할 수 있을까요? 오늘 포스트에서 이를 다뤄보겠습니다.</p>
 
