@@ -187,10 +187,11 @@ window.onload = wrap_img;
       <li>
         <p><strong>Inductive Learning</strong>
 <br>그래프 학습 관점에서 Inductive Learning이란 ground truth를 알고 있는 그래프(들)에 대해 모델을 학습 한 후, 전혀 새로운 그래프의 노드와 엣지의 값을 추정하는 방식입니다. <strong>즉, 학습이 완료된 후에는 모델이 새로운 처음 보는 노드의 값을 추정하는 데에도 적용될 수 있다는 의미이죠.</strong><br>
-<img src="https://i.imgur.com/Fi3vDRg.png?1" alt="Imgur">
-  Shallow Encoder은 Transductive Learning으로 학습해야 하는 대표적인 케이스입니다. 학습 도중 보지 못한 노드는 look-up table상 존재할 리 없으니 맵핑되는 임베딩 벡터가 없을 것이고, 임베딩 벡터가 없다면 node classification 등의 downstream task에서 예측이 불가능하겠죠? 이런 특성 때문에 시간에 따라 노드가 추가될 수 있는 evolving 그래프와 같은 경우 그래프가 변할 때마다 전체 임베딩을 다시 scratch부터 학습해야 한다는 불편함이 있습니다.</p>
+<img src="https://i.imgur.com/Fi3vDRg.png?1" alt="Imgur"></p>
       </li>
     </ul>
+
+    <p>Shallow Encoder은 Transductive Learning으로 학습해야 하는 대표적인 케이스입니다. 학습 도중 보지 못한 노드는 look-up table상 존재할 리 없으니 맵핑되는 임베딩 벡터가 없을 것이고, 임베딩 벡터가 없다면 node classification 등의 downstream task에서 예측이 불가능하겠죠? 이런 특성 때문에 시간에 따라 노드가 추가될 수 있는 evolving 그래프와 같은 경우 그래프가 변할 때마다 전체 임베딩을 다시 scratch부터 학습해야 한다는 불편함이 있습니다.</p>
   </li>
   <li>
 <strong>노드 feature을 활용하지 않음</strong>
