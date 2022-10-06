@@ -1,0 +1,227 @@
+
+<hr />
+<p>toc: true
+comments: true
+layout: post
+description: CS224W Lecture 8.
+categories: [Graph Neural Network, GNN, Graph Convolution Network, GCN ]
+title: Lecture 8.2 - Learning Objectives
+—</p>
+
+<h2 id="2-learning-objectives">2) <strong>Learning Objectives</strong></h2>
+
+<p><img src="https://imgur.com/UZP5j0O" alt="Imgur" /></p>
+
+<p>지금까지 우리는 그래프의 구조, GNN 레이어의 구조, 노드 엠베딩 등을 배웠습니다. 이번에는 모델이 예측하는 부분인 prediction heads에 대해 알아봅시다.</p>
+
+<p>예측부분은 지금까지 그래왔듯이 node-level, edge-level, graph-level로 나눌 수 있습니다.</p>
+
+<p><img src="https://imgur.com/jpBfQEs" alt="Imgur" /></p>
+
+<ul>
+  <li><strong>Node-Level</strong>
+    <ul>
+      <li>노드 엠베딩을 사용해서 바로 예측할 수 있습니다.</li>
+      <li>GNN 연산 후에, d차원의 노드 엠베딩이 결과물로 나옵니다.</li>
+      <li>k-way 예측을 한다고 할 때
+        <ul>
+          <li>분류(Classification) Task : K개의 카테고리를 분류</li>
+          <li>회귀(Regression) Task : K 타겟에 대해서 regression</li>
+        </ul>
+
+        <p><img src="https://imgur.com/w8n9Eh0" alt="Imgur" /></p>
+
+        <p>[{엠베딩 차원} x {타겟 갯수 K}] 형태의 아웃풋을 뽑게됩니다.</p>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Edge-Level</strong>
+    <ul>
+      <li>노드 엠베딩 간의 짝을 인풋값으로 사용합니다.</li>
+      <li>
+        <p>K-way 예측을 한다고 했을 때, 엣지 레벨 아웃풋을 뽑는 방법은 두 가지인데,</p>
+
+        <p><img src="https://imgur.com/wJV9OSI" alt="Imgur" /></p>
+
+        <p><strong>방법1) concatenation + linear</strong></p>
+
+        <ul>
+          <li>그래프 어텐션에서 보았던 것처럼, 두 엠베딩을 합쳐서 레이어에 넣는 방법이 있습니다.</li>
+        </ul>
+
+        <p><img src="https://imgur.com/haELZUD" alt="Imgur" /></p>
+
+        <p><img src="https://imgur.com/FDfRwmc" alt="Imgur" /></p>
+
+        <p><strong>방법 2) dot product</strong></p>
+
+        <p><img src="https://imgur.com/ME07g9w" alt="Imgur" /></p>
+
+        <p>K-way 예측을 한다고 했을 때, multi-head attention에서 봤던 것과 같은 연산을 갖게 됩니다.</p>
+
+        <p><img src="https://imgur.com/toe7Fxo" alt="Imgur" /></p>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Graph-Level</strong>
+    <ul>
+      <li>그래프 내 모든 노드 엠베딩 정보를 사용해서 예측을 합니다.</li>
+      <li>K-way 예측을 한다고 했을 때, 그래프 정보 전체가 들어가서 하나의 벡터값으로 합산되어 도출됩니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="https://imgur.com/gwI57fy" alt="Imgur" /></p>
+
+<ul>
+  <li>
+    <p>정보들을 합산하기 위해서 pooling이 들어가는데,</p>
+
+    <p>(1) global mean pooling</p>
+
+    <p>(2) global max pooling</p>
+
+    <p>(3) global sum pooling</p>
+
+    <p>옵션이 있습니다. 다만,</p>
+  </li>
+  <li>
+    <p><strong>Global Pooling의 문제점</strong></p>
+  </li>
+</ul>
+
+<p>pooling으로 인해 정보가 손실될 수 있습니다.</p>
+
+<p>예를 들어 global sum pooling을 한다고 했을 때,</p>
+
+<p>A = [-1, -2, 0, 1, 2], B = [-10, -20, 0, 10, 20] 
+sum([-1,-2, 0, 1, 2]) = 0
+sum([-10, -20, 0, 10,20] = 0</p>
+
+<p>그래프 A와 B는 분명 다른 그래프이지만, pooling으로 인해 같은 값으로 종결됩니다.</p>
+
+<p>⇒ <strong>Hierarchical Global Pooling</strong>은 이러한 문제를 해결해줍니다.</p>
+
+<p><strong>Logic</strong> : 노드들을 한꺼번에 pooling하는 것이 아니라, 나눠서 계층적(hierarchical)으로 pooling하는 겁니다.</p>
+
+<p>e.g) 
+노드를 나눕니다.
+A = [-1,-2,0,1,2]이라고 할 때,
+round1 : a = ReLU(Sum(-1,-2)), b = ReLU(Sum(0,1,2)
+round2 : ReLU(Sum(a, b)))</p>
+
+<p>B = [-10, -20, 0, 10, 20]
+round1 : a = ReLU(Sum(-10, -20)) b = ReLU(Sum(0,10,20))
+round2 : ReLU(Sum(a,b))</p>
+
+<p>그렇다면 노드들을 어떻게 a와 b를 쪼갤까요?</p>
+
+<p><strong>Hierarchically pool node embeddings (DiffPool)</strong></p>
+
+<p><img src="https://imgur.com/SweoFtO" alt="Imgur" /></p>
+
+<p>그래프는 community 구조를 갖습니다.</p>
+
+<ul>
+  <li>만약 이 community 구조를 예측 전에 알 수 있다면?</li>
+  <li>community 별로 행하는 pooling은 조금 더 유의미해집니다.</li>
+</ul>
+
+<p><strong>방법</strong></p>
+
+<ul>
+  <li>각 레벨별 GNN을 활용합니다.</li>
+  <li>GNN A로는 노드 엠베딩을 계산하고, GNN B로는 각 노드가 어느 그룹에 속하는지 계산합니다.</li>
+  <li>각 레벨별 GNN A와 B는 병렬적으로 처리 가능합니다.</li>
+  <li>각 풀링 레이어에 대해서 GNN A에서 생성한 노드 엠베딩을 합치기 위해서 GNN B에서 뽑은 클러스터링을 부여합니다.</li>
+  <li>클러스터 별로 하나의 새로운 노드를 부여하고, 클러스터 간 엣지를 유지한 상태로 새로운 pooled network를 만듭니다.</li>
+  <li>학습시에는 GNN A와 GNN B를 함께(jointly) 학습시킵니다.</li>
+</ul>
+
+<p>그럼 이번엔 예측값과 정답 라벨에 대해서 이야기해봅시다.</p>
+
+<p><strong>Supervised vs Unsupervised(self-supervised)</strong></p>
+
+<p>모델의 결과값은 모델의 가이드라인이 되어줄 <strong>라벨이 외부 소스로부터 오는지(Supervised)</strong> 또는 <strong>주어진 인풋 그래프 내부로부터 도출하는지(Unsupervised)</strong>에 따라서 학습 방법이 나뉩니다.</p>
+
+<p>Supervised 예시 :  분자 그래프에서 drug likeness(신약 가능성)</p>
+
+<p>Unsupervised 예시 : 두 개의 노드 간의 연결 유무</p>
+
+<p><strong>** 가끔씩 Supervised와 Unsupervised의 경계는 모호합니다. 비지도학습에서도 어느정도의 ‘supervision’은 사용되기 때문입니다.</strong></p>
+
+<p><strong>Supervised Labels의 예시들</strong></p>
+
+<ul>
+  <li>노드 : citation 네트워크에서, 주제가 어느 노드에 속하는지</li>
+  <li>엣지 : 거래내역 네트워크에서 엣지가 사기(fraudulent)인지</li>
+  <li>그래프 : 분자 그래프의 신약 가능성</li>
+</ul>
+
+<p>** Advice : 그래프 데이터가 주어졌을 때, 태스크를 node/edge/graph 레벨로 바꿔보세요. 
+<del>(저 레벨들 말고 다른 태스크가 가능한가??)</del>
+예를 들어서, 몇 노드들이 클러스터를 이룬다고 했을 때, 이 클러스터를 노드 라벨로써 사용해보는 겁니다.</p>
+
+<p><strong>Unsupervised Labels의 예시들</strong></p>
+
+<ul>
+  <li>
+    <p>가끔씩 우리는 다른 정보 없이 그래프 인풋만 받는 경우가 있습니다.</p>
+
+    <p>⇒ 이럴 땐 자급자족으로 인풋에서 추출할 수 있는 정보를 활용해보는 겁니다.</p>
+
+    <ul>
+      <li>노드 : node statistics : 클러스터링 계수나 PageRank</li>
+      <li>엣지 : link prediction : 노드 간의 엣지를 고의적으로 가리고, 모델이 해당 엣지를 예측할 수 있는지 평가합니다.</li>
+      <li>그래프 : graph statistics : 두 개의 그래프가 비슷한 형태인지(isomorphic) 평가합니다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Loss Function</strong></p>
+
+<ul>
+  <li>회귀(Regression) : 연속적, Mean Square Error(L2 loss)
+    <ul>
+      <li>평가 지표
+        <ul>
+          <li>Root Mean Square Error (RMSE)</li>
+          <li>Mean Absolute Error (MAE)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>분류(Classification) : 이산적, Cross Entropy</p>
+
+    <p><img src="https://imgur.com/ZyFmKEe" alt="Imgur" /></p>
+
+    <ul>
+      <li>평가 지표
+        <ul>
+          <li>
+            <p>다중분류</p>
+
+            <p><img src="https://imgur.com/eLvImAL" alt="Imgur" /></p>
+          </li>
+          <li>
+            <p>이진분류</p>
+
+            <p>*분류 threshold에 따라 결괏값이 바뀝니다.</p>
+
+            <ul>
+              <li>Accuracy</li>
+              <li>Precision / Recall</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="https://imgur.com/t7KTIVb" alt="Imgur" /></p>
+
+<p><img src="https://imgur.com/hJWLmRh" alt="Imgur" /></p>
+
+<p>이진분류를 위한 threshold 셋팅에 따라 False Positive Rate과 True Positive Rate이 달라집니다. TPR과 FPR 간의 Trade-off 관계를 잘 조절해서 알맞는 threshold 설정이 가능합니다. ROC(Receiver Operating Characteristic Curve)는 y축으로 가파를수록, 그래서 면적(ROC AUC : Area Under the curve)이 클수록 좋은 지표입니다. 예측이 랜덤일수록 그래프를 가로지르는 대각선 축에 가까워집니다.</p>

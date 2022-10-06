@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Lecture 8.1 - Graph Augmentation for GNNs | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Lecture 8.1 - Graph Augmentation for GNNs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 8." />
+<meta property="og:description" content="CS224W Lecture 8." />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/03/lecture-0801.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/03/lecture-0801.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-03T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Lecture 8.1 - Graph Augmentation for GNNs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-03T00:00:00-05:00","datePublished":"2022-08-03T00:00:00-05:00","description":"CS224W Lecture 8.","headline":"Lecture 8.1 - Graph Augmentation for GNNs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/03/lecture-0801.html"},"url":"https://cs224w-kor.github.io/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/03/lecture-0801.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Lecture 8.1 - Graph Augmentation for GNNs</h1><p class="page-description">CS224W Lecture 8.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-03T00:00:00-05:00" itemprop="datePublished">
+        Aug 3, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Neural Network">Graph Neural Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GNN">GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph Convolution Network">Graph Convolution Network</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#GCN">GCN</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#81---graph-augmentation-for-gnns">8.1 - Graph Augmentation for GNNs</a></li>
+</ul><hr>
+<blockquote>
+  <p><strong>Lecutre 8</strong></p>
+
+  <hr>
+</blockquote>
+
+<p>Recap : 저번 시간에는 Deep Graph Encoder의 구조와 GNN의 일반적인 프레임워크에 대해서 배웠습니다.
+<img src="https://imgur.com/7x1oPNr" alt="Imgur">
+Graph convolution과 Regularization 기법, 그리고 activation function과 같은 레이어를 사용해서 node, subgraph, entire graph와 같이 원하는 아웃풋 형식을 뽑아냅니다.</p>
+
+<p>Graph convolution과 Regularization 기법, 그리고 activation function과 같은 레이어를 사용해서 node, subgraph, entire graph와 같이 원하는 아웃풋 형식을 뽑아냅니다.</p>
+
+<p><img src="https://imgur.com/lzgFnXB" alt="Imgur">
+GNN 레이어 간의 k-hop, message passing 방법, 레이어 연결방법, 결과를 종합하는 방법, 그리고 목표한 아웃풋 형식(learning objective)을 설정할 수 있습니다.</p>
+
+<p>GNN 레이어 간의 k-hop, message passing 방법, 레이어 연결방법, 결과를 종합하는 방법, 그리고 목표한 아웃풋 형식(learning objective)을 설정할 수 있습니다.</p>
+
+<p>이번 시간에는 이어서 그 GNN을 올바르게 학습하기 위한 방법들을 배울텐데요.</p>
+
+<p>1) 그래프 인풋을 학습 목적에 알맞게 처리하는 방법론(<strong>Graph Augmentation</strong>, 직역하면 그래프 증강)</p>
+
+<p>2) 어떻게 GNN을 학습시킬지(<strong>Learning Objectives</strong>)</p>
+
+<p>3) 데이터를 어떻게 나눠서 학습시킬지(<strong>How to deal with data</strong>)</p>
+
+<p>에 대해서 배울 예정입니다.</p>
+
+<h1 id="81---graph-augmentation-for-gnns">
+<a class="anchor" href="#81---graph-augmentation-for-gnns" aria-hidden="true"><span class="octicon octicon-link"></span></a>8.1 - Graph Augmentation for GNNs</h1>
+
+<p>💡아이디어 : Raw input graph ≠ computational graph</p>
+
+<ul>
+  <li>
+    <p>인풋 그래프를 바로 GNN에 넣는 것보다는 Augmentation을 <strong>거치는 것이 훨씬 연산적으로 효율적이고, 높은 퍼포먼스를 뽑을 수 있을 것</strong>입니다.</p>
+  </li>
+  <li>
+    <p>그럼 어떤 전처리가 있을까요? 상황에 따라 알아봅시다.</p>
+  </li>
+  <li><strong>상황1) 인풋 그래프의 피쳐가 부족할 경우 (인접 행렬만 가지고 있을 때 자주 사용합니다.)</strong></li>
+  <li><strong>상황2) 엣지가 너무 많거나, 그래프가 너무 큰 경우</strong></li>
+</ul>
+
+<p><strong>상황1) 인풋 그래프의 피쳐가 부족할 경우 (인접 행렬만 가지고 있을 때 자주 사용합니다.)</strong></p>
+
+<p><strong>방법 1) 노드에 일정한 상수를 부여합니다.</strong></p>
+
+<p>e.g)  각 노드에 1을 부여합니다.</p>
+
+<p><img src="https://imgur.com/Anc8bdY" alt="Imgur"></p>
+
+<ul>
+  <li>단순 상수를 부여한 것이지만, 합계(aggregation) 단계에서 hop별로 몇 개의 이웃이 있는지, 그래서 그래프의 구조가 어떻게 이루어져있는지 알 수 있습니다.</li>
+</ul>
+
+<p><strong>방법 2)</strong> <strong>노드에 유니크한 아이디, one-hot vector를 부여합니다.(Assign unique IDs to nodes)</strong></p>
+
+<p><img src="https://imgur.com/Anc8bdY" alt="Imgur"></p>
+
+<ul>
+  <li>노드 ID는 랜덤</li>
+  <li>노드 수와 같은 길이의 벡터가 각 노드에 부여되는 것이기 때문에 계산적으로 부담될 수 있습니다.</li>
+</ul>
+
+<p>아래는 방법1과 방법2를 비교한 표입니다.</p>
+
+<p><img src="https://imgur.com/qAsRexG" alt="Imgur"></p>
+
+<p>때로는 주어진 정보에 비해 그래프의 구조상 모델 학습이 불가한 경우도 있습니다.</p>
+
+<p>예를 들면, 노드 정보가 주어진 상태에서 그래프 전체 싸이클을 세어야하는 경우가 있습니다.</p>
+
+<p><img src="https://imgur.com/Tcn3lyg" alt="Imgur">
+노드 v1 기준으로 봤을 때, 그래프의 구조와 관계 없이 연산은 항상 같습니다.</p>
+
+<p>노드 v1 기준으로 봤을 때, 그래프의 구조와 관계 없이 연산은 항상 같습니다.</p>
+
+<p>해결방법 : 이럴 때는 싸이클 카운트 정보를 노드 피쳐로 넣어주면 됩니다. (feature augmentation)</p>
+
+<p>Feature Augmentation을 위한 또 다른 그래프 정보들은 어떤 것이 있을까요?</p>
+
+<ul>
+  <li>Node degree</li>
+  <li>Clustering coefficient</li>
+  <li>PageRank</li>
+  <li>Centrality</li>
+</ul>
+
+<p>2번째 강의에서 배웠던 거의 모든 내용이 피쳐로 활용 가능합니다.</p>
+
+<p><strong>방법3) 가상의 노드와 엣지를 첨가합니다.</strong></p>
+
+<p>1) 가상의 엣지 추가</p>
+
+<p>common approach : 2-hop 이웃들을 가상의 엣지로 연결합니다.</p>
+
+<p>앞 강의에서 배웠다시피, 근접 행렬의 n제곱은 n번째 이웃들의 숫자와 같다는 점을 활용합니다.</p>
+
+<p>(instead of using adj. matrix A for GNN computation, use A + A^2)</p>
+
+<p>** n power of adj matrix = # of nodes that are neighbors at n</p>
+
+<p>예시) Bipartite graph : 저자-논문 이분그래프가 있다고 할 때, 2 hop 이웃들을 연결한 가상 엣지들로 저자-저자 콜래보레이션 그래프 변형이 가능하다.</p>
+
+<p>2) 가상의 노드 추가</p>
+
+<p><img src="https://imgur.com/XiTvE4q" alt="Imgur"></p>
+
+<ul>
+  <li>추가한 가상 노드들은 다른 모든 노드들과 연결합니다
+    <ul>
+      <li>두 노드 간의 거리가 3인 sparse graph가 있다고 가정할 때,</li>
+      <li>가상 노드를 추가하게 되면, 모든 노드 간의 거리가 2로 줄어든다.
+        <ul>
+          <li>node A - virtual node - node b</li>
+        </ul>
+
+        <p>⇒ 이점 : sparse graph에서 미미했던 message passing이 쎄진다.</p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>상황2) 엣지가 너무 많거나, 그래프가 너무 큰 경우</strong></p>
+
+<p>e.g) 소셜 네트워크 그래프에서 킴 카다시안의 팔로워들은 다른 일반인보다 훨씬 많은 이웃들을 가질 것입니다.</p>
+
+<p>노드 이웃 샘플링(Node Neighborhood sampling)을 사용해보세요.</p>
+
+<p>기존 방식이 인풋 정보를 전부 다 활용했었다면,</p>
+
+<p><img src="https://imgur.com/z876VK8" alt="Imgur"></p>
+
+<p>아래 그림과 같이 Node Neighborhood sampling은 매 step마다 노드의 다른 이웃들을 샘플링해 학습에 적용합니다. 이상적인 시나리오라면, node neighborhood sampling을 적용한 학습 모델은 그래프 전부를 학습에 포함한 경우와 비슷한 엠베딩을 얻을 수 있게 됩니다.</p>
+
+<p><img src="https://imgur.com/5dAzTFl" alt="Imgur"></p>
+
+<p>그래프가 너무 큰 경우, computational cost를 많이 줄여줄 수 있습니다.</p>
+
+<p>💡<strong>Takeaway : 항상 그래프 인풋을 전처리 없이 바로 사용하는 것은 효율적이지 않다!</strong></p>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/graph%20neural%20network/gnn/graph%20convolution%20network/gcn/2022/08/03/lecture-0801.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
