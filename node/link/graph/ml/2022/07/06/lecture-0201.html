@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Leture 2 - Traditional Methods for Machine Learning in Graphs | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Leture 2 - Traditional Methods for Machine Learning in Graphs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 2. Traditional Methods for Machine Learning in Graphs" />
+<meta property="og:description" content="CS224W Lecture 2. Traditional Methods for Machine Learning in Graphs" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/node/link/graph/ml/2022/07/06/lecture-0201.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/node/link/graph/ml/2022/07/06/lecture-0201.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-06T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Leture 2 - Traditional Methods for Machine Learning in Graphs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-07-06T00:00:00-05:00","datePublished":"2022-07-06T00:00:00-05:00","description":"CS224W Lecture 2. Traditional Methods for Machine Learning in Graphs","headline":"Leture 2 - Traditional Methods for Machine Learning in Graphs","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/node/link/graph/ml/2022/07/06/lecture-0201.html"},"url":"https://cs224w-kor.github.io/blog/node/link/graph/ml/2022/07/06/lecture-0201.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Leture 2 - Traditional Methods for Machine Learning in Graphs</h1><p class="page-description">CS224W Lecture 2. Traditional Methods for Machine Learning in Graphs</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-07-06T00:00:00-05:00" itemprop="datePublished">
+        Jul 6, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Node">Node</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Link">Link</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph">Graph</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ML">ML</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#cs224w-traditional-methods-for-machine-learning-in-graphs--2021--lecture2">CS224W: Traditional Methods for Machine Learning in Graphs | 2021 | Lecture2</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#traditional-ml-pipeline">💡Traditional ML Pipeline</a></li>
+<li class="toc-entry toc-h3"><a href="#-lecture-object--feature-design">💡 Lecture Object : Feature Design</a></li>
+<li class="toc-entry toc-h2"><a href="#traditional-feature-based-method--node">🔴 Traditional Feature-Based Method : Node</a></li>
+<li class="toc-entry toc-h2"><a href="#goal--network에서-node의-구조와-위치를-특정할-수-있는-feature를-만드는-것">Goal : Network에서 Node의 구조와 위치를 특정할 수 있는 Feature를 만드는 것</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#-1-node-degree-k_v">💡 1. Node Degree ($k_v$)</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#"></a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#-2-node-centralityc_v">💡 2. Node Centrality($c_v$)</a></li>
+<li class="toc-entry toc-h3"><a href="#-3-clustering-coefficient">💡 3. Clustering Coefficient</a></li>
+<li class="toc-entry toc-h3"><a href="#-4-graphlets">🤔 4. Graphlets***</a></li>
+<li class="toc-entry toc-h3"><a href="#-node-level-feature-summary">💡 Node-Level Feature Summary</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#traditional-feature-based-method--link">🔗 Traditional Feature-Based Method : Link</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#-link-level-prediction-task">💡 Link-Level Prediction Task</a></li>
+<li class="toc-entry toc-h3"><a href="#-link---level-feature--distance-based-features">💡 Link - Level Feature : Distance-Based Features</a></li>
+<li class="toc-entry toc-h3"><a href="#link-level-feature-summary">💡Link-Level Feature Summary</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#traditional-feature-based-method--graph">⛓ Traditional Feature-Based Method : Graph</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#-kernel-method">💡 Kernel Method</a></li>
+<li class="toc-entry toc-h3"><a href="#-grahplet-features">💡 Grahplet Features</a></li>
+<li class="toc-entry toc-h3"><a href="#-graphlet-kernel">💡 Graphlet Kernel</a></li>
+<li class="toc-entry toc-h3"><a href="#-weisfeiler-lehmanwl-kernel">💡 Weisfeiler-Lehman(WL) Kernel</a></li>
+<li class="toc-entry toc-h3"><a href="#-color-refinement">💡 Color Refinement</a></li>
+<li class="toc-entry toc-h3"><a href="#-graph-level-feature-summary">💡 Graph-Level Feature Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><h1 id="cs224w-traditional-methods-for-machine-learning-in-graphs--2021--lecture2">
+<a class="anchor" href="#cs224w-traditional-methods-for-machine-learning-in-graphs--2021--lecture2" aria-hidden="true"><span class="octicon octicon-link"></span></a>CS224W: Traditional Methods for Machine Learning in Graphs | 2021 | Lecture2</h1>
+
+<hr>
+<blockquote>
+  <p><strong>Lecutre 2. Traditional Methods for Machine Learning in Graphs</strong></p>
+
+  <ul>
+    <li>Lecture 2.1 Traditional Feature-Based Method : Node</li>
+    <li>Lecture 2.2 Traditional Feature-Based Method : Link</li>
+    <li>Lecture 2.3 Traditional Feature-Based Method : Graph</li>
+  </ul>
+</blockquote>
+
+<hr>
+
+<p>2강에선 Graph를 이용한 Traditional ML 방법론들에 대해 설명한다.</p>
+
+<h3 id="traditional-ml-pipeline">
+<a class="anchor" href="#traditional-ml-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡Traditional ML Pipeline</h3>
+
+<p><strong><em>Traditional ML Pipeline</em></strong>은 크게 2단계로 이루어져 있다.</p>
+
+<ol>
+  <li>Data Point, Node, Link, Graph(이하 <strong>입력</strong>)를 Feature Vector로 변환해 ML모델을 학습시킨다.</li>
+  <li>새로운 <strong>입력</strong>이 들어오면 Feature Vector를 얻고 모델을 통해 예측한다.</li>
+</ol>
+
+<hr>
+
+<h3 id="-lecture-object--feature-design">
+<a class="anchor" href="#-lecture-object--feature-design" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Lecture Object : Feature Design</h3>
+
+<hr>
+
+<p><code class="language-plaintext highlighter-rouge">Goal</code> : <strong>입력</strong> Set이 주어졌을때 예측값을 만들어내는것 / 모델은 ML Model 사용</p>
+
+<blockquote>
+  <p>Design Choice</p>
+
+  <ul>
+    <li>Feature : $d$차원의 벡터</li>
+    <li>입력 : Nodes, Links, Sets of Nodes, Entire Graph</li>
+    <li>Objective Function : 무슨 Task를 풀려고 하는가?</li>
+  </ul>
+</blockquote>
+
+<hr>
+
+<ol>
+  <li>Traditional ML Pipeline은 수작업으로 만들어진(Hand-Designed) Feature를 사용한다.</li>
+  <li>Hand Designed Feature를 Graph의 세 레벨 (Node, Link, Graph)로 나누어 설명한다.</li>
+  <li>Undirected Graph를 중점으로 설명한다.</li>
+</ol>
+
+<hr>
+
+<h2 id="traditional-feature-based-method--node">
+<a class="anchor" href="#traditional-feature-based-method--node" aria-hidden="true"><span class="octicon octicon-link"></span></a>🔴 Traditional Feature-Based Method : Node</h2>
+
+<hr>
+
+<blockquote>
+  <h2 id="goal--network에서-node의-구조와-위치를-특정할-수-있는-feature를-만드는-것">
+<a class="anchor" href="#goal--network%EC%97%90%EC%84%9C-node%EC%9D%98-%EA%B5%AC%EC%A1%B0%EC%99%80-%EC%9C%84%EC%B9%98%EB%A5%BC-%ED%8A%B9%EC%A0%95%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8A%94-feature%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94-%EA%B2%83" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Goal : Network에서 Node의 구조와 위치를 특정할 수 있는 Feature를 만드는 것</strong>
+</h2>
+</blockquote>
+
+<h3 id="-1-node-degree-k_v">
+<a class="anchor" href="#-1-node-degree-k_v" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 1. Node Degree ($k_v$)</h3>
+
+<p>Node $v$의 Degree를 $k_v$라고 정의하자. 이때 $k_v$는 $v$가 갖고있는 Edge(Link)의 수와 같다.</p>
+
+<h2>
+<a class="anchor" href="#" aria-hidden="true"><span class="octicon octicon-link"></span></a><img src="https://i.imgur.com/bRvU9Xz.png" alt="Imgur">
+</h2>
+
+<h3 id="-2-node-centralityc_v">
+<a class="anchor" href="#-2-node-centralityc_v" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 2. Node Centrality(<strong>$c_v$</strong>)</h3>
+
+<p>Node Degree는 단순히 이웃한 Node의 갯수를 세므로, 그것들의 중요도를 Capture할 수 없다.</p>
+
+<p>Node Centrality($c_v$)는 Graph에서 해당 Node( $v$)의 중요도를 포함시킨 개념이다.</p>
+
+<ul>
+  <li>
+<strong>2-1. Engienvector centrality</strong>
+    <ul>
+      <li>
+<code class="language-plaintext highlighter-rouge">Important</code> : $v$가 <em>Important</em> 이웃노드 $u$에 둘러싸여 있을 때 $v$는 <em>Important</em>하다고 한다.</li>
+      <li>
+<code class="language-plaintext highlighter-rouge">Formula</code>
+        <ul>
+          <li>$c_v = {1 \over \lambda} \sum\limits_{u\in N(v)}c_u$ ($\lambda$는 Normalization 상수) ⇒ 이렇게 하면 Recursive함</li>
+          <li>$\lambda c= Ac$ ($A$는 Adjacency Matrix)
+            <ul>
+              <li>고유값과 고유벡터 형태로 재설정</li>
+              <li>$c$는 $A$의 고유벡터, $\lambda$는 고유값이며 $\lambda_{max}$는 항상 양수에 Unique함</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+<strong>2-2. Betweenness centrality</strong>
+    <ul>
+      <li>
+<code class="language-plaintext highlighter-rouge">Important</code> : $v$가 다른 노드들을 연결하는 최단 경로에 있을때 <em>Important</em>하다고 한다.(경유)</li>
+      <li>
+        <p><code class="language-plaintext highlighter-rouge">Formula</code>  : $c_v = \sum\limits_{s \neq v \neq t}{v를\ 포함하는 s와\ t사이 \ 최단\ 경로 \over s와\ t사이\ 최단\ 경로}$</p>
+
+        <p><img src="https://i.imgur.com/xh0zsGH.png" alt="Imgur"></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+<strong>2-3. Closeness Centrality</strong>
+    <ul>
+      <li>
+<code class="language-plaintext highlighter-rouge">Important</code> :  $v$가 다른 모든 노드에 대한 최단 경로의 길이가 짧을때 <em>Important</em>하다고 한다.</li>
+      <li>
+        <p><code class="language-plaintext highlighter-rouge">Formula</code> : $c_v = 1 \div  \sum\limits_{u \neq v} (u와\ v사이의\ 최단경로의\ 길이)$</p>
+
+        <p><img src="https://i.imgur.com/QA0e7Hi.png" alt="Imgur"></p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3 id="-3-clustering-coefficient">
+<a class="anchor" href="#-3-clustering-coefficient" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 3. Clustering Coefficient</h3>
+
+<p><strong><em>Clustering Coefficient</em></strong>는 Node $v$의 이웃들이 얼마나 연결되어 있는지를 측정하는 개념이다.</p>
+
+<p>$v$의 이웃간 연결된 경우의 수를 이웃 Node들이 서로 연결될 수 있는 전체 경우의 수로 나누어준다.</p>
+
+<p><img src="https://i.imgur.com/WSxpVTm.png" alt="Imgur"></p>
+
+<p><img src="https://i.imgur.com/g7wDAiK.png" alt="Imgur"></p>
+
+<hr>
+
+<h3 id="-4-graphlets">
+<a class="anchor" href="#-4-graphlets" aria-hidden="true"><span class="octicon octicon-link"></span></a>🤔 4. Graphlets***</h3>
+
+<hr>
+
+<p><code class="language-plaintext highlighter-rouge">Observation</code> : Clustering Coefficient는 Ego-Network의 #(Triangle)을 센다)</p>
+
+<ul>
+  <li>Ego-Network : Node가 주어졌을때 자기자신과 1차-이웃만 포함한 Network</li>
+  <li>#(Triangle) : 3개의 노드가 연결되어 있는 것</li>
+  <li>이런 Triangle Counting을 다양한 구조에 대해 일반화 하는것 ⇒ Graphlets의 개념</li>
+</ul>
+
+<p><img src="https://i.imgur.com/oANu76X.png" alt="Imgur"></p>
+
+<hr>
+
+<ul>
+  <li>Graphlet의 목적 : Node $u$의 이웃 구조를 기술하는 것
+    <ul>
+      <li>
+        <p>Graphlets : $u$의 이웃 구조를 기술하기 위한 작은 Subgraph(Template?)</p>
+
+        <p><img src="https://i.imgur.com/Rih91Sq.png" alt="Imgur"></p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<blockquote>
+  <p><strong><em>Graphlet Degree Vector(GDV)</em></strong> : Node의 Graphelt-Based Feature</p>
+
+  <ul>
+    <li>Degree of Graphlet : 특정 Node가 포함된 Graphlet의 갯수 벡터이다. 
+어떻게 세는지는 아래의 예시를 통해 설명한다.</li>
+  </ul>
+</blockquote>
+
+<hr>
+
+<ol>
+  <li>
+    <p>아래와 같이 생긴 Graph $G$에서 Node $u$에 관심있다고 가정해 보자.</p>
+
+    <p><img src="https://i.imgur.com/6wbUZqm.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>Graph 구조를 보았을때, 최대 3개의 Node가 참여하는 Graphlet을 만들 수 있다.</p>
+
+    <p><img src="https://i.imgur.com/3uIYSMl.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>각각의 Graphlet이 $G$에서 $u$를 포함한채로 몇번 나타나는지 세보자</p>
+
+    <p><img src="https://i.imgur.com/3HqOtKv.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>Node $u$의 GDV는 [2,1,0,2]가 된다.</p>
+  </li>
+</ol>
+
+<hr>
+<blockquote>
+  <p><strong><em>Graphlet Summary</em></strong></p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2~5개의 Node가 참여하는 Graphlet의 갯수는 73개이다. 이를 73차원의 벡터로 표시할 수 있고, 각 Index는 특정한 Neighborhood Topology에 Signature이다. 이 벡터를 이용해 Node의 Local Network Topology를 잘 정제된 Feature로 만든게 GDV이며, 앞에서 소개한 방식보다 자세한 정보를 갖고있다.
+</code></pre></div></div>
+
+<hr>
+
+<h3 id="-node-level-feature-summary">
+<a class="anchor" href="#-node-level-feature-summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Node-Level Feature Summary</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Node Level Feature는 2가지 분류로 나눌수 있다
+
+1. Importance Based (Ex Task : 영향력있는 Node찾기(SNS의 셀럽찾기))
+    1. Node Degree : 단순히 이웃의 숫자를 센다
+    2. Node Centrality : Graph에서의 이웃 노드의 중요도를 모델링한다.
+2. Structure Based (Ex Task : Node의 역할 찾기(단백질 구조에서 특정 단백질의 기능찾기))
+    1. Node Degree : 단순히 이웃의 숫자를 센다
+    2. Clustering Coefficient : 이웃이 어떻게 연결되어있는지 측정한다.
+    3. Graphlet Count Vector : 여러 Graphlet들이 출현하는 빈도를 센다.
+</code></pre></div></div>
+
+<hr>
+
+<h2 id="traditional-feature-based-method--link">
+<a class="anchor" href="#traditional-feature-based-method--link" aria-hidden="true"><span class="octicon octicon-link"></span></a>🔗 Traditional Feature-Based Method : Link</h2>
+
+<hr>
+
+<h3 id="-link-level-prediction-task">
+<a class="anchor" href="#-link-level-prediction-task" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Link-Level Prediction Task</h3>
+
+<p>Link-Level Task는 존재하는 Link를 바탕으로 새로운 Link를 예측하는 것이다. Link를 예측하는 Task는 크게 2가지 Formulation이 있다.</p>
+
+<blockquote>
+  <p><strong><em>1. 랜덤하게 사라진 Link 찾기 :</em></strong> Static한 Graph에 적절하다.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong><em>2. 시간이 흐름에 따라 생겨나는 Link 찾기 :</em></strong> SNS, Transaction같이 Dynamic한 Graph에 적절하다.</p>
+</blockquote>
+
+<p>Link-Level Prediction의 자세한 방법은 다음과 같다.</p>
+
+<ol>
+  <li>각 Node쌍 ($x,y)$에 score $c(x,y)$를 계산한다.</li>
+  <li>$c(x,y)$ 내림차순으로 Node 쌍을 정렬한다</li>
+  <li>Top $N$개의 Pair들을 새로운 Link로 예측한다.</li>
+</ol>
+
+<hr>
+
+<h3 id="-link---level-feature--distance-based-features">
+<a class="anchor" href="#-link---level-feature--distance-based-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Link - Level Feature : Distance-Based Features</h3>
+
+<p>&lt;/aside&gt;</p>
+
+<blockquote>
+  <p><strong><em>1. 노드간 최단 경로</em></strong></p>
+
+</blockquote>
+
+<p>두 Node간 최단경로의 거리를 사용한다. 이웃의 수나 강도에 대한 어떠한 정보도 캡쳐하지 않는다.</p>
+
+<blockquote>
+  <p><strong><em>2. Local Neighborhood Overlap</em></strong></p>
+
+</blockquote>
+
+<p>두 Node가 공유하는 이웃을 캡쳐한다.</p>
+
+<ul>
+  <li>
+<strong>Coomon Neighbors</strong> : 단순히 교집합을 구한다</li>
+  <li>
+<strong>Jaccard’s Coefficient</strong> : 교집합의 크기를 합집합으로 나눈다</li>
+  <li>
+<strong>Adamic-Adar Index</strong> : (SNS에서 잘 동작한다고 하네요)
+두 Node가 공유하는 이웃을 u라고 할 때 $\sum \limits_u {1\over log(k_u)}$</li>
+</ul>
+
+<blockquote>
+  <p><strong><em>3. Global Neighborhood Overlap</em></strong></p>
+
+</blockquote>
+
+<p>Local Neighborhood Overlap의 단점은 잠재적 이웃도 직접적인 공통 이웃이 없으면 0이 된다는 점이다.</p>
+
+<p><img src="https://i.imgur.com/xWSmHWZ.png" alt="Imgur"></p>
+
+<ul>
+  <li>
+<strong>Katz Index</strong> : 주어진 Node 쌍을 잇는 모든 길이의 경로를 센다. Matrix를 이용해 깔끔하게 연산할수 있다.
+    <ul>
+      <li>$A_{uv}$는 직접 이웃일 때 1이고 아니면 0이다.</li>
+      <li>$P_{uv}^{(K)}$는 $K$길이의 $u,v$를 잇는 경로이다.</li>
+      <li>$P^{(K)}$ = $A^k$이다.</li>
+      <li>
+<code class="language-plaintext highlighter-rouge">Formula</code>
+        <ul>
+          <li>$S_{uv} = \sum \limits_{l=1}^\infty
+  \beta^l A_{uv}^{l}$ ($l$ : Path의 길이, $\beta$: Discount Factor($0&lt;\beta&lt;1$)</li>
+          <li>$S_{uv} = \sum \limits_{l=1}^\infty \beta^lA^i=(I-\beta A)^{-1}-I$ (Closed-Form)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="link-level-feature-summary">
+<a class="anchor" href="#link-level-feature-summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡Link-Level Feature Summary</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Link Level Feature는 3가지 분류로 나눌수 있다
+
+1. Distance-Based :두 Node간 최단경로의 거리
+2. Local Neigborhood Overlap : 두 Node가 공유하는 이웃의 수
+3. Global Neighborhood Overlap : 두 Node를 잇는 모든 길이의 경로 가중합
+</code></pre></div></div>
+
+<hr>
+
+<h2 id="traditional-feature-based-method--graph">
+<a class="anchor" href="#traditional-feature-based-method--graph" aria-hidden="true"><span class="octicon octicon-link"></span></a>⛓ Traditional Feature-Based Method : Graph</h2>
+
+<hr>
+
+<blockquote>
+  <p><strong>Goal : 전체 Graph 구조를 특정할 수 있는 Feature를 만드는 것</strong></p>
+
+  <ul>
+    <li>아이디어 : Graph로 Feature를 직접 만드는 대신 Kernel을 만들자.
+      <ul>
+        <li>Kernel $K(G,G’) \in \R$ 은 두 Graph$(G)$ 사이의 유사도를 측정한다.</li>
+        <li>Kernel Matrix는 항상 양의 고유값을 갖고 대칭행렬 이어야한다.</li>
+        <li>Feature Representaiton $\phi(.)$이 존재한다.</li>
+        <li>이 Kernel을 SVM등에 붙여서 사용한다.</li>
+      </ul>
+    </li>
+  </ul>
+</blockquote>
+
+<hr>
+
+<h3 id="-kernel-method">
+<a class="anchor" href="#-kernel-method" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Kernel Method</h3>
+
+<ul>
+  <li>
+<strong>Goal :</strong> Graph Feature Vector $\phi(G)$를 설계한다</li>
+  <li>
+<strong>Idea :</strong> Graph에 대해 Bow를 만든다.
+    <ul>
+      <li>
+<em>Bow</em> : NLP에서 모든 단어가 몇 번 나타나는지 세는 방법</li>
+      <li>
+        <p><em>Naive Solution</em> : Node를 Word로 사용한다. 그러나 너무 Naive해서 써먹기 어렵다.</p>
+
+        <p><img src="https://i.imgur.com/c7WNp0e.png" alt="Imgur"></p>
+      </li>
+      <li>
+        <p><em>Node Degrees</em> : Node Degree를 Word로 사용한다.</p>
+
+        <p><img src="https://i.imgur.com/nLC4jnv.png" alt="Imgur"></p>
+      </li>
+      <li>이런식의 Bag-of-something 방식이 Graphlet Kernel과 WL Kernel에서도 사용된다.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3 id="-grahplet-features">
+<a class="anchor" href="#-grahplet-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Grahplet Features</h3>
+
+<ul>
+  <li>
+<strong>Idea</strong> : Graph에 존재하는 서로 다른 Graphlet의 숫자를 세자</li>
+  <li>
+<strong>Note :</strong> 이때의 Graphlet은 Node-Level과 조금 다른 정의를 갖고있다.
+    <ul>
+      <li>Isolated Node로 Graphlet의 일부로 허용한다.</li>
+      <li>Root Node가 없다.</li>
+    </ul>
+
+    <p><img src="https://i.imgur.com/RCZYqWd.png" alt="Imgur"></p>
+  </li>
+  <li>Graph $G$와 Graphlet list $g_k = (g_1,g_2 …g_{nk})$가 주어졌을 때
+Graphlet Count Vector $f_G \in \R^{nk}$ 는 Graph에서 나타나는 각 Graphlet의 인스턴스 수로 정의된다.
+    <ul>
+      <li>
+        <table>
+          <tbody>
+            <tr>
+              <td>$(f_G)_i = #(g_i \in G)$</td>
+              <td>(for $i = 1,2,…n_k)$</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p><img src="https://i.imgur.com/15aKkBh.png" alt="Imgur"></p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="-graphlet-kernel">
+<a class="anchor" href="#-graphlet-kernel" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Graphlet Kernel</h3>
+
+<ul>
+  <li>2개의 Graph $G$ 와 $G’$가 주어지면, Graphlet Kernel은 $K(G,G’) = {f_G}^Tf_{G’}$로 표현될 수 있다(내적)</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">Problem</code> : $G$ 와 $G’$가 크기(Scale)이 다르면 값이 크게 왜곡된다.</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">Solution</code>: $f_G$  대신 Sum으로 나눠준 $h_G$를 사용한다.  $h_G = {f_G \over Sum(f_G)}$</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">Limitation</code> : Graphlet을 세는 연산이 매우 Expensive하다 !
+    <ul>
+      <li>$n$ 크기의 Graph의 $k$ 크기의 Graphlet를 세려면 $n^k$번 연산해야 한다.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3 id="-weisfeiler-lehmanwl-kernel">
+<a class="anchor" href="#-weisfeiler-lehmanwl-kernel" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Weisfeiler-Lehman(WL) Kernel</h3>
+
+<ul>
+  <li>
+<strong>Goal :</strong> 효율적인 Graph Feature Descriptor를 만드는 것
+    <ul>
+      <li>WL-Kernel은 강력하고 효율적이어서 인기가 많다.</li>
+    </ul>
+  </li>
+  <li>
+<strong>Idea :</strong> Node Degree를 이용해 반복적으로 Node Vocap을 풍부하게 만들어 나가는 것
+    <ul>
+      <li>One-Hop Neighborhood인 Node Degree 방식을 일반화 한 버전이다.</li>
+      <li>
+<strong><em>Color Refinement</em></strong> 알고리즘을 통해 이루어진다.</li>
+    </ul>
+  </li>
+  <li><strong>각 Step에서의 Time-Complexity가 Edge에 따라 Linear하게 증가한다.</strong></li>
+</ul>
+
+<h3 id="-color-refinement">
+<a class="anchor" href="#-color-refinement" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 Color Refinement</h3>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Given</code> : Graph $G$와 그것들의 Set of Nodes $V$</p>
+
+    <ol>
+      <li>Initial Color $c^{(0)}(v)$를 각 노드 $v$에 할당한다</li>
+      <li>Iteratively하게 Node의 Color를 정제해 나간다.
+  $c^{(k+1)}(v) = HASH({c^{(k)}(v), {c^{(k)}(u) }_{u\in N(v)})$
+        <ul>
+          <li>HASH는 다른 입력을 다른 Color로 매핑하는 연산이다.</li>
+        </ul>
+      </li>
+      <li>$K$ Step 동안의 정제가 끝나면 $c^{(K)}(v)$ 값을 Summary한다.</li>
+    </ol>
+
+    <hr>
+
+    <ul>
+      <li>
+        <p>비슷하지만 조금 다른 Graph 두개 ($G_1, G_2$)가 주어졌을때 Color Refienment 예시이다</p>
+
+        <ol>
+          <li>
+            <p>동일한 Initial Color를 모든 Node에 할당한다.</p>
+
+            <p><img src="https://i.imgur.com/MbNlENL.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>이웃하는 색상에 대해 Aggregate한다.</p>
+
+            <p><img src="https://i.imgur.com/qsIdHIv.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>Aggregate된 Color를 HASH한다.</p>
+
+            <p><img src="https://i.imgur.com/ARtbUYJ.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>이웃하는 색상에 대해 Aggregate한다.</p>
+
+            <p><img src="https://i.imgur.com/54MxJxX.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>Aggregate된 Color를 HASH한다.</p>
+
+            <p><img src="https://i.imgur.com/jzDMsuL.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>Color Refinement가 끝나면 WL Kernel이 각 Color가 등장했던 횟수를 세서 Summary한다.</p>
+
+            <p><img src="https://i.imgur.com/l2oEW8J.png" alt="Imgur"></p>
+          </li>
+          <li>
+            <p>Color Count Vector를 내적해 WL Kernel의 결과값을 구한다.</p>
+
+            <p><img src="https://i.imgur.com/XXN2ldt.png" alt="Imgur"></p>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h3 id="-graph-level-feature-summary">
+<a class="anchor" href="#-graph-level-feature-summary" aria-hidden="true"><span class="octicon octicon-link"></span></a>💡 <strong><em>Graph-Level Feature Summary</em></strong>
+</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Graph Level Feature는 Kernel을 이용한다.
+
+1. Graphlet Kernel :Bag-of-Graphlets, Computationally Expensive
+2. WL- Kernel :
+    - Color-Refinement 알고리즘을 이용해 반복적으로 피팅
+    - Bag-of-Colors
+    - Computationally Efficient !
+    - Closely related to Graph Neural Networks
+</code></pre></div></div>
+
+<blockquote>
+  <p>Original Lecture Video :<br>
+  Lec 2-1 : https://www.youtube.com/watch?v=3IS7UhNMQ3U  <br>
+  Lec 2-2 : https://www.youtube.com/watch?v=4dVwlE9jYxY<br>
+  Lec 2-3 : https://www.youtube.com/watch?v=buzsHTa4Hgs</p>
+</blockquote>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/node/link/graph/ml/2022/07/06/lecture-0201.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
