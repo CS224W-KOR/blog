@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Leture 16 - Advanced Topics in Graph Neural Networks | CS224W-KOR</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Leture 16 - Advanced Topics in Graph Neural Networks" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CS224W Lecture 16. Advanced Topics in Graph Neural Networks" />
+<meta property="og:description" content="CS224W Lecture 16. Advanced Topics in Graph Neural Networks" />
+<link rel="canonical" href="https://cs224w-kor.github.io/blog/node/link/graph/ml/%20gnn/theory/2022/08/31/lecture-1601.html" />
+<meta property="og:url" content="https://cs224w-kor.github.io/blog/node/link/graph/ml/%20gnn/theory/2022/08/31/lecture-1601.html" />
+<meta property="og:site_name" content="CS224W-KOR" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-31T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Leture 16 - Advanced Topics in Graph Neural Networks" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-31T00:00:00-05:00","datePublished":"2022-08-31T00:00:00-05:00","description":"CS224W Lecture 16. Advanced Topics in Graph Neural Networks","headline":"Leture 16 - Advanced Topics in Graph Neural Networks","mainEntityOfPage":{"@type":"WebPage","@id":"https://cs224w-kor.github.io/blog/node/link/graph/ml/%20gnn/theory/2022/08/31/lecture-1601.html"},"url":"https://cs224w-kor.github.io/blog/node/link/graph/ml/%20gnn/theory/2022/08/31/lecture-1601.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://cs224w-kor.github.io/blog/feed.xml" title="CS224W-KOR" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">CS224W-KOR</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">Questions</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Leture 16 - Advanced Topics in Graph Neural Networks</h1><p class="page-description">CS224W Lecture 16. Advanced Topics in Graph Neural Networks</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-08-31T00:00:00-05:00" itemprop="datePublished">
+        Aug 31, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      7 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#Node">Node</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Link">Link</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Graph">Graph</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#ML">ML</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/# GNN"> GNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#Theory">Theory</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#16-advanced-topics-in-graph-neural-networks">16. Advanced Topics in Graph Neural Networks</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#161-how-expressive-are-graph-neural-networks">16.1 How Expressive are Graph Neural Networks</a></li>
+<li class="toc-entry toc-h2"><a href="#162-position-aware-graph-neural-networks">16.2 Position-aware Graph Neural Networks</a></li>
+<li class="toc-entry toc-h2"><a href="#163-identity-aware-graph-neural-networks">**16.3 Identity-Aware Graph Neural Networks</a></li>
+<li class="toc-entry toc-h2"><a href="#164-robustness-of-graph-neural-networks">**16.4 Robustness of Graph Neural Networks</a></li>
+<li class="toc-entry toc-h2"><a href="#"></a></li>
+</ul>
+</li>
+</ul><h1 id="16-advanced-topics-in-graph-neural-networks">
+<a class="anchor" href="#16-advanced-topics-in-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>16. Advanced Topics in Graph Neural Networks</h1>
+
+<p><code class="language-plaintext highlighter-rouge">핵심 내용</code></p>
+
+<hr>
+
+<ul>
+  <li>완벽한 GNN의 조건은 무엇이며, 어떻게 도달할 수 있는가 ?</li>
+  <li>Graph에서의 위치를 나타내는 GNN은 어떻게 만들 수 있는가 ?</li>
+  <li>Target Node를 구분하는 ID-GNN은 어떻게 만들 수 있는가?</li>
+  <li>GNN은 Adversarial Attack에 취약한가?</li>
+</ul>
+
+<hr>
+
+<blockquote>
+  <p>이번 강의의 주제는 <strong>완벽한 GNN</strong>이다. 완벽한 GNN이 무엇이며, 어떻게 동작해야 하는지에 대해 고찰하면서 Adavanced GNN을 만들어 나가는 내용이다.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="161-how-expressive-are-graph-neural-networks">
+<a class="anchor" href="#161-how-expressive-are-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>16.1 <em>How Expressive are Graph Neural Networks</em>
+</h2>
+
+<hr>
+
+<p>사고 실험을 통해 완벽한 GNN이 어떤 일을 해야하는지 생각해보자. 9강에서도 말 했듯이, <strong>완벽한 GNN이라면</strong> Target Node의 Neighborhood Structure(이하 이웃구조)와 Embedding을 Injective하게 Mapping해야 한다. 이 얘기를 풀어서 설명하면 <strong>(1) 같은 이웃구조를 가지고 있는 Node는 같은 Embedding을 가져야하고, (2) 다른 이웃구조를 가지고 있는 Node는 다른 Embedding을 가져야 한다.</strong> (Feature는 같다고 가정한다)</p>
+
+<p><img src="https://i.imgur.com/eyAvERC.png" alt="Imgur"></p>
+
+<p>이 가정을 바탕으로 “<strong>실패</strong>“한 모델과 “<strong>성공적인</strong>” 모델을 정의해보자. 서로 다른 Graph Input (Nodes, Edges, Graphs) 쌍이 들어오면, 실패한 모델은 그 둘을 같은 Embedding으로 매핑할 것이고, 성공적인 모델은 다른 Embedding으로 매핑할 것이다. 이 정의를 기억하며 완벽한 GNN이란 무엇인지 계속 생각해보자. 2가지 조건을 만족시키면 완벽한 GNN일까? 그리고 지금 GNN은 완벽할까?</p>
+
+<p>우선 <strong>1) 같은 이웃구조를 가진 Node는 같은 Embedding을 가진다</strong>는 결함이 있는 조건이다. Graph안에서의 Position이 중요한 정보라면, 같은 이웃 구조더라도, 다른 Position에 놓여있으면 다른 Embedding을 가져야 한다. 이런 경우를 <code class="language-plaintext highlighter-rouge">Position-aware</code> Task라고 부르며 (1)을 만족하더라도 Position-Aware Task라면 모델링에 실패했다고 볼 수 있다. 그리고 여태 소개한 GNN중 Position 정보를 Encoding하는 모델은 없다.</p>
+
+<p><strong>(2) 다른 이웃구조를 가지고 있는 Node는 다른 Embedding을 가져야 한다</strong>는 여태 나온 GNN으로 항상 성공할 수 없는 조건이다. Message Passing GNN은 Cycle Count를 전해줄 수 없으므로 아래 예시에서 실패하며, <a href="https://www.notion.so/CS224w-Lecture-9-32c0c85a9ee440a4ab128fa79535e3de">Symetric한 구조에서도 실패한다.</a></p>
+
+<p>이번 강의에선 이 두가지 문제점을 More Expressive GNN을 설계한다. <strong>(1)번 문제</strong>는 Graph에서의 Position을 기반으로한 Embedding을 만들어내 해결하고, <strong>(2)번 문제</strong>는 WL Kernel보다 강력한 Message Passing GNN을 만들어서 해결한다.</p>
+
+<hr>
+
+<h2 id="162-position-aware-graph-neural-networks">
+<a class="anchor" href="#162-position-aware-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>16.2 <em>Position-aware Graph Neural Networks</em>
+</h2>
+
+<hr>
+
+<p>Graph에는 2가지 종류의 Task가 있다. 첫째는 Structural한 역할에 따라 Node의 Label이 정해지는 <strong>Structure-Aware Task</strong>이고, 둘째는 Graph의 Position에 따라 Label이 정해지는 <strong>Postion-Aware Task</strong>이다. GNN은 대부분의 <strong>Structure-Aware Task를 잘 수행하지만,</strong> 아쉽게도 <strong>Position 정보는 이용하지 않기 때문에 Position-Aware Task에선 실패한다.</strong> 그렇다면 <em>**</em>어떻게 해야 GNN이 Position-Aware Task를 수행하게 만들 수 있을까? Anchor 개념이 그 해답이 될 수 있다.</p>
+
+<p><img src="https://i.imgur.com/5byRtar.png" alt="Imgur"></p>
+
+<p>무작위로 Graph의 한 Node를 Anchor로 정했다고 가정해보자($s_1$) Anchor(Reference Point)가 정해지면 거리를 잴 수 있고, 거리를 잴 수 있다면 위치 정보를 표현할 수 있다. 이때 Anchor Node 하나 당 Coordinate Axis 하나의 역할을 하므로 Anchor Node를 여러 개 사용할 수록 고차원적인 거리 정보를 표현할 수 있다.</p>
+
+<p><img src="https://i.imgur.com/JCb4j1r.png" alt="Imgur"></p>
+
+<p>단순히 Anchor Node를 여러개 쓰는것 뿐만 아니라, Set 개념으로 접근하여, Anchor Set에 도달할 수 있는 최소거리 등의 정보를 이용할 수 도 있다. 아래는 $v_3$, $s_1$을 하나의 Anchor Set으로 표현한 예시이다. 여러 사이즈의 Anchor Set을 사용하면 기존보다 효율적으로 Position정보를 인코딩 할 수 있다.</p>
+
+<p><img src="https://i.imgur.com/2HYZqJX.png" alt="Imgur"></p>
+
+<p>이런 Positional 정보를 어떻게 사용할 수 있을까? 간단하게 생각해 볼 수 있는 방법은 Node의 Feature로 사용하는 것이다.실제로 더욱 풍부한 정보를 주는 것이므로 도움이 많이된다. 주의해야 할 점은 각 인코딩이 무작위 Anchor를 기준으로 정해지므로, 그래프는 그대로인데 정보가 여러 방식으로 인코딩 될 수 있다. 이는 NeuralNet에서 차원 순서가 바뀌는것과 동일한데, 당연히 결과가 크게 바뀔것이다.</p>
+
+<p>이를 해결하기 위한 엄밀한 방식으로는 Permutation-Invariant한 Position Encoding을 만드는 방법이 있다. 다양한 Position-Aware GNN Paper가 이런 방식을 제시하고 있는데 강의에선 다루지 않는다.</p>
+
+<hr>
+
+<h2 id="163-identity-aware-graph-neural-networks">
+<a class="anchor" href="#163-identity-aware-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**16.3 <em>Identity-Aware Graph Neural Networks</em></strong>
+</h2>
+
+<hr>
+
+<p>전 단원에서 GNN은 <strong>대부분의</strong> Structure-Aware Task를 잘 수행한다고 했다. 즉 Structure-Aware Task를 <strong>전부 완벽하게</strong> 수행하지는 못한다는 뜻이다. Node, Edge, Graph 의 3가지 Level에서 GNN이 풀지못하는 특정Structure-Aware Task를 찾아보자.</p>
+
+<hr>
+
+<blockquote>
+  <p><strong>실패 사례</strong></p>
+
+</blockquote>
+
+<hr>
+
+<ol>
+  <li>
+    <p>Node Level에서는 다른 입력인데, Compuational Graph가 같은 경우를 예시로 들 수 있다.</p>
+
+    <p><img src="https://i.imgur.com/0WE2MVR.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>위의 문제는 Edge Level 에서도 동일하게 발생한다. $v_1$, $v_2$의 Embedding이 같으므로, $v_0$이 어디에 연결되어야 할 지 알 수 없다.</p>
+
+    <p><img src="https://i.imgur.com/YaK8EYs.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>다른 입력을 가지고 있는데, Computational Graph를 그리면 똑같아지는 경우도 있다. 이런 경우 두 Graph는 엄연히 다르지만, 같은 Graph Embedding을 갖게된다.</p>
+
+    <p><img src="https://i.imgur.com/fzXUWur.png" alt="Imgur"></p>
+  </li>
+</ol>
+
+<p>이 사례들은 자주 발생하지는 않으나, WL-Kernel이나 GNN의 Corner Case로 종종 언급되는 문제이다. 이런 문제는 어떻게 해결해 볼 수 있을까? 이 강의에선 <strong><em>Coloring</em></strong>이라는 방법을 통해 임베딩 하려는 Node에 색상을 할당하는 방식으로 해결한다.</p>
+
+<hr>
+
+<blockquote>
+  <p><strong>Coloring</strong></p>
+
+</blockquote>
+
+<p><img src="https://i.imgur.com/oVdVdq2.png" alt="Imgur"></p>
+
+<p>여러 Hop에 거친 Computational Graph라면 일반적으로 자기 자신이 포함되는 경우가 잦은데, 이를 이용한 방식이다. Node의 순서와 ID에 Invariant한 특징을 가지고 있으므로, GNN의 특성에도 잘 들어 맞는다. 그럼 <strong><em>Coloring</em></strong>을 이용해 위의 문제를 해결하는 예시를 확인해보자.</p>
+
+<ol>
+  <li>
+    <p><strong>Node Level에서는 다른 입력인데 Compuational Graph가 같은 경우,</strong> Coloring을 이용하면 다른 Computational Graph를 갖게되어 Node Classification 문제를 쉽게 해결할 수 있다 !</p>
+
+    <p><img src="https://i.imgur.com/oVdVdq2.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p><strong>Node Level에서는 다른 입력인데 Compuational Graph가 같은 경우의 Edge Level Task도</strong> 관심있는 Node 쌍 중 하나에 대해 Coloring하면, 이 역시 다른 Computaitonal Graph를 갖게되어 문제를 해결할 수 있다.</p>
+
+    <p><img src="https://i.imgur.com/4CHAUVI.png" alt="Imgur"></p>
+  </li>
+  <li>
+    <p>Graph Level도 위에서 말한 사례들과 같은 원리로 풀린다.</p>
+
+    <p><img src="https://i.imgur.com/Uglhjpt.png" alt="Imgur"></p>
+  </li>
+</ol>
+
+<blockquote>
+  <p><strong>ID GNN</strong></p>
+
+</blockquote>
+
+<p>시작 Node에 구분할 수 있는 정보를 준다는, 너무나도 직관적인 방식으로 문제를 해결할 수 있음을 확인했다. 그러면 Coloring을 이용하는 GNN은 어떻게 만들 수 있을까? <code class="language-plaintext highlighter-rouge">Heterogenous message passing</code>을 이용해 Coloring 개념을 적용할 수 있는데, 이런식으로 Node를 구분하는 GNN을 <strong>ID(entity- Aware) GNN (이하 ID-GNN)이라고 부른다.</strong></p>
+
+<p>일반적으로 GNN은 모든 Node가 동일한 Message Passing연산을 지닌다. 이와 다르게 <strong>ID-GNN은 Heterogenous하게 Message Passing을 수행하는데</strong> 문맥에서도 알 수 있듯이, Heterogenous 하다는 뜻은 다른 Node에 다른 Message Passing 연산을 적용한다는 뜻이다.</p>
+
+<p><img src="https://i.imgur.com/CsYoBe7.png" alt="Imgur"></p>
+
+<p>다시 풀어서 설명하면 <strong>Coloring</strong>된 Node는 다른 NeuralNet을 통해 Message Passing을 수행한다는 의미인데, 이렇게 다른 Computational Graph를 삽입하면 Coloring을 연산에 녹여낸 것과 같은 개념이므로. 기존에 GNN이 풀 수  없었던 Structure-Aware Task를 풀 수 있게 되는 것이다. 아래는 9강에서 부터 꾸준히 언급해왔던 문제인데, <strong>ID-GNN을 이용하면 쉽게 해결할 수 있는 것을 볼 수 있다.</strong></p>
+
+<p><img src="https://i.imgur.com/9CaWUjR.png" alt="Imgur"></p>
+
+<p><strong>Heterogenous하게 연산을 구성하지 않고, Identity Infomation을 Feature로 추가해주는 방식</strong>으로도 어느정도 문제를 해결할 수 있는데 이를 <strong>ID-GNN-Fast</strong> 라고 부른다. 연산을 여러 종류로 구성하지 않아도 되므로, 비교적 간단하다. Identity Infomation을 인코딩 하기 위해 각 Layer(Hop)의 Cycle Count를 사용하는데, 이 방식은 훨씬 가볍고 어느 GNN과도 함께 쓰일 수 있다.</p>
+
+<p><img src="https://i.imgur.com/9CaWUjR.png" alt="Imgur"></p>
+
+<hr>
+
+<h2 id="164-robustness-of-graph-neural-networks">
+<a class="anchor" href="#164-robustness-of-graph-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>**16.4 <em>Robustness of Graph Neural Networks</em></strong>
+</h2>
+
+<hr>
+
+<p>(조금 다른 주제)</p>
+
+<p>딥러닝 모델들의 성능이 향상되면서, 다양한 종류의 어플리케이션이 세상에 나오고있다. 이러한 모델들이 세상에 나올 준비가 되어있을까? <strong>Adversarial Example</strong>을 살펴보면서 딥러닝 모델의 취약점에 대해 이야기해본다.</p>
+
+<p>Adversarial Attack의 가장 대표적인 예시는 CNN와 Noise이다. NeuralNet을 교란시키기 위해 계산된 Noise를 원본 이미지에 더해주면, 육안으로 같은 이미지임에도 불구하고 전혀 다른 결과를 내뱉게 된다. CV Task 뿐만아니라 NLP와 Audio Domain에서도 Adversarial Attack이 가능하다.</p>
+
+<p><strong>Adversarial Attack은</strong> 딥러닝 모델이 대개 Robust하지 않다는 점을 보여주는 좋은 예시이다. 이런 취약점은현실세계에서 모델 성능이 예상했던 것 보다 낮게 나올 수도 있으며, 악의적으로 모델을 해킹할 수도 있다는 것을 보여준다.</p>
+
+<p><strong>GNN</strong>은 어떨까? 현실세계에서 <strong>GNN</strong>의 Application은 일반적으로 Public Platform이나, 금전적인 이익을 위해 사용된다.(Ex :RecSys, SNS, Search Engine)즉 현실적으로 <strong>GNN</strong>의 입력값을 조작하거나, 예측값을 해킹할 충분한 유인이 있다는 뜻이다. <strong>GNN</strong>은 <strong>Adversarial Examples</strong>에 대해 Robust할까?</p>
+
+<p>이를 알아보기 위해 현실 세계에서 발생할만한 <strong>Adversarial attack의 가능성에 대해 알아보고, (2)</strong> 공격하는 입장이 되어 <strong>모델을 분석해 본다. (3) Optimization</strong> 문제로 수식화 한 뒤, (4) 모델이 얼마나 취약한지를 Empirically 확인한다. <strong>**쉬운 **</strong>설명을 위해 <strong>GCN</strong>을 이용해 <strong>Semi-Supervised Node Classification</strong>을 수행한다고 가정하고 얘기한다.</p>
+
+<hr>
+
+<p><img src="https://i.imgur.com/gm4xpdb.png" alt="Imgur"></p>
+
+<hr>
+
+<blockquote>
+  <p><strong>Attack possibilities</strong></p>
+
+</blockquote>
+
+<hr>
+
+<p><img src="https://i.imgur.com/snrDncW.png" alt="Imgur"></p>
+
+<hr>
+
+<p>Node의 집합 $V$가 있을 때 공격하고자 하는 Node를 $t$ , Attacker 가 수정할수 있는 Node 집합을 $S$라고 해보자. $t$가 $S$에 포함된다면 Direct Attack, 포함되지 않는다면 Indirect Attack이라고 부른다. 즉 $S = {t}$인 경우 Direct Attack이고, $t \notin S$ 일 경우 Indirect Attack이다.</p>
+
+<p>Attack은 일반적으로 (1) Node의 Feature를 수정하거나, (2) Link를 추가하거나 제거하는 식으로 이루어진다. 예를 들어 (1) 검색 엔진을 공격하기 위해 글 내용 자체, 혹은 연결된 글을 수정하거나 (2) SNS에서 Follower나 Like를 어뷰징하는 사례를 들을 수 있다.</p>
+
+<hr>
+
+<blockquote>
+  <p><strong>Mathematical Formulation</strong></p>
+
+</blockquote>
+
+<hr>
+
+<p>Attack의 Objective는 Graph의 조작은 최소한으로 하고, Node Label Classification의 변동을 최대한으로 하는것이다. Notation을 이용해 표현하면 다음과 같다.</p>
+
+<p>$A:$ adjacency matrix, $X :$ Feature Matrix 일 때 원본 Graph $(A,X)$와 조작한 Graph $(A’, X’)$는 $(A,X)$ ≈ $(A’, X’)$ 관계에 놓여야 한다. 즉 조작이 알아칠수 없을만큼 작아야 하며,Feature의 분포 등의 변화가 없어야 한다.</p>
+
+<p>이제 $A,X$를 이용해 <strong>GCN</strong>으로 Node Label $Y$를 예측한다고 해보자. 이때 $A,X,Y$로 학습된 Parameter를 $\theta^<em>$, 예측된 Label을 $c^</em>_v$라고 하고, Attacker는 $A,X,Y$와 배포된 모델을 얻을 수 있으며, $A’,X’,Y$를 이용해 $c^<em>_v$와 $c^{</em>‘}_v$ 를 다르게 만드는것이 목적이다.</p>
+
+<p>기존에 학습된 <strong>GCN</strong>이 있다면 $A’,X’$를 입력해서 학습 시켰을때, 나오는 Label이 있을텐데, $(A,X)$ ≈ $(A’, X’)$ 관계면서 그 Label이 기존 예측 Class로 할당될 확률을 낮추고, 다른 Class로 할당될 확률을 높여야 한다.</p>
+
+<p>이 최적화 문제는 여러 어려운 점들이 있는데 우선 $A’$가 Discrete하기 때문에 Gradient 기반 방법론을 적용하기 어렵고, $A’, X’$가 변경될 때 마다 새롭게 학습을 해야한다는 점이다. 최근엔 이 최적화 문제를 조금 쉬운 방법으로 풀 수 있는 많은 근사방법론들이 제안되고 있다.</p>
+
+<blockquote>
+  <p><strong>Experiment</strong></p>
+
+</blockquote>
+
+<hr>
+
+<ul>
+  <li>Setting  :
+    <ul>
+      <li>Semi-supervised node classification with GCN</li>
+      <li>Graph :  Paper citation network (2,800 nodes, 8,000 edges).</li>
+      <li>Attack type: Edge modification (addition or deletion of edges)</li>
+      <li>Attack budget on node v: $d_v +2$ modifications</li>
+      <li>Random Seed를 5번 바꿔가며 훈련한 결과(5 Times)를 사용</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<p>위의 세팅을 기반으로 7-class 분류를 GCN을 통해 5번 진행한 결과가 아래와 같다. 왼쪽 그림은 조작하지 않은 Graph의 결과인데, 5번 모두 Class 6으로 할당된 것을 볼 수 있으며, 다른 Class와의 Margin이 매우 큰 걸 볼 수 있다. 두번째 그림은 5개의 Edge를 Target Node에 붙인 결과인데 예측 양상이 크게 달라진걸 볼 수 있다.</p>
+
+<p><img src="https://i.imgur.com/SBC7wFD.png" alt="Imgur"></p>
+
+<p><img src="https://i.imgur.com/0OMGEcj.png" alt="Imgur"></p>
+
+<p>아래는 Attack 방법에 따른 오분류율 시각화인데, Direct Attack은 심각한 영향을 끼치고, Random이나 Indirect는 Attack이라고 하기엔 부족한 모습을 보여주는걸 볼 수 있다.</p>
+
+<h2>
+<a class="anchor" href="#" aria-hidden="true"><span class="octicon octicon-link"></span></a><img src="https://i.imgur.com/clsCYZu.png" alt="Imgur">
+</h2>
+
+  </div><!-- from https://github.com/utterance/utterances
+<script src="https://utteranc.es/client.js"
+        repo="CS224W-KOR/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>-->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://cs224w-kor.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/blog/node/link/graph/ml/%20gnn/theory/2022/08/31/lecture-1601.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>CS224W 강의를 공부하는 글또 그래프 스터디 블로그</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/cs224w-kor" target="_blank" title="cs224w-kor"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
